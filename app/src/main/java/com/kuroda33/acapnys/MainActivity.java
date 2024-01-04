@@ -1,6 +1,11 @@
 package com.kuroda33.acapnys;
 //import static androidx.transition.GhostViewHolder.getHolder;
 
+import static java.lang.Math.PI;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import static java.lang.Math.sqrt;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -34,6 +39,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -45,6 +51,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener,SurfaceHolder.Callback{
     private SensorManager sma;
     private final String TAG = "MainActivity";
@@ -67,31 +74,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
   //  @RequiresApi(api = Build.VERSION_CODES.M)
   // SurfaceHolderクラスのmHolderというメンバ変数の宣言
   // 一時的に画面を格納するためのホルダーだと思っておけば良い
-  SurfaceHolder mHolder;
+    private SurfaceView mSurfaceView;
+    //SurfaceHolder
+    private SurfaceHolder mHolder;
     int mSurfaceWidth;      // surfaceViewの幅
     int mSurfaceHeight;     // surfaceViewの高さ
-
+    private boolean mIsDrawing;
+    //画?
+    private Paint mPaint;
+    //路径
+    private Path mPath;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // 画面レイアウトで配置したsurfaceViewを取得し、メンバ変数mHolderへ格納
-        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
-        mHolder = surfaceView.getHolder();
-        // surfaceHolderが変更・破棄された時のイベントリスナー
+
+        mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
+        mHolder = mSurfaceView.getHolder();
         mHolder.addCallback(this);
 
-        // 背景画像を用意しているため、canvas自体は透明にする
-        mHolder.setFormat(PixelFormat.TRANSLUCENT);
-        surfaceView.setZOrderOnTop(true);
-
-        //   getHolder().addCallback(this);
-      //  val myView = DrawTest(this);
-       // setContentView(myView);
-     //   setContentView(new DrawTest(this));
-        //   CountN = 0;
         Log.i(TAG, "onCreate 0");
-         quaterView = (TextView) findViewById(R.id.quaternionData);
+        quaterView = (TextView) findViewById(R.id.quaternionData);
         quaterView.setMovementMethod(new ScrollingMovementMethod());
         Selbtn = (Button) findViewById(R.id.buttonSelect);
 
@@ -135,25 +138,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sma = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         sma.registerListener(this, sma.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
                 SensorManager.SENSOR_DELAY_FASTEST);
-
-
-        Paint paint = new Paint();
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        ///輪郭と中身の両方を塗りつぶし
-
-        Path path = new Path();
-        path.moveTo(10.0f, 10.0f);
-        ///始点を決める。
-        path.lineTo(200.0f, 150.0f);
-        path.lineTo(150.0f, 200.0f);
-        path.close();
-        ///パスを閉じる
-
-      //  Canvas.drawPath(path, paint);
-
-
+        set_rpk_ppk();
+  //      Log.d("k*************",String.valueOf(ppk1.length));
+        Log.i("k+++++++++++++",String.valueOf(facePoints2.length));
+    //    cq0 = nq0; cq3 = -nq3;
     }
     private void prepareSerialCommunication() {
+        cq0 = nq0; cq3 = -nq3;
         //交信先が指定されたBTデバイスのインスタンスを取得
         CapNYS=true;
         try {
@@ -222,6 +213,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private String selectedDevice = "";
     private void getTargetAddress() {
+        cq0 = nq0; cq3 = -nq3;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 return;
@@ -271,30 +263,68 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 })
                 .show();
     }
+
+    float mnq0,mnq1,mnq2,mnq3,a0,a1,a2,a3;
+    float cq0 = 0.99F, cq1 = 0.0F, cq2 = 0.0F, cq3 = 0.0F;//spaceを押した時のcenter quatrnion
+    float nq0 = 0.01F, nq1 = 0.0F, nq2 = 0.0F, nq3 = 0.0F;//現在のquaternion
+
+    private void MultQuat(float q0, float q1, float q2, float q3, float p0, float p1, float p2, float p3) {
+        a0 = q0 * p0 - q1 * p1 - q2 * p2 - q3 * p3;
+        a1 = q1 * p0 + q0 * p1 - q3 * p2 + q2 * p3;
+        a2 = q2 * p0 + q3 * p1 + q0 * p2 - q1 * p3;
+        a3 = q3 * p0 - q2 * p1 + q1 * p2 + q0 * p3;
+    }
+    String[] sxyz = { "1+,3-,2+","2+,3-,1-","2-,3-,1+", "1-,3-,2-", "1-,3+,2+","2-,3+,1-","2+,3+,1+","1+,3+,2-"};
+    private void QuatXchan(float q0,float q1, float q2, float q3)
+    {
+        String Sxyz;
+        Sxyz = sxyz[6];
+        float tx, ty, tz;
+        if (Sxyz.charAt(0) == '1')tx = q1;
+	    else if (Sxyz.charAt(0) == '2')tx = q2;
+	    else tx = q3;
+        if (Sxyz.charAt(1) == '-')tx = -tx;
+
+        if (Sxyz.charAt(3) == '1')ty = q1;
+	    else if (Sxyz.charAt(3) == '2')ty = q2;
+	    else ty = q3;
+        if (Sxyz.charAt(4) == '-')ty = -ty;
+
+        if (Sxyz.charAt(6) == '1')tz = q1;
+	    else if (Sxyz.charAt(6) == '2')tz = q2;
+	    else tz = q3;
+        if (Sxyz.charAt(7) == '-')tz = -tz;
+        mnq0 = q0;
+	    mnq1 = tx;
+	    mnq2 = ty;
+	    mnq3 = tz;
+    }
     public void onSensorChanged(SensorEvent event) {
-        byte[] bytes = new byte[6];
-        float[] floats = new float[11];
-        bytes[0] = 1;
-        bytes[1] = 2;
-        bytes[2] = (byte) (event.values[0] * 128);
-        bytes[3] = (byte) (event.values[1] * 128);
-        bytes[4] = (byte) (event.values[2] * 128);
-        bytes[5] = (byte) (event.values[3] * 128);
-        floats[0] = 1;
-        floats[7] = event.values[0];
-        floats[8] = event.values[1];
-        floats[9] = event.values[2];
-        floats[10] = event.values[3];
+        float[] floats = new float[12];
+        //floats[0]:header
+        //floats[1-7]:damy
+        nq0=floats[8] = event.values[3];
+        nq1=floats[9] = event.values[0];
+        nq2=floats[10] = event.values[1];
+        nq3=floats[11] = event.values[2];
+
+        MultQuat(cq0, cq1, cq2, cq3, nq0, nq1, nq2, nq3);//set a0~a3
+        QuatXchan(a0,a1, a2, a3);//set mnq0~mnq3
+      //  mnq0 = a0;
+      //  mnq1 = a1;
+      //  mnq2 = a2;
+      //  mnq3 = a3;
 
         String str = "x=" + event.values[0] + "\n" + "y=" + event.values[1] + "\n" + "z=" + event.values[2] + "\n" + "w=" + event.values[3];
         quaterView.setText(str);
-    //    let quaterImage = drawHead(width: realWinHeight/2.5, height: realWinHeight/2.5, radius: realWinHeight/5-1,qOld0:qCG0, qOld1: qCG1, qOld2:qCG2,qOld3:qCG3)
-     //   draw1();
         if (CapNYS == true) {
-
             try {
-                //mOutput.write(str.getBytes(StandardCharsets.UTF_8));
-                mOutput.write(bytes);
+                mOutput.write(new byte[] {(byte)1,(byte)0,(byte)0,(byte)0});
+                for (int i = 1; i < floats.length; i++) {
+                    int intBits = Float.floatToIntBits(floats[i]);
+                    byte[] outBytes = {(byte)(intBits), (byte)(intBits>>8), (byte)(intBits>>16), (byte)(intBits>>24)};
+                    mOutput.write(outBytes);
+                }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 mAlertDialog.setMessage("メッセージHelloを送信することが出来ませんでした。");
@@ -303,7 +333,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 CapNYS = false;
                 Selbtn.setEnabled(true);
                 Selbtn.setText("Select CapNYS-PC");
-
             }
         }
     }
@@ -312,203 +341,241 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+
+    @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.BLUE);
-        paint.setStyle(Paint.Style.FILL);
+        Log.d(TAG, "surfaceCreated...");
+        if (mHolder == null) {
+            mHolder = mSurfaceView.getHolder();
+            mHolder.addCallback(this);
+        }
 
-        Canvas canvas = holder.lockCanvas();
-        canvas.drawColor(Color.BLACK);
-        canvas.drawCircle(100, 100, 50, paint);
-        holder.unlockCanvasAndPost(canvas);
-        onDraw(canvas);
+        mPath = new Path();
+        //初始化画?
+        mPaint = new Paint();
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(6);
+        mPaint.setAntiAlias(true);
+        mPaint.setColor(Color.RED);
+        mSurfaceView.setFocusable(true);
+        mSurfaceView.setFocusableInTouchMode(true);
+        mSurfaceView.setKeepScreenOn(true);
+
+        mIsDrawing = true;
+        new Thread(runnable).start();
     }
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
-    public void surfaceDestroyed(SurfaceHolder holder) {}
-    // Viewをextendsしたクラスを作成し描画処理をする
-    //static public class DrawTest extends View {
 
-      //  public DrawTest(Context context) {
-        //    super(context);
-        //}
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        Log.d(TAG, "surfaceChanged...");
+    }
 
-        // 描画処理を記述
-      //  @Override
-        public void onDraw(Canvas canvas) {
-            Paint paint = new Paint();
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        Log.d(TAG, "surfaceDestroyed...");
+        mIsDrawing = false;
+        mHolder = null;
+    }
 
-            // 黒の細い線
-            paint.setColor(Color.argb(255, 0, 0, 0));
-            canvas.drawLine(0, 0, 50, 50, paint);
+    private void draw() {
+        if (mHolder != null) {
+            Canvas canvas = null;
+            try{
+                //用于??的Canvas, ?定画布并返回画布?象
+                canvas = mHolder.lockCanvas();
+                //接下去就是在画布上?行一下draw
+                canvas.drawColor(Color.WHITE);
+                canvas.drawPath(mPath,mPaint);
+            } catch (Exception e){
 
-            // 黒の中太の線
-            paint.setStrokeWidth(5);
-            float[] pts = {50, 50, 100, 100};
-            canvas.drawLines(pts, paint);
-
-            // 青の太い線
-            paint.setColor(Color.BLUE);
-            paint.setStrokeWidth(10);
-            float[] pts2 = {100, 100, 150, 150};
-            canvas.drawLines(pts2, paint);
+            } finally {
+                //当画布内容不?空?，才post，避免出?黑屏的情况。
+                if(canvas !=null && mHolder != null)
+                    mHolder.unlockCanvasAndPost(canvas);
+            }
         }
-  //  }
-  //  var rpk1 = Array(repeating: CGFloat(0), count:500)
-    //var ppk1 = Array(repeating: CGFloat(0), count:500)//144*3
-    int[] facePoints = {//x1,y1,0, x2,y2,0, x3,y3,1, x4,y4,0  の並びは   MoveTo(x1,y1)  LineTo(x2,y2)  LineTo(x3,y3)  MoveTo(x4,y4) と描画される
-            0,0,0, 15,0,0, 30,0,0, 45,0,0, 60,0,0, 75,0,0, 90,0,0, 105,0,0, 120,0,0, 135,0,0, 150,0,0, 165,0,0,//horizon 12
-            180,0,0, 195,0,0, 210,0,0, 225,0,0, 240,0,0, 255,0,0, 270,0,0, 285,0,0, 300,0,0, 315,0,0, 330,0,0, 345,0,0, 360,0,1,//horizon 12+13=25
-            0,0,0, 0,15,0, 0,30,0, 0,45,0, 0,60,0, 0,75,0, 0,90,0, 0,105,0, 0,120,0, 0,135,0, 0,150,0, 0,165,0,//vertical 25+12
-            0,180,0, 0,195,0, 0,210,0, 0,225,0, 0,240,0, 0,255,0, 0,270,0, 0,285,0, 0,300,0, 0,315,0, 0,330,0, 0,345,0, 0,360,1,//virtical 37+13=50
-            0,90,0, 15,90,0, 30,90,0, 45,90,0, 60,90,0, 75,90,0, 90,90,0, 105,90,0, 120,90,0, 135,90,0, 150,90,0, 165,90,0,//coronal 50+12=62
-            180,90,0, 195,90,0, 210,90,0, 225,90,0, 240,90,0, 255,90,0, 270,90,0, 285,90,0, 300,90,0, 315,90,0, 330,90,0, 345,90,90, 360,90,1,//coronal 62+13=75
-            20,-90,0, 20,-105,0, 20,-120,0, 20,-135,0, 20,-150,0, 20,-165,0, 20,-180,1,
+    }
+
+    private  Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            long start =System.currentTimeMillis();
+            while(mIsDrawing){
+                mPath.reset();
+                draw();
+                drawHead(500,500,90,mnq0,mnq1,mnq2,mnq3);
+                draw();
+                Log.d(TAG,"drawing??????");
+                long end = System.currentTimeMillis();
+                if(end-start<100){
+                    try{
+                        Thread.sleep(100-end+start);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    };
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int x=(int) event.getX();
+        int y= (int) event.getY();
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                cq0 = nq0; cq3 = -nq3;
+                Log.d(TAG, "onTouchEvent: down11");
+                mPath.moveTo(x,y);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                Log.d(TAG, "onTouchEvent: move22");
+                mPath.lineTo(x,y);
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.d(TAG, "onTouchEvent: up33");
+                break;
+        }
+        return true;
+    }
+    int cameraType = 1;
+   // float[] rpk1 = new float[600];
+    float[][] rpk12 = new float[600][3];
+    //float[] ppk1 = new float[600];
+    float[][] ppk12 = new float[600][3];
+
+    int[][] facePoints2 = {//x1,y1,0, x2,y2,0, x3,y3,1, x4,y4,0  の並びは   MoveTo(x1,y1)  LineTo(x2,y2)  LineTo(x3,y3)  MoveTo(x4,y4) と描画される
+            {0,0,0}, {15,0,0}, {30,0,0}, {45,0,0}, {60,0,0}, {75,0,0}, {90,0,0}, {105,0,0}, {120,0,0}, {135,0,0}, {150,0,0}, {165,0,0},//horizon 12
+            {180,0,0}, {195,0,0}, {210,0,0}, {225,0,0}, {240,0,0}, {255,0,0}, {270,0,0}, {285,0,0}, {300,0,0}, {315,0,0}, {330,0,0}, {345,0,0}, {360,0,1},//horizon 12+13=25
+            {0,0,0}, {0,15,0}, {0,30,0}, {0,45,0}, {0,60,0}, {0,75,0}, {0,90,0}, {0,105,0}, {0,120,0}, {0,135,0}, {0,150,0}, {0,165,0},//vertical 25+12
+            {0,180,0}, {0,195,0}, {0,210,0}, {0,225,0}, {0,240,0}, {0,255,0}, {0,270,0}, {0,285,0}, {0,300,0}, {0,315,0}, {0,330,0}, {0,345,0}, {0,360,1},//virtical 37+13=50
+            {0,90,0}, {15,90,0}, {30,90,0}, {45,90,0}, {60,90,0}, {75,90,0}, {90,90,0}, {105,90,0}, {120,90,0}, {135,90,0}, {150,90,0}, {165,90,0},//coronal 50+12=62
+            {180,90,0}, {195,90,0}, {210,90,0}, {225,90,0}, {240,90,0}, {255,90,0}, {270,90,0}, {285,90,0}, {300,90,0}, {315,90,0}, {330,90,0}, {345,90,90}, {360,90,1},//coronal 62+13=75
+            {20,-90,0}, {20,-105,0}, {20,-120,0}, {20,-135,0}, {20,-150,0}, {20,-165,0}, {20,-180,1},
             //hair 75+7=82
-            -20,-90,0, -20,-105,0, -20,-120,0, -20,-135,0, -20,-150,0, -20,-165,0, -20,-180,1,//hair 82+7=89
-            40,-90,0, 40,-105,0, 40,-120,0, 40,-135,0, 40,-150,0, 40,-165,0, 40,-180,1,
+            {-20,-90,0}, {-20,-105,0}, {-20,-120,0}, {-20,-135,0}, {-20,-150,0}, {-20,-165,0}, {-20,-180,1},//hair 82+7=89
+            {40,-90,0}, {40,-105,0}, {40,-120,0}, {40,-135,0}, {40,-150,0}, {40,-165,0}, {40,-180,1},
             //hair 89+7=96
-            -40,-90,0, -40,-105,0, -40,-120,0, -40,-135,0, -40,-150,0, -40,-165,0, -40,-180,1,//hair 96+7=103
-            23,-9,0, 31,-12,0, 38,-20,0, 40,-31,0, 38,-41,0, 31,-46,0, 23,-45,0, 15,-39,0, 10,-32,0, 8,-23,0, 10,-16,0, 15,-10,0, 23,-9,1,//eye +13
-            -23,-9,0, -31,-12,0, -38,-20,0, -40,-31,0, -38,-41,0, -31,-46,0, -23,-45,0, -15,-39,0, -10,-32,0, -8,-23,0, -10,-16,0, -15,-10,0, -23,-9,1,//eye +13
-            22,-26,0, 23,-25,0, 24,-24,1,//eye dots 3
-            -22,-26,0, -23,-25,0, -24,-24,1,//eye dots 3
-            -19,32,0, -14,31,0, -9,31,0, -4,31,0, 0,30,0, 4,31,0, 9,31,0, 14,31,0, 19,32,1};//mouse 9
-  /*  func set_rpk_ppk() {
-        let faceR:CGFloat = 40//hankei
-        var frontBack:Int = 0
-        let camera = 0//Int(camera.getUserDefaultInt(str: "cameraType", ret: 0))
-        if camera == 0{//front camera
-            frontBack = 180
+            {-40,-90,0}, {-40,-105,0}, {-40,-120,0}, {-40,-135,0}, {-40,-150,0}, {-40,-165,0}, {-40,-180,1},//hair 96+7=103
+            {23,-9,0}, {31,-12,0}, {38,-20,0}, {40,-31,0}, {38,-41,0}, {31,-46,0}, {23,-45,0}, {15,-39,0}, {10,-32,0}, {8,-23,0}, {10,-16,0}, {15,-10,0}, {23,-9,1},//eye +13
+            {-23,-9,0}, {-31,-12,0}, {-38,-20,0}, {-40,-31,0}, {-38,-41,0}, {-31,-46,0}, {-23,-45,0}, {-15,-39,0}, {-10,-32,0}, {-8,-23,0}, {-10,-16,0}, {-15,-10,0}, {-23,-9,1},//eye +13
+            {22,-26,0}, {23,-25,0}, {24,-24,1},//eye dots 3
+            {-22,-26,0}, {-23,-25,0}, {-24,-24,1},//eye dots 3
+            {-19,32,0}, {-14,31,0}, {-9,31,0}, {-4,31,0}, {0,30,0}, {4,31,0}, {9,31,0}, {14,31,0}, {19,32,1}, {1000,1000,1000}};//mouse 9
+    float pi180 = (float) PI/180.0F;
+
+    private void set_rpk_ppk() {
+        int r = 40;//hankei
+        float dx,dy,dz;
+           // convert draw data to radian
+        for (int i = 0; facePoints2[i][0] != 1000; i++) {
+            rpk12[i][0] = facePoints2[i][0] * pi180;
+            rpk12[i][1] = facePoints2[i][1] * pi180;
         }
-        // convert draw data to radian
-        print("frontBack",frontBack)
-        for i in 0..<facePoints.count/3 {
-            rpk1[i*2] = CGFloat(facePoints[3 * i + 0]) * 0.01745329//pi/180
-            rpk1[i*2+1] = CGFloat(facePoints[3 * i + 1]+frontBack) * 0.01745329//pi/180
-        }
+
         // move (1,0,0) to each draw point
-        for i in 0..<facePoints.count/3{
-            ppk1[i*3] = 0
-            ppk1[i*3+1] = faceR
-            ppk1[i*3+2] = 0
+        for (int i = 0; facePoints2[i][0] != 1000; i++) {
+            ppk12[i][0] = 0;
+            ppk12[i][1] = 1.0F * r;
+            ppk12[i][2] = 0;
         }
+
         // rotate all draw point based on draw data
-        var dx,dy,dz:CGFloat
-        for i in  0..<facePoints.count/3 {
+        for (int i = 0; facePoints2[i][0] != 1000; i++) {
             //rotateX
-            dy = ppk1[i*3+1]*cos(rpk1[i*2]) - ppk1[i*3+2]*sin(rpk1[i*2])
-            dz = ppk1[i*3+1]*sin(rpk1[i*2]) + ppk1[i*3+2]*cos(rpk1[i*2])
-            ppk1[i*3+1] = dy;
-            ppk1[i*3+2] = dz;
+            dy = ppk12[i][1]*(float)cos(rpk12[i][0]) - ppk12[i][2]*(float)sin(rpk12[i][0]);
+            dz = ppk12[i][1]*(float)sin(rpk12[i][0]) + ppk12[i][2]*(float)cos(rpk12[i][0]);
+            ppk12[i][1] = dy;
+            ppk12[i][2] = dz;
             //rotateZ
-            dx = ppk1[i*3]*cos(rpk1[i*2+1])-ppk1[i*3+1]*sin(rpk1[i*2+1])
-            dy = ppk1[i*3]*sin(rpk1[i*2+1]) + ppk1[i*3+1]*cos(rpk1[i*2+1])
-            ppk1[i*3] = dx
-            ppk1[i*3+1] = dy
+            dx = ppk12[i][0]*(float)cos(rpk12[i][1]) - ppk12[i][1]*(float)sin(rpk12[i][1]);
+            dy = ppk12[i][0]*(float)sin(rpk12[i][1]) + ppk12[i][1]*(float)cos(rpk12[i][1]);
+            ppk12[i][0] = dx;
+            ppk12[i][1] = dy;
             //rotateY
-            dx =  ppk1[i*3] * cos(1.5707963) + ppk1[i*3+2] * sin(1.5707963)
-            dz = -ppk1[i*3] * sin(1.5707963) + ppk1[i*3+2] * cos(1.5707963)
-            ppk1[i*3]=dx
-            ppk1[i*3+2]=dz
+            dx = ppk12[i][0]*(float)cos(1.5707963) - ppk12[i][2]*(float)sin(1.5707963);
+            dz = ppk12[i][0]*(float)sin(1.5707963) + ppk12[i][2]*(float)cos(1.5707963);
+            ppk12[i][0] = dx;
+            ppk12[i][2] = dz;
         }
     }
     //モーションセンサーをリセットするときに-1とする。リセット時に-1なら,角度から０か１をセット
-    var degreeAtResetHead:Int=0//0:-90<&&<90 1:<-90||>90 -1:flag for get degree
-    func drawHead(width w:CGFloat, height h:CGFloat, radius r:CGFloat, qOld0:CGFloat, qOld1:CGFloat, qOld2:CGFloat, qOld3:CGFloat)->UIImage{
-//        print(String(format:"%.3f,%.3f,%.3f,%.3f",qOld0,qOld1,qOld2,qOld3))
-        var ppk = Array(repeating: CGFloat(0), count:500)
-        let faceX0:CGFloat = w/2;
-        let faceY0:CGFloat = h/2;//center
-        let faceR:CGFloat = r;//hankei
-        let defaultRadius:CGFloat = 40.0
-        let size = CGSize(width:w, height:h)
+    int degreeAtResetHead=0;//0:-90<&&<90 1:<-90||>90 -1:flag for get degree
+    private void RotateQuat(int i,float x0,float y0,float z0, float q0, float q1, float q2, float q3)
+    {
+        float ax, ay, az, norm, mag;
 
-        // イメージ処理の開始
-        for i in 0..<facePoints.count/3 {
-            let x0:CGFloat = ppk1[i*3]
-            let y0:CGFloat = ppk1[i*3+1]
-            let z0:CGFloat = cameraType==0 ? -ppk1[i*3+2]:ppk1[i*3+2]
-            var q0=qOld0
-            var q1=qOld1
-            var q2=qOld2
-            var q3=qOld3
-            var norm,mag:CGFloat!
-                    mag = CGFloat(sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3))
-            if mag>CGFloat(Float.ulpOfOne){
-                norm = 1 / mag
-                q0 *= norm
-                q1 *= norm
-                q2 *= norm
-                q3 *= norm
-            }
-            ppk[i*3] = x0 * (q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) + y0 * (2 * (q1 * q2 - q0 * q3)) + z0 * (2 * (q1 * q3 + q0 * q2))
-            ppk[i*3+1] = x0 * (2 * (q1 * q2 + q0 * q3)) + y0 * (q0 * q0 - q1 * q1 + q2 * q2 - q3 * q3) + z0 * (2 * (q2 * q3 - q0 * q1))
-            ppk[i*3+2] = x0 * (2 * (q1 * q3 - q0 * q2)) + y0 * (2 * (q2 * q3 + q0 * q1)) + z0 * (q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3)
-        }
-        // イメージ処理の開始
-        UIGraphicsBeginImageContextWithOptions(size, false, 1.0)
+  /*      mag = (float)sqrt((q0 * q0) + (q1 * q1) + (q2 * q2) + (q3 * q3));
+        if (mag>1.192092896e-07F){
+            norm = 1 / mag;
+            q0 *= norm;
+            q1 *= norm;
+            q2 *= norm;
+            q3 *= norm;
+        }*/
 
-        let drawPath = UIBezierPath(arcCenter: CGPoint(x: faceX0, y:faceY0), radius: faceR, startAngle: 0, endAngle: CGFloat(Double.pi)*2, clockwise: true)
-        // 内側の色
-        UIColor.white.setFill()
-//        // 内側を塗りつぶす
-        drawPath.fill()
+        ppk[i][0] = x0 * (q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) + y0 * (2 * (q1 * q2 - q0 * q3)) + z0 * (2 * (q1 * q3 + q0 * q2));
+        ppk[i][1] = x0 * (2 * (q1 * q2 + q0 * q3)) + y0 * (q0 * q0 - q1 * q1 + q2 * q2 - q3 * q3) + z0 * (2 * (q2 * q3 - q0 * q1));
+        ppk[i][2] = x0 * (2 * (q1 * q3 - q0 * q2)) + y0 * (2 * (q2 * q3 + q0 * q1)) + z0 * (q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3);
+    }
+    float[][] ppk = new float[600][3];
+  public void drawHead(float w, float h, float r, float qOld0, float qOld1, float qOld2, float qOld3){
 
-        let uraPoint=faceR/40.0//この値の意味がよくわからなかった
+      float faceX0 = w/2F;
+      float faceY0 = h/2F;//center
+      float faceR = r;//hankei
+      float defaultRadius = 40.0F;
+      //     let size = CGSize(width:w, height:h)
+      for (int i = 0; facePoints2[i][0] != 1000; i++) {
+          RotateQuat(i,ppk12[i][0],ppk12[i][1],ppk12[i][2], qOld0, qOld1, qOld2, qOld3);
+      }
 
-        var endpointF=true//終点でtrueとする
-        if degreeAtResetHead == 1{//iPhoneが >90||<-90 垂直以上に傾いた時
-            for i in 0..<facePoints.count/3-1{
-                if endpointF==true{//始点に移動する
+      float uraPoint=faceR/40.0F;//この値の意味がよくわからなかった
 
-                    if ppk[i*3+1] < uraPoint{
-                        endpointF=true
-                    }else{
-                        endpointF=false
-                    }
-                    drawPath.move(to: CGPoint(x:faceX0+ppk[i*3]*faceR/defaultRadius,y:faceY0-ppk[i*3+2]*faceR/defaultRadius))
-                }else{
-                    if ppk[i*3+1] > uraPoint{
-                        drawPath.addLine(to: CGPoint(x:faceX0+ppk[i*3]*faceR/defaultRadius,y:faceY0-ppk[i*3+2]*faceR/defaultRadius))
-                    }else{
-                        drawPath.move(to: CGPoint(x:faceX0+ppk[i*3]*faceR/defaultRadius,y:faceY0-ppk[i*3+2]*faceR/defaultRadius))
-                    }
-                    if facePoints[3*i+2] == 1{
-                        endpointF=true
-                    }
-                }
-            }
-        }else{//iPhoneが-90~+90の時
-            for i in 0..<facePoints.count/3-1{
-                if endpointF==true{//始点に移動する
+      boolean endpointF=true;//終点でtrueとする
+      if (degreeAtResetHead == 1){//iPhoneが >90||<-90 垂直以上に傾いた時
+          for(int i=0;facePoints2[i][0]!=1000;i++){
+              if (endpointF==true){//始点に移動する
 
-                    if ppk[i*3+1] < uraPoint{
-                        endpointF=true
-                    }else{
-                        endpointF=false
-                    }
-                    drawPath.move(to: CGPoint(x:faceX0-ppk[i*3]*faceR/defaultRadius,y:faceY0+ppk[i*3+2]*faceR/defaultRadius))
-                }else{
-                    if ppk[i*3+1] > uraPoint{
-                        drawPath.addLine(to: CGPoint(x:faceX0-ppk[i*3]*faceR/defaultRadius,y:faceY0+ppk[i*3+2]*faceR/defaultRadius))
-                    }else{
-                        drawPath.move(to: CGPoint(x:faceX0-ppk[i*3]*faceR/defaultRadius,y:faceY0+ppk[i*3+2]*faceR/defaultRadius))
-                    }
-                    if facePoints[3*i+2] == 1{
-                        endpointF=true
-                    }
-                }
-            }
-        }
-        // 線の色
-        UIColor.black.setStroke()
-        drawPath.lineWidth = 2.0//1.0
-        // 線を描く
-        drawPath.stroke()
-        // イメージコンテキストからUIImageを作る
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        // イメージ処理の終了
-        UIGraphicsEndImageContext()
-        return image!
-    }*/
+                  if (ppk[i][1] < uraPoint){
+                      endpointF=true;
+                  }else{
+                      endpointF=false;
+                  }
+                  mPath.moveTo(faceX0+ppk[i][0]*faceR/defaultRadius,faceY0+ppk[i][2]*faceR/defaultRadius);
+              }else {
+                  if (ppk[i][1] > uraPoint) {
+                      if (ppk[i][1] > uraPoint){
+                          mPath.lineTo(faceX0+ppk[i][0]*faceR/defaultRadius,faceY0+ppk[i][2]*faceR/defaultRadius);
+                      }else{
+                          mPath.moveTo(faceX0+ppk[i][0]*faceR/defaultRadius,faceY0+ppk[i][2]*faceR/defaultRadius);
+                      }
+                      if (facePoints2[i][2] == 1) {
+                          endpointF = true;
+                      }
+                  }
+              }
+          }
+      }else{//iPhoneが-90~+90の時
+          for(int  i=0;facePoints2[i][0]!=1000;i++){
+              if (endpointF==true){//始点に移動する
+
+                  if (ppk[i][1] < uraPoint){
+                      endpointF=true;
+                  }else{
+                      endpointF=false;
+                  }
+                  mPath.moveTo(faceX0-ppk[i][0]*faceR/defaultRadius,faceY0-ppk[i][2]*faceR/defaultRadius);
+              }else{
+                  if (ppk[i][1] > uraPoint){
+                      mPath.lineTo(faceX0-ppk[i][0]*faceR/defaultRadius,faceY0-ppk[i][2]*faceR/defaultRadius);
+                  }else{
+                      mPath.moveTo(faceX0-ppk[i][0]*faceR/defaultRadius,faceY0-ppk[i][2]*faceR/defaultRadius);
+                  }
+                  if (facePoints2[i][2] == 1){
+                      endpointF=true;
+                  }
+              }
+          }
+      }
+  }
 }
