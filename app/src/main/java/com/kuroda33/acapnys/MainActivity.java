@@ -4,16 +4,16 @@ package com.kuroda33.acapnys;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
-import static java.lang.Math.sqrt;
+//import static java.lang.Math.sqrt;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
+//import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
+//import androidx.recyclerview.widget.DefaultItemAnimator;
 
 import android.Manifest;
 import android.app.Activity;
@@ -28,7 +28,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PixelFormat;
+//import android.graphics.PixelFormat;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -53,20 +53,20 @@ import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener,SurfaceHolder.Callback{
-    private SensorManager sma;
+    SensorManager sma;
     private final String TAG = "MainActivity";
     //SerialPort Service UUID (SPP)
     private static final UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
     private static final int CHECK_PERMISSION = 1001;
     private String TargetMACAddress = "No device is connected";
     private BluetoothAdapter mBtAdapter; //BTアダプタ
-    private BluetoothDevice mBtDevice;//BTデバイス
+    BluetoothDevice mBtDevice;//BTデバイス
     private BluetoothSocket mBtSocket;//BTソケット
     private OutputStream mOutput;//出力ストリーム
     private Intent enableBtIntent;
     private ActivityResultLauncher<Intent> launcher;
-    private Handler mHandler = new Handler(Looper.getMainLooper());
-    private Runnable mRunnable;
+    Handler mHandler = new Handler(Looper.getMainLooper());
+    Runnable mRunnable;
     boolean CapNYS=false ;
     private AlertDialog.Builder mAlertDialog;
     private TextView quaterView;
@@ -77,11 +77,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SurfaceView mSurfaceView;
     //SurfaceHolder
     private SurfaceHolder mHolder;
-    int mSurfaceWidth;      // surfaceViewの幅
-    int mSurfaceHeight;     // surfaceViewの高さ
+//    int mSurfaceWidth;      // surfaceViewの幅
+//    int mSurfaceHeight;     // surfaceViewの高さ
     private boolean mIsDrawing;
     //画?
-    private Paint mPaint;
+    private Paint mPaint,mPaint2;
     //路径
     private Path mPath;
     @Override
@@ -303,17 +303,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         float[] floats = new float[12];
         //floats[0]:header
         //floats[1-7]:damy
-        nq0=floats[8] = event.values[3];
-        nq1=floats[9] = event.values[0];
-        nq2=floats[10] = event.values[1];
-        nq3=floats[11] = event.values[2];
+        nq0=floats[8] = (float) event.values[3];
+        nq1=floats[9] = (float) event.values[0];
+        nq2=floats[10] = (float) event.values[1];
+        nq3=floats[11] = (float) event.values[2];
 
         MultQuat(cq0, cq1, cq2, cq3, nq0, nq1, nq2, nq3);//set a0~a3
         QuatXchan(a0,a1, a2, a3);//set mnq0~mnq3
-      //  mnq0 = a0;
-      //  mnq1 = a1;
-      //  mnq2 = a2;
-      //  mnq3 = a3;
 
         String str = "x=" + event.values[0] + "\n" + "y=" + event.values[1] + "\n" + "z=" + event.values[2] + "\n" + "w=" + event.values[3];
         quaterView.setText(str);
@@ -353,10 +349,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mPath = new Path();
         //初始化画?
         mPaint = new Paint();
+        mPaint2 = new Paint();
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(6);
-        mPaint.setAntiAlias(true);
-        mPaint.setColor(Color.RED);
+        mPaint.setAntiAlias(false);
+        mPaint.setColor(Color.BLACK);
+        //mPaint2.setStyle(Paint.Style.STROKE);
+        mPaint2.setStrokeWidth(6);
+        mPaint2.setAntiAlias(false);
+        mPaint2.setColor(Color.LTGRAY);
         mSurfaceView.setFocusable(true);
         mSurfaceView.setFocusableInTouchMode(true);
         mSurfaceView.setKeepScreenOn(true);
@@ -385,6 +386,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 canvas = mHolder.lockCanvas();
                 //接下去就是在画布上?行一下draw
                 canvas.drawColor(Color.WHITE);
+              //  Paint paint = new Paint();
+               // paint.setColor(Color.argb(255, 255, 255, 255));
+
+                // x=40, y=40 半径 20 の円を描画
+               // paint.setAntiAlias(false);
+            //    canvas.drawCircle(40.5f, 40.5f, 20.0f, mPaint2);
+            //    canvas.drawARGB(255, 55, 55, 55);
+                // 画?
+                canvas.drawCircle(canvas.getWidth() / 2f, canvas.getHeight() / 2f, canvas.getHeight()/3f, mPaint2);
+                drawHead(canvas.getWidth(),canvas.getHeight(),canvas.getHeight()/3f,mnq0,mnq1,mnq2,mnq3);
                 canvas.drawPath(mPath,mPaint);
             } catch (Exception e){
 
@@ -396,14 +407,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    private  Runnable runnable = new Runnable() {
+    final Runnable runnable = new Runnable() {
         @Override
         public void run() {
             long start =System.currentTimeMillis();
             while(mIsDrawing){
                 mPath.reset();
-                draw();
-                drawHead(500,500,90,mnq0,mnq1,mnq2,mnq3);
                 draw();
                 Log.d(TAG,"drawing??????");
                 long end = System.currentTimeMillis();
@@ -417,6 +426,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         }
     };
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int x=(int) event.getX();
@@ -425,11 +435,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             case MotionEvent.ACTION_DOWN:
                 cq0 = nq0; cq3 = -nq3;
                 Log.d(TAG, "onTouchEvent: down11");
-                mPath.moveTo(x,y);
+               // mPath.moveTo(x,y);
                 break;
             case MotionEvent.ACTION_MOVE:
                 Log.d(TAG, "onTouchEvent: move22");
-                mPath.lineTo(x,y);
+               // mPath.lineTo(x,y);
                 break;
             case MotionEvent.ACTION_UP:
                 Log.d(TAG, "onTouchEvent: up33");
@@ -437,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         return true;
     }
-    int cameraType = 1;
+   // int cameraType = 1;
    // float[] rpk1 = new float[600];
     float[][] rpk12 = new float[600][3];
     //float[] ppk1 = new float[600];
@@ -450,33 +460,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             {0,180,0}, {0,195,0}, {0,210,0}, {0,225,0}, {0,240,0}, {0,255,0}, {0,270,0}, {0,285,0}, {0,300,0}, {0,315,0}, {0,330,0}, {0,345,0}, {0,360,1},//virtical 37+13=50
             {0,90,0}, {15,90,0}, {30,90,0}, {45,90,0}, {60,90,0}, {75,90,0}, {90,90,0}, {105,90,0}, {120,90,0}, {135,90,0}, {150,90,0}, {165,90,0},//coronal 50+12=62
             {180,90,0}, {195,90,0}, {210,90,0}, {225,90,0}, {240,90,0}, {255,90,0}, {270,90,0}, {285,90,0}, {300,90,0}, {315,90,0}, {330,90,0}, {345,90,90}, {360,90,1},//coronal 62+13=75
-            {20,-90,0}, {20,-105,0}, {20,-120,0}, {20,-135,0}, {20,-150,0}, {20,-165,0}, {20,-180,1},
-            //hair 75+7=82
+            {20,-90,0}, {20,-105,0}, {20,-120,0}, {20,-135,0}, {20,-150,0}, {20,-165,0}, {20,-180,1},//hair 75+7=82
             {-20,-90,0}, {-20,-105,0}, {-20,-120,0}, {-20,-135,0}, {-20,-150,0}, {-20,-165,0}, {-20,-180,1},//hair 82+7=89
-            {40,-90,0}, {40,-105,0}, {40,-120,0}, {40,-135,0}, {40,-150,0}, {40,-165,0}, {40,-180,1},
-            //hair 89+7=96
+            {40,-90,0}, {40,-105,0}, {40,-120,0}, {40,-135,0}, {40,-150,0}, {40,-165,0}, {40,-180,1},//hair 89+7=96
             {-40,-90,0}, {-40,-105,0}, {-40,-120,0}, {-40,-135,0}, {-40,-150,0}, {-40,-165,0}, {-40,-180,1},//hair 96+7=103
             {23,-9,0}, {31,-12,0}, {38,-20,0}, {40,-31,0}, {38,-41,0}, {31,-46,0}, {23,-45,0}, {15,-39,0}, {10,-32,0}, {8,-23,0}, {10,-16,0}, {15,-10,0}, {23,-9,1},//eye +13
             {-23,-9,0}, {-31,-12,0}, {-38,-20,0}, {-40,-31,0}, {-38,-41,0}, {-31,-46,0}, {-23,-45,0}, {-15,-39,0}, {-10,-32,0}, {-8,-23,0}, {-10,-16,0}, {-15,-10,0}, {-23,-9,1},//eye +13
             {22,-26,0}, {23,-25,0}, {24,-24,1},//eye dots 3
             {-22,-26,0}, {-23,-25,0}, {-24,-24,1},//eye dots 3
             {-19,32,0}, {-14,31,0}, {-9,31,0}, {-4,31,0}, {0,30,0}, {4,31,0}, {9,31,0}, {14,31,0}, {19,32,1}, {1000,1000,1000}};//mouse 9
-    float pi180 = (float) PI/180.0F;
+    float pi180 = (float) PI/180.0f;
 
     private void set_rpk_ppk() {
-        int r = 40;//hankei
+        float r = 40F;//hankei
         float dx,dy,dz;
            // convert draw data to radian
         for (int i = 0; facePoints2[i][0] != 1000; i++) {
-            rpk12[i][0] = facePoints2[i][0] * pi180;
-            rpk12[i][1] = facePoints2[i][1] * pi180;
+            rpk12[i][0] = (float) facePoints2[i][0] * pi180;
+            rpk12[i][1] = (float) facePoints2[i][1] * pi180;
         }
 
         // move (1,0,0) to each draw point
         for (int i = 0; facePoints2[i][0] != 1000; i++) {
-            ppk12[i][0] = 0;
-            ppk12[i][1] = 1.0F * r;
-            ppk12[i][2] = 0;
+            ppk12[i][0] = 0f;
+            ppk12[i][1] = 1.0f * r;
+            ppk12[i][2] = 0f;
         }
 
         // rotate all draw point based on draw data
@@ -500,9 +508,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
     //モーションセンサーをリセットするときに-1とする。リセット時に-1なら,角度から０か１をセット
     int degreeAtResetHead=0;//0:-90<&&<90 1:<-90||>90 -1:flag for get degree
-    private void RotateQuat(int i,float x0,float y0,float z0, float q0, float q1, float q2, float q3)
+    private void RotateQu(int i,float x0,float y0,float z0, float q0, float q1, float q2, float q3)
     {
-        float ax, ay, az, norm, mag;
+      //  float ax, ay, az, norm, mag;
 
   /*      mag = (float)sqrt((q0 * q0) + (q1 * q1) + (q2 * q2) + (q3 * q3));
         if (mag>1.192092896e-07F){
@@ -513,23 +521,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             q3 *= norm;
         }*/
 
-        ppk[i][0] = x0 * (q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) + y0 * (2 * (q1 * q2 - q0 * q3)) + z0 * (2 * (q1 * q3 + q0 * q2));
-        ppk[i][1] = x0 * (2 * (q1 * q2 + q0 * q3)) + y0 * (q0 * q0 - q1 * q1 + q2 * q2 - q3 * q3) + z0 * (2 * (q2 * q3 - q0 * q1));
-        ppk[i][2] = x0 * (2 * (q1 * q3 - q0 * q2)) + y0 * (2 * (q2 * q3 + q0 * q1)) + z0 * (q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3);
+        ppk[i][0] = x0 * (q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) + y0 * (2f * (q1 * q2 - q0 * q3)) + z0 * (2f * (q1 * q3 + q0 * q2));
+        ppk[i][1] = x0 * (2f * (q1 * q2 + q0 * q3)) + y0 * (q0 * q0 - q1 * q1 + q2 * q2 - q3 * q3) + z0 * (2f * (q2 * q3 - q0 * q1));
+        ppk[i][2] = x0 * (2f * (q1 * q3 - q0 * q2)) + y0 * (2f * (q2 * q3 + q0 * q1)) + z0 * (q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3);
     }
     float[][] ppk = new float[600][3];
-  public void drawHead(float w, float h, float r, float qOld0, float qOld1, float qOld2, float qOld3){
+  public void drawHead(float w, float h, float faceR, float qOld0, float qOld1, float qOld2, float qOld3){
 
-      float faceX0 = w/2F;
-      float faceY0 = h/2F;//center
-      float faceR = r;//hankei
-      float defaultRadius = 40.0F;
+      float faceX0 = w/2f;
+      float faceY0 = h/2f;//center
+  //    float faceR = r;//hankei
+      float defaultRadius = 40.0f;
       //     let size = CGSize(width:w, height:h)
       for (int i = 0; facePoints2[i][0] != 1000; i++) {
-          RotateQuat(i,ppk12[i][0],ppk12[i][1],ppk12[i][2], qOld0, qOld1, qOld2, qOld3);
+          RotateQu(i,ppk12[i][0],ppk12[i][1],ppk12[i][2], qOld0, qOld1, qOld2, qOld3);
       }
 
-      float uraPoint=faceR/40.0F;//この値の意味がよくわからなかった
+      float uraPoint=faceR/50.0f;//この値の意味がよくわからなかった
 
       boolean endpointF=true;//終点でtrueとする
       if (degreeAtResetHead == 1){//iPhoneが >90||<-90 垂直以上に傾いた時
