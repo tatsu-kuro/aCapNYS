@@ -83,20 +83,20 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     //SerialPort Service UUID (SPP)
     private static final UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
     private static final int CHECK_PERMISSION = 1001;
-    private String TargetMACAddress = "No device is connected";
-    private BluetoothAdapter mBtAdapter; //BTアダプタ
-    BluetoothDevice mBtDevice;//BTデバイス
-    private BluetoothSocket mBtSocket;//BTソケット
+  //  private String TargetMACAddress = "No device is connected";
+  //  private BluetoothAdapter mBtAdapter; //BTアダプタ
+  //  BluetoothDevice mBtDevice;//BTデバイス
+//    private BluetoothSocket mBtSocket;//BTソケット
     private OutputStream mOutput;//出力ストリーム
-    private Intent enableBtIntent;
+ //   private Intent enableBtIntent;
     private ActivityResultLauncher<Intent> launcher;
     Handler mHandler = new Handler(Looper.getMainLooper());
-    Runnable mRunnable;
+ //   Runnable mRunnable;
     boolean CapNYS=false ;
     private AlertDialog.Builder mAlertDialog;
     //  private TextView quaterView;
-    private Button CamSelBtn;
-    private Button Selbtn;
+ //   private Button CamSelBtn;
+ //   private Button Selbtn;
     private EditText ipe1,ipe2,ipe3,ipe4;
     private EditText selectedText;
     private Button ipSetBtn;//ボタンselectMacAddress
@@ -127,9 +127,9 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         i(TAG, "onCreate 0");
         //  quaterView = (TextView) findViewById(R.id.quaternionData);
         //  quaterView.setMovementMethod(new ScrollingMovementMethod());
-        Selbtn = (Button) findViewById(R.id.selectButton);
+ //       Selbtn = (Button) findViewById(R.id.selectButton);
         ipSetBtn = (Button) findViewById(R.id.ipSetButton);
-        CamSelBtn = (Button) findViewById(R.id.connectButton);
+   //     CamSelBtn = (Button) findViewById(R.id.connectButton);
         ipe1 = (EditText) findViewById(R.id.ip1);
         ipe2 = (EditText) findViewById(R.id.ip2);
         ipe3 = (EditText) findViewById(R.id.ip3);
@@ -141,7 +141,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         mAlertDialog.setTitle("Alert");
         mAlertDialog.setPositiveButton("OK", null);
 
-        CamSelBtn.setOnClickListener(new View.OnClickListener() {
+  /*      CamSelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO Auto-generated method stub
@@ -157,6 +157,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
                 //   prepareSerialCommunication();
             }
         });
+   */
         ipSetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -173,7 +174,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         //     @override
         //               public void onClick(View v){
         // });
-        enableBtIntent = new Intent( BluetoothAdapter.ACTION_REQUEST_ENABLE );
+  /*      enableBtIntent = new Intent( BluetoothAdapter.ACTION_REQUEST_ENABLE );
         launcher= registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -195,7 +196,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
                 return;
             }
         }
-        launcher.launch(enableBtIntent);
+        launcher.launch(enableBtIntent);*/
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         //     sma.registerListener(this,sma.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR),SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),SensorManager.SENSOR_DELAY_FASTEST);
@@ -221,12 +222,12 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         editor.putString("ip4", ipe4.getText().toString());
         ipad=String.format("%s.%s.%s.%s",ipe1.getText().toString(),ipe2.getText().toString(),ipe3.getText().toString(),ipe4.getText().toString());
         Log.i("kuroa****",ipad);
-        editor.putString("TargetMACAddress",TargetMACAddress);
-        editor.putString("selectedDevice",selectedDevice);
-        selectedText.setText(selectedDevice);
+    //    editor.putString("TargetMACAddress",TargetMACAddress);
+    //    editor.putString("selectedDevice",selectedDevice);
+    //    selectedText.setText(selectedDevice);
 
         inetSocketAddress = new InetSocketAddress(ipad, portn);
-        Log.i("kuroda-save",selectedDevice);
+     //   Log.i("kuroda-save",selectedDevice);
         //      editor.putInt("DataInt", 123);
         //      editor.putBoolean("DataBoolean", true);
         //      editor.putLong("DataLong", 12345678909876L);
@@ -251,13 +252,13 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         ipad=String.format("%s.%s.%s.%s",ipe1.getText().toString(),ipe2.getText().toString(),ipe3.getText().toString(),ipe4.getText().toString());
         Log.i("kuroa****",ipad);
         inetSocketAddress = new InetSocketAddress(ipad, portn);
-        TargetMACAddress=data.getString("TargetMACAddress","no address");
-        selectedDevice=data.getString("selectedDevice","no device");
-        Log.i("kuroda-load",selectedDevice);
-        selectedText.setText(selectedDevice);
+    //    TargetMACAddress=data.getString("TargetMACAddress","no address");
+     //   selectedDevice=data.getString("selectedDevice","no device");
+      //  Log.i("kuroda-load",selectedDevice);
+     //   selectedText.setText(selectedDevice);
 
     }
-    private void prepareSerialCommunication() {
+ /*   private void prepareSerialCommunication() {
         cq0 = nq0; cq3 = -nq3;
         //交信先が指定されたBTデバイスのインスタンスを取得
         //   CapNYS=true;
@@ -299,8 +300,9 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         }
         //   Selbtn.setEnabled(false);
     }
-
+*/
     //permissinの取得要求の結果の取得
+    /*
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -312,7 +314,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
             }
         }
         launcher.launch(enableBtIntent);
-    }
+    }*/
 
     @Override
     protected void onDestroy() {
@@ -320,16 +322,16 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         if (sensorManager != null) {
             sensorManager.unregisterListener(this);
         }
-        if (mBtSocket != null) {
-            try {
-                mBtSocket.close();
-            } catch (IOException connectException) {/*ignore*/}
-            mBtSocket = null;
-        }
-        mHandler.removeCallbacks(mRunnable);
+//        if (mBtSocket != null) {
+ //           try {
+ //               mBtSocket.close();
+ //           } catch (IOException connectException) {/*ignore*/}
+ //           mBtSocket = null;
+ //       }
+ //       mHandler.removeCallbacks(mRunnable);
     }
-    private String selectedDevice = "";
-    private void getTargetAddress() {
+ //   private String selectedDevice = "";
+ /*   private void getTargetAddress() {
         cq0 = nq0; cq3 = -nq3;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
@@ -380,7 +382,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
                     //Cancelを押したらここに入る
                 })
                 .show();
-    }
+    }*/
     float mnq0,mnq1,mnq2,mnq3,a0,a1,a2,a3;
     float cq0 = 0.99F, cq1 = 0.0F, cq2 = 0.0F, cq3 = 0.0F;//spaceを押した時のcenter quatrnion
     float nq0 = 0.01F, nq1 = 0.0F, nq2 = 0.0F, nq3 = 0.0F;//現在のquaternion
@@ -489,8 +491,8 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
                 mAlertDialog.show();
                 e.printStackTrace();
                 CapNYS = false;
-                Selbtn.setEnabled(true);
-                Selbtn.setText("Select CapNYS-PC");
+          //      Selbtn.setEnabled(true);
+            //    Selbtn.setText("Select CapNYS-PC");
             }
         }
     }
@@ -528,7 +530,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         mSurfaceView.setKeepScreenOn(true);
 
         mIsDrawing = true;
-        new Thread(runnable).start();
+   //     new Thread(runnable).start();
     }
 
     @Override
@@ -544,6 +546,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void draw() {
+        /*
         if (mHolder != null) {
             Canvas canvas = null;
             try{
@@ -569,10 +572,10 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
                 if(canvas !=null && mHolder != null)
                     mHolder.unlockCanvasAndPost(canvas);
             }
-        }
+        }*/
     }
 
-    final Runnable runnable = new Runnable() {
+ /*   final Runnable runnable = new Runnable() {
         @Override
         public void run() {
             long start =System.currentTimeMillis();
@@ -591,7 +594,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
             }
         }
     };
-
+*/
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int x=(int) event.getX();
