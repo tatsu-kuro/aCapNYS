@@ -20,14 +20,6 @@
         app:layout_constraintStart_toEndOf="@+id/selectedDev"
         app:layout_constraintTop_toTopOf="@+id/connectButton" />
 
-    <SurfaceView
-        android:id="@+id/surfaceView"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <Button
         android:id="@+id/connectButton"
         style="@style/Widget.AppCompat.Button"

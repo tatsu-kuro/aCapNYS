@@ -77,52 +77,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.UUID;
 
-public class GyroActivity extends AppCompatActivity implements SensorEventListener,SurfaceHolder.Callback {
+public class GyroActivity extends AppCompatActivity implements SensorEventListener{
     SensorManager sensorManager;
     private final String TAG = "MainActivity";
-    //SerialPort Service UUID (SPP)
-    private static final UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-    private static final int CHECK_PERMISSION = 1001;
-  //  private String TargetMACAddress = "No device is connected";
-  //  private BluetoothAdapter mBtAdapter; //BTアダプタ
-  //  BluetoothDevice mBtDevice;//BTデバイス
-//    private BluetoothSocket mBtSocket;//BTソケット
-    private OutputStream mOutput;//出力ストリーム
- //   private Intent enableBtIntent;
-    private ActivityResultLauncher<Intent> launcher;
-    Handler mHandler = new Handler(Looper.getMainLooper());
- //   Runnable mRunnable;
-    boolean CapNYS=false ;
+
     private AlertDialog.Builder mAlertDialog;
-    //  private TextView quaterView;
- //   private Button CamSelBtn;
- //   private Button Selbtn;
+
     private EditText ipe1,ipe2,ipe3,ipe4;
     private EditText selectedText;
     private Button ipSetBtn;//ボタンselectMacAddress
-    //  @RequiresApi(api = Build.VERSION_CODES.M)
-    // SurfaceHolderクラスのmHolderというメンバ変数の宣言
-    // 一時的に画面を格納するためのホルダーだと思っておけば良い
-    private SurfaceView mSurfaceView;
-    //SurfaceHolder
-  //  private SurfaceHolder mHolder;
-    int mSurfaceWidth;      // surfaceViewの幅
-    int mSurfaceHeight;     // surfaceViewの高さ
-    int mSurfaceTop;
-    int msurfaceLeft;
-    private boolean mIsDrawing;
-    //画?
-    private Paint mPaint,mPaint2;
-    //路径
- //   private Path mPath;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gyro);
 
-        mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
-  //      mHolder = mSurfaceView.getHolder();
-  //      mHolder.addCallback(this);
 
         i(TAG, "onCreate 0");
         //  quaterView = (TextView) findViewById(R.id.quaternionData);
@@ -169,34 +138,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
                 //i(TAG,ips1+ips2+ips3+ips4);
             }
         });
-        //       ipSetBtn.setOnClickListener(new View.OnClickListener() {
-        // 引数にeditTextを格納しているコンテナのidを入れる
-        //     @override
-        //               public void onClick(View v){
-        // });
-  /*      enableBtIntent = new Intent( BluetoothAdapter.ACTION_REQUEST_ENABLE );
-        launcher= registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    i(TAG,"result");
-                    if (result.getResultCode() == Activity.RESULT_CANCELED) {
-                        Toast.makeText(this, "Bluetooth usage was not allowed.", Toast.LENGTH_LONG).show();
-                        mAlertDialog.setMessage("Bluetoothの利用を拒否されました。これ以上何もできないので，アプリを終了してください。");
-                        mAlertDialog.show();
-                        //finish();    // アプリ終了宣言
-                    } else {
-                        i(TAG, "onActivityResult() Bluetooth function is available.");
-                    }
-                });
 
-        //permissionをチェックし得られていなかったら取得要求
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN}, CHECK_PERMISSION);
-                return;
-            }
-        }
-        launcher.launch(enableBtIntent);*/
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         //     sma.registerListener(this,sma.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR),SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),SensorManager.SENSOR_DELAY_FASTEST);
@@ -238,7 +180,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
 
     String ipad="192.168.0.209";
     int portn=1108;
-  
+
     private void loadData() {
         SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
 
@@ -305,22 +247,6 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-     //   Log.d(TAG, "surfaceChanged...");
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-    //    Log.d(TAG, "surfaceDestroyed...");
-    //    mIsDrawing = false;
-    //    mHolder = null;
-    }
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int x=(int) event.getX();
