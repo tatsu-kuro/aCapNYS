@@ -10,4 +10,16 @@
         "\n〇画面の中央の録画スタートボタンをタップ\n〇中央の録画ストップボタンをタップ\nで録画完了です。"
         "\n\n3：左下の[Send Motion Data]ボタンをタップすると、モーションセンサーデータをWiFiおよびBluetoothで送信するページに飛びます。この機能はWindows用のCapNYSアプリの為のものです。"
     </string>
+    <string-array name="spinner_items1">
+        <item>none</item>
+        <item>small</item>
+        <item>mid</item>
+        <item>big</item>
+    </string-array>
+    <string-array name="spinner_items2">
+        <item>none</item>
+        <item>small</item>
+        <item>mid</item>
+        <item>big</item>
+    </string-array>
 </resources>
