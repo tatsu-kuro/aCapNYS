@@ -9,11 +9,7 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -26,6 +22,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ACapNYS"
         tools:targetApi="31">
+        <activity
+            android:name=".GridButtons"
+            android:exported="false"
+            android:screenOrientation="landscape"/>
         <activity
             android:name=".PlayActivity"
             android:exported="false"
