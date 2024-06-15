@@ -103,7 +103,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         ipe2 = (EditText) findViewById(R.id.ip2);
         ipe3 = (EditText) findViewById(R.id.ip3);
         ipe4 = (EditText) findViewById(R.id.ip4);
-        selectedText = (EditText) findViewById(R.id.selectedDev);
+
         loadData();
 
         mAlertDialog = new AlertDialog.Builder(this);

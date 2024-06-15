@@ -1,9 +1,13 @@
 package com.kuroda33.acapnys;
 
+import static androidx.camera.core.CameraXThreads.TAG;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 public class GridButtons extends AppCompatActivity {
 
@@ -11,6 +15,14 @@ public class GridButtons extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grid_buttons);
+        Button ExitBtn=findViewById(R.id.exitButton);
+        ExitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "surfaceDestroyed...");
+                finish();
+            }
+        });
     }
 
     @Override

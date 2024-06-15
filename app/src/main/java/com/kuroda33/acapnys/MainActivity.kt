@@ -100,7 +100,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener{//},SurfaceHolder
       //  viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
         viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
         viewBinding.helpButton.setOnClickListener {
-            val intent = Intent(/* packageContext = */ application,/* cls = */ GridButtons::class.java)
+   //         val intent = Intent(/* packageContext = */ application,/* cls = */ GridButtons::class.java)
+   //         startActivity(/* intent = */ intent)
+            val intent = Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
             startActivity(/* intent = */ intent)
 
 
