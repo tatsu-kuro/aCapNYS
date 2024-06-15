@@ -34,9 +34,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
             android:focusable="auto"
             android:focusableInTouchMode="false"
-            android:background="@android:drawable/editbox_background_normal"
             android:text="IP"
             android:textAlignment="center"
             android:tooltipText="kkkkkkkkk" />
@@ -115,7 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:layout_weight="0.1"
-            android:text="set" />
+            android:text="Set" />
     </LinearLayout>
 
     <LinearLayout
@@ -149,7 +149,9 @@
             android:layout_marginLeft="10dp"
             android:layout_weight="1"
             android:background="@android:drawable/editbox_background_normal"
-            android:text="Pitc"
+            android:text="Pitch"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
             android:textAlignment="center"
             android:focusableInTouchMode="false"
             android:tooltipText="kkkkkkkkk" />
