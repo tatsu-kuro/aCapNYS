@@ -135,7 +135,8 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
                 String ips3=ipe3.getText().toString();
                 String ips4=ipe4.getText().toString();
                 saveData();
-                //i(TAG,ips1+ips2+ips3+ips4);
+                i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclick ips");
             }
         });
 
@@ -148,7 +149,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         ExitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "surfaceDestroyed...");
+             //   Log.d(TAG, "surfaceDestroyed...");
                 finish();
             }
         });
@@ -254,7 +255,9 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
              //   cq0 = nq0; cq3 = -nq3;
-                Log.d(TAG, "onTouchEvent: down11");
+
+                String Str = String.format ("eventX:%03d Y:%03d",x,y);
+                Log.d(TAG, Str);
                 // mPath.moveTo(x,y);
                 break;
             case MotionEvent.ACTION_MOVE:

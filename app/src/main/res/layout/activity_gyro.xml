@@ -48,10 +48,12 @@
             android:layout_weight="1"
             android:digits="0123456789"
             android:maxLength="3"
-            android:background="@android:drawable/editbox_background_normal"
+            android:gravity="right"
+            android:inputType="number"
             android:text="192"
-            android:gravity="end"
-            android:inputType="number" />
+
+            android:background="@android:drawable/editbox_background_normal"
+            />
 
         <EditText
             android:id="@+id/ip2"
@@ -182,17 +184,32 @@
             android:layout_weight="1"
             android:focusableInTouchMode="false"
             android:text="0"  />
-
-        <EditText
-            android:id="@+id/button12"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/plusminu2"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.01"
             android:background="@android:drawable/editbox_background_normal"
-            android:text="-     +"
             android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginRight="-3dp"
+            android:layout_marginLeft="-5dp"
+            android:text="-"
             android:textAlignment="center" />
 
+        <Button
+            android:id="@+id/plusminus3"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.01"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginLeft="-3dp"
+            android:text="+"
+            android:textAlignment="center" />
         <EditText
             android:id="@+id/button13"
             android:layout_width="wrap_content"
@@ -201,24 +218,40 @@
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:text="2.0" />
-
-        <EditText
-            android:id="@+id/button14"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/but30"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.01"
             android:background="@android:drawable/editbox_background_normal"
-            android:text="-     +"
             android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginRight="-3dp"
+            android:layout_marginLeft="-5dp"
+            android:text="-"
             android:textAlignment="center" />
 
         <Button
-            android:id="@+id/button15"
+            android:id="@+id/butt15"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.01"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginLeft="-3dp"
+            android:text="+"
+            android:textAlignment="center" />
+
+        <Button
+            android:id="@+id/butto15"
             android:background="@android:drawable/editbox_background_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
-            android:layout_weight="0.1"
+            android:layout_weight="0.01"
             android:text="Stop" />
     </LinearLayout>
 
@@ -266,34 +299,65 @@
             android:layout_weight="1"
             android:focusableInTouchMode="false"
             android:text="0"  />
-
-        <EditText
-            android:id="@+id/button20"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/plusminus0"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.01"
             android:background="@android:drawable/editbox_background_normal"
-            android:text="-     +"
             android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginRight="-3dp"
+            android:layout_marginLeft="-5dp"
+            android:text="-"
             android:textAlignment="center" />
 
+        <Button
+            android:id="@+id/plusminus1"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.01"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginLeft="-3dp"
+            android:text="+"
+            android:textAlignment="center" />
         <EditText
-            android:id="@+id/button21"
+            android:id="@+id/plusminus2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:text="2.0" />
-
-        <EditText
-            android:id="@+id/button22"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/button21"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.01"
             android:background="@android:drawable/editbox_background_normal"
-            android:text="-     +"
             android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginRight="-3dp"
+            android:layout_marginLeft="-5dp"
+            android:text="-"
+            android:textAlignment="center" />
+
+        <Button
+            android:id="@+id/butto21"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.01"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginLeft="-3dp"
+            android:text="+"
             android:textAlignment="center" />
 
         <Button
@@ -351,15 +415,31 @@
             android:layout_weight="1"
             android:focusableInTouchMode="false"
             android:text="0"/>
-
-        <EditText
-            android:id="@+id/button28"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/plusminus4"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.01"
             android:background="@android:drawable/editbox_background_normal"
-            android:text="-     +"
             android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginRight="-3dp"
+            android:layout_marginLeft="-5dp"
+            android:text="-"
+            android:textAlignment="center" />
+
+        <Button
+            android:id="@+id/plusminus5"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.01"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginLeft="-3dp"
+            android:text="+"
             android:textAlignment="center" />
 
         <EditText
@@ -371,16 +451,32 @@
             android:background="@android:drawable/editbox_background_normal"
             android:text="2.0" />
 
-        <EditText
+        <Button
             android:id="@+id/button30"
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.01"
             android:background="@android:drawable/editbox_background_normal"
-            android:text="-     +"
             android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginRight="-3dp"
+            android:layout_marginLeft="-5dp"
+            android:text="-"
             android:textAlignment="center" />
 
+        <Button
+            android:id="@+id/butto30"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.01"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginLeft="-3dp"
+            android:text="+"
+            android:textAlignment="center" />
         <Button
             android:id="@+id/button31"
             android:background="@android:drawable/editbox_background_normal"
