@@ -14,10 +14,10 @@
 
 
         <EditText
-            android:id="@+id/button32"
+            android:id="@+id/motionSensorText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="auto"
+            android:focusable="false"
             android:focusableInTouchMode="false"
             android:text="Sent motion data via WiFi"
             android:textAlignment="center" />
@@ -128,10 +128,10 @@
 
 
         <EditText
-            android:id="@+id/button33"
+            android:id="@+id/rehabilitationText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusable="auto"
+            android:focusable="false"
             android:focusableInTouchMode="false"
             android:text="Head Rotations Vestibular Rehabilitation"
             android:textAlignment="center" />
@@ -145,7 +145,7 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/button8"
+            android:id="@+id/pitchTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -159,7 +159,7 @@
             android:tooltipText="kkkkkkkkk" />
 
         <EditText
-            android:id="@+id/button9"
+            android:id="@+id/pitch0"
             android:background="@android:drawable/editbox_background_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -168,7 +168,7 @@
             android:text="0" />
 
         <EditText
-            android:id="@+id/button10"
+            android:id="@+id/pitch1"
             android:background="@android:drawable/editbox_background_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -177,7 +177,7 @@
             android:text="0"  />
 
         <EditText
-            android:id="@+id/button11"
+            android:id="@+id/pitch2"
             android:background="@android:drawable/editbox_background_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -185,7 +185,7 @@
             android:focusableInTouchMode="false"
             android:text="0"  />
         <Button
-            android:id="@+id/plusminu2"
+            android:id="@+id/pitchButton0"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
@@ -199,7 +199,7 @@
             android:textAlignment="center" />
 
         <Button
-            android:id="@+id/plusminus3"
+            android:id="@+id/pitchButton1"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
@@ -211,7 +211,7 @@
             android:text="+"
             android:textAlignment="center" />
         <EditText
-            android:id="@+id/button13"
+            android:id="@+id/pitch3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -219,7 +219,7 @@
             android:focusableInTouchMode="false"
             android:text="2.0" />
         <Button
-            android:id="@+id/but30"
+            android:id="@+id/pitchButton2"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
@@ -233,7 +233,7 @@
             android:textAlignment="center" />
 
         <Button
-            android:id="@+id/butt15"
+            android:id="@+id/pitchButton3"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
@@ -262,7 +262,7 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/button16"
+            android:id="@+id/rollTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -274,7 +274,7 @@
             android:tooltipText="kkkkkkkkk" />
 
         <EditText
-            android:id="@+id/button17"
+            android:id="@+id/roll0"
             android:background="@android:drawable/editbox_background_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -283,7 +283,7 @@
             android:text="0"  />
 
         <EditText
-            android:id="@+id/button18"
+            android:id="@+id/roll1"
             android:background="@android:drawable/editbox_background_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -292,7 +292,7 @@
             android:text="0"  />
 
         <EditText
-            android:id="@+id/button19"
+            android:id="@+id/roll2"
             android:background="@android:drawable/editbox_background_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -300,7 +300,7 @@
             android:focusableInTouchMode="false"
             android:text="0"  />
         <Button
-            android:id="@+id/plusminus0"
+            android:id="@+id/rollButton0"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
@@ -314,7 +314,7 @@
             android:textAlignment="center" />
 
         <Button
-            android:id="@+id/plusminus1"
+            android:id="@+id/rollButton1"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
@@ -326,7 +326,7 @@
             android:text="+"
             android:textAlignment="center" />
         <EditText
-            android:id="@+id/plusminus2"
+            android:id="@+id/roll3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -334,7 +334,7 @@
             android:focusableInTouchMode="false"
             android:text="2.0" />
         <Button
-            android:id="@+id/button21"
+            android:id="@+id/rollButton2"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
@@ -348,7 +348,7 @@
             android:textAlignment="center" />
 
         <Button
-            android:id="@+id/butto21"
+            android:id="@+id/rollButton3"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
@@ -378,7 +378,7 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/button24"
+            android:id="@+id/yawTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -390,7 +390,7 @@
             android:tooltipText="kkkkkkkkk" />
 
         <EditText
-            android:id="@+id/button25"
+            android:id="@+id/yaw0"
             android:background="@android:drawable/editbox_background_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -399,7 +399,7 @@
             android:text="0" />
 
         <EditText
-            android:id="@+id/button26"
+            android:id="@+id/yaw1"
             android:background="@android:drawable/editbox_background_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -408,7 +408,7 @@
             android:text="0" />
 
         <EditText
-            android:id="@+id/button27"
+            android:id="@+id/yaw2"
             android:background="@android:drawable/editbox_background_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -416,7 +416,7 @@
             android:focusableInTouchMode="false"
             android:text="0"/>
         <Button
-            android:id="@+id/plusminus4"
+            android:id="@+id/yawButton0"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
@@ -430,7 +430,7 @@
             android:textAlignment="center" />
 
         <Button
-            android:id="@+id/plusminus5"
+            android:id="@+id/yawButton1"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
@@ -443,7 +443,7 @@
             android:textAlignment="center" />
 
         <EditText
-            android:id="@+id/button29"
+            android:id="@+id/yaw3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -452,7 +452,7 @@
             android:text="2.0" />
 
         <Button
-            android:id="@+id/button30"
+            android:id="@+id/yawButton2"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
@@ -466,7 +466,7 @@
             android:textAlignment="center" />
 
         <Button
-            android:id="@+id/butto30"
+            android:id="@+id/yawButton3"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.01"
@@ -494,7 +494,7 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/button34"
+            android:id="@+id/sound"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -503,14 +503,14 @@
             android:text="Sound"
             android:focusableInTouchMode="false"/>
         <Spinner
-            android:id="@+id/spinner1"
+            android:id="@+id/soundSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:entries="@array/spinner_items1"
             android:spinnerMode="dropdown" />
         <EditText
-            android:id="@+id/button35"
+            android:id="@+id/vibration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -519,7 +519,7 @@
             android:text="Vibration"
             android:focusableInTouchMode="false"/>
         <Spinner
-            android:id="@+id/spinner2"
+            android:id="@+id/vibrationSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
