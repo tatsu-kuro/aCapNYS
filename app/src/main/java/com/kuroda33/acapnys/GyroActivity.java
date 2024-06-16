@@ -86,7 +86,33 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     private EditText ipe1,ipe2,ipe3,ipe4;
     private EditText selectedText;
     private Button ipSetBtn;//ボタンselectMacAddress
-
+    private Button rehaStartBtn;
+    private Button rehaStopBtn;
+    private Button rehaResetBtn;
+    private EditText pitchText1;
+    private EditText pitchText2;
+    private EditText pitchText3;
+    private Button pitchDegreeUpBtn;
+    private Button pitchDegreeDownBtn;
+    private Button pitchSecUpBtn;
+    private Button pitchSecDownBtn;
+    private EditText pitchText4;
+    private EditText rollText1;
+    private EditText rollText2;
+    private EditText rollText3;
+    private Button rollDegreeUpBtn;
+    private Button rollDegreeDownBtn;
+    private Button rollSecUpBtn;
+    private Button rollSecDownBtn;
+    private EditText rollText4;
+    private EditText yawText1;
+    private EditText yawText2;
+    private EditText yawText3;
+    private Button yawDegreeUpBtn;
+    private Button yawDegreeDownBtn;
+    private Button yawSecUpBtn;
+    private Button yawSecDownBtn;
+    private EditText yawText4;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,7 +124,22 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         //  quaterView.setMovementMethod(new ScrollingMovementMethod());
  //       Selbtn = (Button) findViewById(R.id.selectButton);
         ipSetBtn = (Button) findViewById(R.id.ipSetButton);
-   //     CamSelBtn = (Button) findViewById(R.id.connectButton);
+        rehaStartBtn = (Button) findViewById(R.id.startButton);
+        rehaStopBtn = (Button) findViewById(R.id.stopButton);
+        rehaResetBtn = (Button) findViewById(R.id.resetButton);
+        pitchDegreeDownBtn = (Button) findViewById(R.id.pitchDegreeDownButton);
+        pitchDegreeUpBtn = (Button) findViewById(R.id.pitchDegreeUpButton);
+        pitchSecDownBtn = (Button) findViewById(R.id.pitchSecDownButton);
+        pitchSecUpBtn = (Button) findViewById(R.id.pitchSecUpButton);
+        rollDegreeDownBtn = (Button) findViewById(R.id.rollDegreeDownButton);
+        rollDegreeUpBtn = (Button) findViewById(R.id.rollDegreeUpButton);
+        rollSecDownBtn = (Button) findViewById(R.id.rollSecDownButton);
+        rollSecUpBtn = (Button) findViewById(R.id.rollSecUpButton);
+        yawDegreeDownBtn = (Button) findViewById(R.id.yawDegreeDownButton);
+        yawDegreeUpBtn = (Button) findViewById(R.id.yawDegreeUpButton);
+        yawSecDownBtn = (Button) findViewById(R.id.yawSecDownButton);
+        yawSecUpBtn = (Button) findViewById(R.id.yawSecUpButton);
+
         ipe1 = (EditText) findViewById(R.id.ip1);
         ipe2 = (EditText) findViewById(R.id.ip2);
         ipe3 = (EditText) findViewById(R.id.ip3);
@@ -139,7 +180,112 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
                 Log.d(TAG,"onclick ips");
             }
         });
+        pitchDegreeDownBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclickStart");
+            }
+        });
+        pitchDegreeUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclickStart");
+            }
+        });
+        pitchSecDownBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclickStart");
+            }
+        });
+        pitchSecUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclickStart");
+            }
+        });
+        rollDegreeDownBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclick rolldegreedown");
+            }
+        });
+        rollDegreeUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclickStart");
+            }
+        });
+        rollSecDownBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclickStart");
+            }
+        });
+        rollSecUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclick rollsecup");
+            }
+        });
+        yawDegreeDownBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclick yawdegreedown");
+            }
+        });
+        yawDegreeUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclick yawdegreeup");
+            }
+        });
+        yawSecDownBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclickStart");
+            }
+        });
+        yawSecUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclickStart");
+            }
+        });
 
+        rehaStartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+           //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclickStart");
+            }
+        });
+        rehaStopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclickStop");
+            }
+        });
+        rehaResetBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //     i(TAG,ips1+ips2+ips3+ips4);
+                Log.d(TAG,"onclickReset");
+            }
+        });
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         //     sma.registerListener(this,sma.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR),SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),SensorManager.SENSOR_DELAY_FASTEST);
