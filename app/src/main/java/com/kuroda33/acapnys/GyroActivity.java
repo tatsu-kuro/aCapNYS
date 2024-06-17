@@ -60,6 +60,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,39 +81,34 @@ import java.util.UUID;
 public class GyroActivity extends AppCompatActivity implements SensorEventListener{
     SensorManager sensorManager;
     private final String TAG = "MainActivity";
-
+    InetSocketAddress inetSocketAddress = null;
     private AlertDialog.Builder mAlertDialog;
-
     private EditText ipe1,ipe2,ipe3,ipe4;
-    private EditText selectedText;
-    private Button ipSetBtn;//ボタンselectMacAddress
+    private EditText pitchDegreeE,pitchSecE,rollDegreeE,rollSecE,yawDegreeE,yawSecE;
+    private EditText pitchCurrentE,pitchCountE,rollCurrentE,rollCountE,yawCurrentE,yawCountE;
+    private int pitchDegree,rollDegree,yawDegree;
+    private double pitchSec,rollSec,yawSec;
+    private Button ipSetBtn;
     private Button rehaStartBtn;
     private Button rehaStopBtn;
     private Button rehaResetBtn;
-    private EditText pitchText1;
-    private EditText pitchText2;
-    private EditText pitchText3;
     private Button pitchDegreeUpBtn;
     private Button pitchDegreeDownBtn;
     private Button pitchSecUpBtn;
     private Button pitchSecDownBtn;
-    private EditText pitchText4;
-    private EditText rollText1;
-    private EditText rollText2;
-    private EditText rollText3;
+
     private Button rollDegreeUpBtn;
     private Button rollDegreeDownBtn;
     private Button rollSecUpBtn;
     private Button rollSecDownBtn;
-    private EditText rollText4;
-    private EditText yawText1;
-    private EditText yawText2;
-    private EditText yawText3;
+
     private Button yawDegreeUpBtn;
     private Button yawDegreeDownBtn;
     private Button yawSecUpBtn;
     private Button yawSecDownBtn;
-    private EditText yawText4;
+
+    private int soundType;
+    private int vibrationType;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,6 +140,19 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         ipe2 = (EditText) findViewById(R.id.ip2);
         ipe3 = (EditText) findViewById(R.id.ip3);
         ipe4 = (EditText) findViewById(R.id.ip4);
+        pitchCurrentE = (EditText) findViewById(R.id.pitch0);
+        pitchCountE = (EditText) findViewById(R.id.pitch1);
+        rollCurrentE = (EditText) findViewById(R.id.roll0);
+        rollCountE = (EditText) findViewById(R.id.roll1);
+        yawCurrentE = (EditText) findViewById(R.id.yaw0);
+        yawCountE = (EditText) findViewById(R.id.yaw1);
+
+        pitchDegreeE = (EditText) findViewById(R.id.pitch2);
+        pitchSecE= (EditText) findViewById(R.id.pitch3);
+        rollDegreeE = (EditText) findViewById(R.id.roll2);
+        rollSecE = (EditText) findViewById(R.id.roll3);
+        yawDegreeE = (EditText) findViewById(R.id.yaw2);
+        yawSecE = (EditText) findViewById(R.id.yaw3);
 
         loadData();
 
@@ -175,14 +184,33 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
                 String ips2=ipe2.getText().toString();
                 String ips3=ipe3.getText().toString();
                 String ips4=ipe4.getText().toString();
-                saveData();
-                i(TAG,ips1+ips2+ips3+ips4);
+          //      saveData();
+                SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
+                SharedPreferences.Editor editor = data.edit();
+
+                editor.putString("ip1", ipe1.getText().toString());
+                editor.putString("ip2", ipe2.getText().toString());
+                editor.putString("ip3", ipe3.getText().toString());
+                editor.putString("ip4", ipe4.getText().toString());
+                ipad=String.format("%s.%s.%s.%s",ipe1.getText().toString(),ipe2.getText().toString(),ipe3.getText().toString(),ipe4.getText().toString());
+                Log.i("kuroa****",ipad);
+
+                inetSocketAddress = new InetSocketAddress(ipad, portn);
+
+                editor.commit();
+                editor.apply();
+
+
+           //     i(TAG,ips1+ips2+ips3+ips4);
                 Log.d(TAG,"onclick ips");
             }
         });
         pitchDegreeDownBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                pitchDegree -= 1;
+                saveData();
+                loadData();
                 //     i(TAG,ips1+ips2+ips3+ips4);
                 Log.d(TAG,"onclickStart");
             }
@@ -190,6 +218,9 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         pitchDegreeUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                pitchDegree += 1;
+                saveData();
+                loadData();
                 //     i(TAG,ips1+ips2+ips3+ips4);
                 Log.d(TAG,"onclickStart");
             }
@@ -197,6 +228,9 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         pitchSecDownBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                pitchDegree -= 1;
+                saveData();
+                loadData();
                 //     i(TAG,ips1+ips2+ips3+ips4);
                 Log.d(TAG,"onclickStart");
             }
@@ -204,6 +238,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         pitchSecUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 //     i(TAG,ips1+ips2+ips3+ips4);
                 Log.d(TAG,"onclickStart");
             }
@@ -211,6 +246,9 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         rollDegreeDownBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                rollDegree -= 1;
+                saveData();
+                loadData();
                 //     i(TAG,ips1+ips2+ips3+ips4);
                 Log.d(TAG,"onclick rolldegreedown");
             }
@@ -218,6 +256,9 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         rollDegreeUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                rollDegree += 1;
+                saveData();
+                loadData();
                 //     i(TAG,ips1+ips2+ips3+ips4);
                 Log.d(TAG,"onclickStart");
             }
@@ -239,6 +280,9 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         yawDegreeDownBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                yawDegree -= 1;
+                saveData();
+                loadData();
                 //     i(TAG,ips1+ips2+ips3+ips4);
                 Log.d(TAG,"onclick yawdegreedown");
             }
@@ -246,6 +290,9 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         yawDegreeUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                yawDegree += 1;
+                saveData();
+                loadData();
                 //     i(TAG,ips1+ips2+ips3+ips4);
                 Log.d(TAG,"onclick yawdegreeup");
             }
@@ -300,36 +347,53 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
             }
         });
     }
-    InetSocketAddress inetSocketAddress = null;
+
     private void saveData() {
         SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
         SharedPreferences.Editor editor = data.edit();
-
+        editor.putString("pitchDegree",String.valueOf(pitchDegree));
+        editor.putString("rollDegree",String.valueOf(rollDegree));
+        editor.putString("yawDegree",String.valueOf(yawDegree));
         editor.putString("ip1", ipe1.getText().toString());
         editor.putString("ip2", ipe2.getText().toString());
         editor.putString("ip3", ipe3.getText().toString());
         editor.putString("ip4", ipe4.getText().toString());
-        ipad=String.format("%s.%s.%s.%s",ipe1.getText().toString(),ipe2.getText().toString(),ipe3.getText().toString(),ipe4.getText().toString());
-        Log.i("kuroa****",ipad);
-    //    editor.putString("TargetMACAddress",TargetMACAddress);
-    //    editor.putString("selectedDevice",selectedDevice);
-    //    selectedText.setText(selectedDevice);
-
-        inetSocketAddress = new InetSocketAddress(ipad, portn);
-     //   Log.i("kuroda-save",selectedDevice);
-        //      editor.putInt("DataInt", 123);
-        //      editor.putBoolean("DataBoolean", true);
-        //      editor.putLong("DataLong", 12345678909876L);
-        //      editor.putFloat("DataFloat", 12.345f);
         editor.commit();
         editor.apply();
     }
 
     String ipad="192.168.0.209";
     int portn=1108;
-
+/*
+vibeSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"vibrationType",ret:1)
+soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundType",ret:1)
+        pitchStepper.value=myFunctions().getUserDefaultDouble(str: "pitchLimit", ret:30)
+        rollStepper.value=myFunctions().getUserDefaultDouble(str: "rollLimit", ret:30)
+        yawStepper.value=myFunctions().getUserDefaultDouble(str: "yawLimit", ret:30)
+        pitchStepper2.value=myFunctions().getUserDefaultDouble(str: "pitchLimit2", ret:2.0)
+        rollStepper2.value=myFunctions().getUserDefaultDouble(str: "rollLimit2", ret:2.0)
+        yawStepper2.value=myFunctions().getUserDefaultDouble(str: "yawLimit2", ret:2.0)
+ */
     private void loadData() {
         SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
+        String pd = data.getString("pitchDegree","4");
+        String ps = data.getString("pitchSec","400");
+        String rd = data.getString("rollDegree","30");
+        String rs = data.getString("rollSec","2.0");
+        String yd = data.getString("yawDegree","30");
+        String ys = data.getString("yawSec","2.0");
+        pitchDegree= Integer.parseInt(pd);
+        pitchSec=Double.parseDouble(ps);
+        rollDegree=Integer.parseInt(rd);
+        rollSec=Double.parseDouble(rd);
+        yawDegree=Integer.parseInt(yd);
+        yawSec=Double.parseDouble(ys);
+        pitchDegreeE.setText(pd + "d");
+        pitchSecE.setText(ps + "s");
+        rollDegreeE.setText(rd + "d");
+        rollSecE.setText(rs + "s");
+        yawDegreeE.setText(yd + "d");
+        yawSecE.setText(ys + "s");
 
         ipe1.setText(data.getString("ip1","192"));
         ipe2.setText(data.getString("ip2","168"));

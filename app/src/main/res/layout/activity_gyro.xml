@@ -26,7 +26,8 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        >
 
         <EditText
             android:id="@+id/ipLabel"
@@ -185,6 +186,7 @@
             android:layout_weight="1"
             android:focusableInTouchMode="false"
             android:text="30d"
+            android:inputType="number"
             android:textAlignment="textEnd"/>
         <Button
             android:id="@+id/pitchDegreeDownButton"
@@ -304,6 +306,7 @@
             android:layout_weight="1"
             android:focusableInTouchMode="false"
             android:text="30d"
+            android:inputType="number"
             android:textAlignment="textEnd"/>
         <Button
             android:id="@+id/rollDegreeDownButton"
@@ -424,6 +427,7 @@
             android:layout_weight="1"
             android:focusableInTouchMode="false"
             android:text="30d"
+            android:inputType="number"
             android:textAlignment="textEnd"/>
         <Button
             android:id="@+id/yawDegreeDownButton"
