@@ -228,7 +228,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         pitchSecDownBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pitchDegree -= 1;
+                pitchSec -= 0.1;
                 saveData();
                 loadData();
                 //     i(TAG,ips1+ips2+ips3+ips4);
@@ -238,8 +238,9 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         pitchSecUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //     i(TAG,ips1+ips2+ips3+ips4);
+                pitchSec += 0.1;
+                saveData();
+                loadData();
                 Log.d(TAG,"onclickStart");
             }
         });
@@ -266,14 +267,18 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         rollSecDownBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //     i(TAG,ips1+ips2+ips3+ips4);
+                rollSec -= 0.1;
+                saveData();
+                loadData();
                 Log.d(TAG,"onclickStart");
             }
         });
         rollSecUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //     i(TAG,ips1+ips2+ips3+ips4);
+                rollSec += 0.1;
+                saveData();
+                loadData();
                 Log.d(TAG,"onclick rollsecup");
             }
         });
@@ -300,14 +305,18 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         yawSecDownBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //     i(TAG,ips1+ips2+ips3+ips4);
+                yawSec -= 0.1;
+                saveData();
+                loadData();
                 Log.d(TAG,"onclickStart");
             }
         });
         yawSecUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //     i(TAG,ips1+ips2+ips3+ips4);
+                yawSec += 0.1;
+                saveData();
+                loadData();
                 Log.d(TAG,"onclickStart");
             }
         });
@@ -352,8 +361,11 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
         SharedPreferences.Editor editor = data.edit();
         editor.putString("pitchDegree",String.valueOf(pitchDegree));
+        editor.putString("pitchSec",String.valueOf(pitchSec));
         editor.putString("rollDegree",String.valueOf(rollDegree));
+        editor.putString("rollSec",String.valueOf(rollSec));
         editor.putString("yawDegree",String.valueOf(yawDegree));
+        editor.putString("yawSec",String.valueOf(yawSec));
         editor.putString("ip1", ipe1.getText().toString());
         editor.putString("ip2", ipe2.getText().toString());
         editor.putString("ip3", ipe3.getText().toString());
@@ -385,7 +397,7 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
         pitchDegree= Integer.parseInt(pd);
         pitchSec=Double.parseDouble(ps);
         rollDegree=Integer.parseInt(rd);
-        rollSec=Double.parseDouble(rd);
+        rollSec=Double.parseDouble(rs);
         yawDegree=Integer.parseInt(yd);
         yawSec=Double.parseDouble(ys);
         pitchDegreeE.setText(pd + "d");
