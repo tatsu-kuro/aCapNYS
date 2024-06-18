@@ -12,6 +12,7 @@ import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
+import static java.lang.Math.round;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
 import static java.security.AccessController.getContext;
@@ -388,12 +389,13 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
  */
     private void loadData() {
         SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
-        String pd = data.getString("pitchDegree","4");
-        String ps = data.getString("pitchSec","400");
+        String pd = data.getString("pitchDegree","30");
+        String ps = data.getString("pitchSec","2.0");
         String rd = data.getString("rollDegree","30");
         String rs = data.getString("rollSec","2.0");
         String yd = data.getString("yawDegree","30");
         String ys = data.getString("yawSec","2.0");
+        // pitchText4.text=(round(pitchStepper2.value*10)/10).description + "s"
         pitchDegree= Integer.parseInt(pd);
         pitchSec=Double.parseDouble(ps);
         rollDegree=Integer.parseInt(rd);
@@ -401,11 +403,11 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
         yawDegree=Integer.parseInt(yd);
         yawSec=Double.parseDouble(ys);
         pitchDegreeE.setText(pd + "d");
-        pitchSecE.setText(ps + "s");
+        pitchSecE.setText(String.format("%.1fs",pitchSec));
         rollDegreeE.setText(rd + "d");
-        rollSecE.setText(rs + "s");
+        rollSecE.setText(String.format("%.1fs", rollSec));
         yawDegreeE.setText(yd + "d");
-        yawSecE.setText(ys + "s");
+        yawSecE.setText(String.format("%.1fs",yawSec));
 
         ipe1.setText(data.getString("ip1","192"));
         ipe2.setText(data.getString("ip2","168"));
