@@ -48,6 +48,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioAttributes;
+import android.media.SoundPool;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -87,6 +89,8 @@ import java.util.concurrent.TimeUnit;
 
 public class GyroActivity extends AppCompatActivity implements SensorEventListener{
     SensorManager sensorManager;
+    private SoundPool soundPool;
+    private int sound1,sound2,sound3;
     long millis = TimeUnit.MILLISECONDS.ordinal();
     private final String TAG = "MainActivity";
     InetSocketAddress inetSocketAddress = null;
@@ -137,6 +141,17 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gyro);
+        AudioAttributes audioAttributes= new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN)
+                .build();
+        soundPool = new SoundPool.Builder()
+                .setAudioAttributes(audioAttributes)
+                .setMaxStreams(3)
+                .build();
+        sound1 = soundPool.load(this,R.raw.beep1,1);
+        sound2 = soundPool.load(this,R.raw.beep2,1);
+        sound3 = soundPool.load(this,R.raw.beep3,1);
 
 
         i(TAG, "onCreate 0");
@@ -656,7 +671,9 @@ private int checkOK( float d0,float d1,float limit,int count,float ms)
         t += 1;
         yawCountE.setText(String.valueOf(t));
     }
-
+void soundANDvibe(){
+        soundPool.play(sound1,1.0F,1.0F,1,0,1);
+}
     private void checkRotation()
     {
         int tempDirection=0;
@@ -670,7 +687,7 @@ private int checkOK( float d0,float d1,float limit,int count,float ms)
             if(checkOK(lastPitch,pitchA.get(cnt-3),pitchDegree, cnt-3 - lastPitchCount,pitchSec) == 5)
             {
                 incPitchOK();
-            //    soundANDvibe();
+                soundANDvibe();
 //                AudioServicesPlaySystemSound(1519)
                 //              print("o:",lastPitch-pitchA[cnt-3],cnt-3-lastPitchCount)
             }
