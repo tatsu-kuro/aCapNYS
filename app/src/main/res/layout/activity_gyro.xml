@@ -39,8 +39,7 @@
             android:focusable="auto"
             android:focusableInTouchMode="false"
             android:text="IP"
-            android:textAlignment="center"
-            android:tooltipText="kkkkkkkkk" />
+            android:textAlignment="center" />
 
         <EditText
             android:id="@+id/ip1"
@@ -192,7 +191,6 @@
             android:id="@+id/pitchDegreeDownButton"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.01"
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:paddingLeft="0dp"
@@ -206,7 +204,7 @@
             android:id="@+id/pitchDegreeUpButton"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.01"
+
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:paddingLeft="0dp"
@@ -227,7 +225,7 @@
             android:id="@+id/pitchSecDownButton"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.01"
+
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:paddingLeft="0dp"
@@ -241,7 +239,7 @@
             android:id="@+id/pitchSecUpButton"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.01"
+
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:paddingLeft="0dp"
@@ -273,10 +271,12 @@
             android:layout_marginLeft="10dp"
             android:layout_weight="1"
             android:background="@android:drawable/editbox_background_normal"
-            android:text="Roll"
             android:focusableInTouchMode="false"
-            android:textAlignment="center"
-            android:tooltipText="kkkkkkkkk" />
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+
+            android:text="Roll"
+            android:textAlignment="center" />
 
         <EditText
             android:id="@+id/roll0"
@@ -312,7 +312,6 @@
             android:id="@+id/rollDegreeDownButton"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.01"
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:paddingLeft="0dp"
@@ -326,7 +325,6 @@
             android:id="@+id/rollDegreeUpButton"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.01"
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:paddingLeft="0dp"
@@ -347,7 +345,6 @@
             android:id="@+id/rollSecDownButton"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.01"
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:paddingLeft="0dp"
@@ -361,7 +358,7 @@
             android:id="@+id/rollSecUpButton"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.01"
+
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:paddingLeft="0dp"
@@ -433,7 +430,7 @@
             android:id="@+id/yawDegreeDownButton"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.01"
+
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:paddingLeft="0dp"
@@ -447,7 +444,7 @@
             android:id="@+id/yawDegreeUpButton"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.01"
+
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:paddingLeft="0dp"
@@ -470,7 +467,7 @@
             android:id="@+id/yawSecDownButton"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.01"
+
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:paddingLeft="0dp"
@@ -484,7 +481,6 @@
             android:id="@+id/yawSecUpButton"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.01"
             android:background="@android:drawable/editbox_background_normal"
             android:focusableInTouchMode="false"
             android:paddingLeft="0dp"

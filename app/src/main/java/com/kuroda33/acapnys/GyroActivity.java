@@ -78,11 +78,14 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class GyroActivity extends AppCompatActivity implements SensorEventListener{
     SensorManager sensorManager;
+    long millis = TimeUnit.MILLISECONDS.ordinal();
     private final String TAG = "MainActivity";
     InetSocketAddress inetSocketAddress = null;
     private AlertDialog.Builder mAlertDialog;
@@ -113,6 +116,21 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
 
     private int soundType;
     private int vibrationType;
+    private boolean rehaF=true;
+
+    ArrayList <Float>  pitchA;
+    {
+        pitchA = new ArrayList<>();
+    }
+    ArrayList <Float>  rollA;
+    {
+        rollA = new ArrayList<>();
+    }
+    ArrayList <Float>  yawA;
+    {
+        yawA = new ArrayList<>();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -476,11 +494,86 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
             sensorManager.unregisterListener(this);
         }
     }
+    private int yaw180cnt = 0;//180°or -180°を越えた回数
+    private float theLastYaw = 0;
+    private float getYaw(Float y) {
+        if (yawA.size()==0) {
+            theLastYaw = y;
+            return y;
+        }
+        else {
+            if (theLastYaw > 100 && y < -100){
+                yaw180cnt += 1;
+            }
+            else if (theLastYaw < -100 && y>100){
+                yaw180cnt -= 1;
+            }
+            theLastYaw = y;
+            return (y + new Float(yaw180cnt * 360));
+        }
+    }
 
+    int getDirection(float a, float b, float c, float d)
+    {
+        if ((a+1 < b) && (b+1 < c) && (c+1 < d)){  return 1;}
+        else if ((a > b+1) && (b > c+1) && (c > d+1)){return -1;}
+        else {return 0;}
+    }
+
+    float RAD_TO_DEG=180F/3.1415F;
+    void QuaternionToEuler(float q0, float q1,float q2, float q3) {
+        float pitch,roll,yaw;
+        pitch = (float) Math.asin(-2 * q1 * q3 + 2 * q0 * q2);    // pitch
+        roll = (float) Math.atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2 * q2 + 1);
+        yaw = (float) Math.atan2(2 * (q1 * q2 + q0 * q3), q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3);
+
+        pitch *= RAD_TO_DEG;
+        yaw *= RAD_TO_DEG;
+        // Declination of SparkFun Electronics (40°05'26.6"N 105°11'05.9"W) is
+        //     8° 30' E  ± 0° 21' (or 8.5°) on 2016-07-19
+        // - http://www.ngdc.noaa.gov/geomag-web/#declination
+        //    yawf -= 8.5;
+        roll *= RAD_TO_DEG;
+        pitchA.add(pitch);//(Kalman(value: pitch, num: 0));
+        rollA.add(roll);//(Kalman(value: roll, num: 1));
+        float yawtmp=getYaw(yaw);
+        yawA.add(yawtmp);//(Kalman(value: yawtmp, num: 2))
+//        rollSecE.setText(String.format("%.1fs", rollSec));
+        pitchCurrentE.setText(String.format("%.0f",pitch));//);pitchText1.text=Int(pitch).description
+        rollCurrentE.setText(String.format("%.0f",roll));//);pitchText1.text=Int(pitch).description
+        yawCurrentE.setText(String.format("%.0f",yaw));//);pitchText1.text=Int(pitch).description
+//        pitch = int(pitchf);
+//        roll = int(rollf);
+//        yaw = int(yawf);
+    }
+//    func checkOK( d0:Float,d1:Float,limit:Float,count:Int,ms:Double)->Int
+/*
+private int checkOK( float d0,float d1,float limit,int count,double ms)
+    {
+        float d = d0 - d1;
+        if (count < 5){return 0;}//5*40ms
+        if (d > limit || d < -limit)
+        {
+//            print("pitch:",count*40,Int(ms*1000))
+            if (double(count*40) < ms*1000){
+                return 5;
+            }
+            else{
+                return 0;
+            }
+            //if (count < 50){return 5} // 30度以上１秒以内 25*40ms
+            //else {
+            //    return 0
+            //}
+        }
+        return 0;
+    }
+*/
     public void onSensorChanged(SensorEvent event) {
         float[] floats = new float[12];
         //floats[0]:header
         //floats[1-7]:damy
+        millis = TimeUnit.MILLISECONDS.ordinal();
         float nq0=floats[8] = (float) event.values[3];
         float nq1=floats[9] = (float) event.values[0];
         float nq2=floats[10] = (float) event.values[1];
@@ -514,9 +607,75 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
                 return null;
             }
         };
+        if (rehaF==true){
+            QuaternionToEuler(nq0,nq1,nq2,nq3);// q1: Float(quat.y), q2: Float(quat.x), q3: Float(quat.w))
+ //           pitchCurrentE.setText(String.format("%.2f",nq0));//);pitchText1.text=Int(pitch).description
+ //           rollCurrentE.setText(String.format("%.2f",nq1));//);pitchText1.text=Int(pitch).description
+ //           yawCurrentE.setText(String.format("%.2f",nq2));//
+    //        checkRotation();
+        }
+       // if UDPf==true{
+       //     send(dataUTF8!)
+       // }
+
         task.execute(datagramPacket);
     }
+ /*   private void checkRotation()
+    {
+        int tempDirection=0;
+        int cnt=pitchA.size() -1;
+        if(cnt<5){return;}
+        // pitch
+        tempDirection = getDirection(a:pitchA[cnt-3],b:pitchA[cnt-2],c:pitchA[cnt-1],d:pitchA[cnt])
+        if((tempDirection == -1 && pitchDirection == 1)||(tempDirection == 1 && pitchDirection == -1))//向きが代わった時
+        {
+            pitchDirection = tempDirection  //向きを新しくする
+            if(checkOK(d0:lastPitch,d1:pitchA[cnt-3],limit:Float(pitchStepper.value), count: cnt-3 - lastPitchCount,ms:pitchStepper2.value) == 5)
+            {
+                incPitchOK()
+                soundANDvibe()
+//                AudioServicesPlaySystemSound(1519)
+                //              print("o:",lastPitch-pitchA[cnt-3],cnt-3-lastPitchCount)
+            }
+            lastPitch = pitchA[cnt-3]
+            lastPitchCount = cnt-3
+        }
+        if (tempDirection != 0){pitchDirection = tempDirection}
 
+        // roll
+        tempDirection = getDirection(a:rollA[cnt - 3],b:rollA[cnt - 2],c:rollA[cnt - 1],d:rollA[cnt])
+        if ((tempDirection == -1 && rollDirection == 1)||(tempDirection == 1 && rollDirection == -1))
+        {
+            rollDirection = tempDirection
+            if (checkOK(d0:lastRoll,d1:rollA[cnt - 3],limit:Float(rollStepper.value),count: cnt - 3 - lastRollCount,ms:rollStepper2.value) == 5)
+            {
+                incRollOK()
+                soundANDvibe()
+//                AudioServicesPlaySystemSound(1103)//1519)
+            }
+            lastRoll = rollA[cnt-3]
+            lastRollCount = cnt-3
+        }
+        if (tempDirection != 0){rollDirection = tempDirection}
+
+        // yaw
+        tempDirection = getDirection(a:yawA[cnt-3], b:yawA[cnt - 2], c:yawA[cnt - 1], d:yawA[cnt]);
+        if ((tempDirection == -1 && yawDirection == 1)||(tempDirection == 1 && yawDirection == -1))
+        {
+            yawDirection = tempDirection
+            if (checkOK(d0:lastYaw, d1:yawA[cnt-3],limit:Float(yawStepper.value),count: cnt-3 - lastYawCount,ms:yawStepper2.value) == 5)
+            {
+                incYawOK()
+                soundANDvibe()
+//                AudioServicesPlaySystemSound(1519)
+            }
+            lastYaw = yawA[cnt-3]
+            lastYawCount = cnt-3
+        }
+        if (tempDirection != 0){yawDirection = tempDirection}
+
+    }
+*/
     // センサーの精度が変更されると呼ばれる
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
