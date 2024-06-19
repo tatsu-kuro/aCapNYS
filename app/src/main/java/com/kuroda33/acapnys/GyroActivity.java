@@ -10,6 +10,7 @@ import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
 import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+import static java.lang.Integer.*;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.round;
@@ -53,6 +54,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.text.Editable;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -92,7 +94,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     private EditText ipe1,ipe2,ipe3,ipe4;
     private EditText pitchDegreeE,pitchSecE,rollDegreeE,rollSecE,yawDegreeE,yawSecE;
     private EditText pitchCurrentE,pitchCountE,rollCurrentE,rollCountE,yawCurrentE,yawCountE;
-    private int pitchDegree,rollDegree,yawDegree;
+    private float pitchDegree,rollDegree,yawDegree;
     private float pitchSec,rollSec,yawSec;
     private Button ipSetBtn;
     private Button rehaStartBtn;
@@ -429,11 +431,11 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     private void saveData() {
         SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
         SharedPreferences.Editor editor = data.edit();
-        editor.putInt("pitchDegree",pitchDegree);
+        editor.putFloat("pitchDegree",pitchDegree);
         editor.putFloat("pitchSec",pitchSec);
-        editor.putInt("rollDegree",rollDegree);
+        editor.putFloat("rollDegree",rollDegree);
         editor.putFloat("rollSec",rollSec);
-        editor.putInt("yawDegree",yawDegree);
+        editor.putFloat("yawDegree",yawDegree);
         editor.putFloat("yawSec",yawSec);
         editor.putInt("soundType",soundType);
         editor.putInt("vibrationType",vibrationType);
@@ -459,20 +461,20 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
  */
     private void loadData() {
         SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
-        pitchDegree = data.getInt("pitchDegree",30);
+        pitchDegree = data.getFloat("pitchDegree",30);
         pitchSec = data.getFloat("pitchSec", 2F);
-        rollDegree = data.getInt("rollDegree",30);
+        rollDegree = data.getFloat("rollDegree",30);
         rollSec = data.getFloat("rollSec",2F);
-        yawDegree = data.getInt("yawDegree",30);
+        yawDegree = data.getFloat("yawDegree",30);
         yawSec = data.getFloat("yawSec", 2F);
         soundType = data.getInt("soundType",1);
         vibrationType = data.getInt("vibrationType",1);
 
-        pitchDegreeE.setText(String.format("%dd",pitchDegree));
+        pitchDegreeE.setText(String.format("%.0fd",pitchDegree));
         pitchSecE.setText(String.format("%.1fs",pitchSec));
-        rollDegreeE.setText(String.format("%dd",rollDegree));
+        rollDegreeE.setText(String.format("%.0fd",rollDegree));
         rollSecE.setText(String.format("%.1fs", rollSec));
-        yawDegreeE.setText(String.format("%dd",yawDegree));
+        yawDegreeE.setText(String.format("%.0fd",yawDegree));
         yawSecE.setText(String.format("%.1fs",yawSec));
         soundSpin.setSelection(soundType);
         vibrationSpin.setSelection(vibrationType);
@@ -509,7 +511,8 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
                 yaw180cnt -= 1;
             }
             theLastYaw = y;
-            return (y + new Float(yaw180cnt * 360));
+            float tmp=yaw180cnt*360F;
+            return (y + tmp);
         }
     }
 
@@ -541,21 +544,25 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
 //        rollSecE.setText(String.format("%.1fs", rollSec));
         pitchCurrentE.setText(String.format("%.0f",pitch));//);pitchText1.text=Int(pitch).description
         rollCurrentE.setText(String.format("%.0f",roll));//);pitchText1.text=Int(pitch).description
-        yawCurrentE.setText(String.format("%.0f",yaw));//);pitchText1.text=Int(pitch).description
+        yawCurrentE.setText(String.format("%.0f",yawtmp));//);pitchText1.text=Int(pitch).description
 //        pitch = int(pitchf);
 //        roll = int(rollf);
 //        yaw = int(yawf);
     }
 //    func checkOK( d0:Float,d1:Float,limit:Float,count:Int,ms:Double)->Int
-/*
-private int checkOK( float d0,float d1,float limit,int count,double ms)
+
+private int checkOK( float d0,float d1,float limit,int count,float ms)
     {
         float d = d0 - d1;
         if (count < 5){return 0;}//5*40ms
         if (d > limit || d < -limit)
         {
+            //int i = (count) * 40;
+            //long tmp = count.longValue();
+            //long tmp=Float(count);
+
 //            print("pitch:",count*40,Int(ms*1000))
-            if (double(count*40) < ms*1000){
+            if (count*40F < ms*1000F){
                 return 5;
             }
             else{
@@ -568,7 +575,7 @@ private int checkOK( float d0,float d1,float limit,int count,double ms)
         }
         return 0;
     }
-*/
+
     public void onSensorChanged(SensorEvent event) {
         float[] floats = new float[12];
         //floats[0]:header
@@ -612,7 +619,7 @@ private int checkOK( float d0,float d1,float limit,int count,double ms)
  //           pitchCurrentE.setText(String.format("%.2f",nq0));//);pitchText1.text=Int(pitch).description
  //           rollCurrentE.setText(String.format("%.2f",nq1));//);pitchText1.text=Int(pitch).description
  //           yawCurrentE.setText(String.format("%.2f",nq2));//
-    //        checkRotation();
+            checkRotation();
         }
        // if UDPf==true{
        //     send(dataUTF8!)
@@ -620,62 +627,91 @@ private int checkOK( float d0,float d1,float limit,int count,double ms)
 
         task.execute(datagramPacket);
     }
- /*   private void checkRotation()
+    int pitchDirection = 0;
+    int rollDirection = 0;
+    int yawDirection = 0;
+    float lastPitch = 0F;
+    int lastPitchCount = 0;
+    float lastRoll = 0F;
+    int lastRollCount = 0;
+    float lastYaw = 0F;
+    int lastYawCount = 0;
+    void incPitchOK(){
+        String str = pitchCountE.getText().toString();
+        int t = parseInt(str);
+        t += 1;
+        pitchCountE.setText(String.valueOf(t));
+    }
+
+
+    void incRollOK(){
+        String str = rollCountE.getText().toString();
+        int t = parseInt(str);
+        t += 1;
+        rollCountE.setText(String.valueOf(t));
+    }
+    void incYawOK(){
+        String str = yawCountE.getText().toString();
+        int t = parseInt(str);
+        t += 1;
+        yawCountE.setText(String.valueOf(t));
+    }
+
+    private void checkRotation()
     {
         int tempDirection=0;
         int cnt=pitchA.size() -1;
         if(cnt<5){return;}
         // pitch
-        tempDirection = getDirection(a:pitchA[cnt-3],b:pitchA[cnt-2],c:pitchA[cnt-1],d:pitchA[cnt])
+        tempDirection = getDirection(pitchA.get(cnt-3),pitchA.get(cnt-2),pitchA.get(cnt-1),pitchA.get(cnt));
         if((tempDirection == -1 && pitchDirection == 1)||(tempDirection == 1 && pitchDirection == -1))//向きが代わった時
         {
-            pitchDirection = tempDirection  //向きを新しくする
-            if(checkOK(d0:lastPitch,d1:pitchA[cnt-3],limit:Float(pitchStepper.value), count: cnt-3 - lastPitchCount,ms:pitchStepper2.value) == 5)
+            pitchDirection = tempDirection;  //向きを新しくする
+            if(checkOK(lastPitch,pitchA.get(cnt-3),pitchDegree, cnt-3 - lastPitchCount,pitchSec) == 5)
             {
-                incPitchOK()
-                soundANDvibe()
+                incPitchOK();
+            //    soundANDvibe();
 //                AudioServicesPlaySystemSound(1519)
                 //              print("o:",lastPitch-pitchA[cnt-3],cnt-3-lastPitchCount)
             }
-            lastPitch = pitchA[cnt-3]
-            lastPitchCount = cnt-3
+            lastPitch = pitchA.get(cnt-3);
+            lastPitchCount = cnt-3;
         }
-        if (tempDirection != 0){pitchDirection = tempDirection}
+        if (tempDirection != 0){pitchDirection = tempDirection;}
 
         // roll
-        tempDirection = getDirection(a:rollA[cnt - 3],b:rollA[cnt - 2],c:rollA[cnt - 1],d:rollA[cnt])
+        tempDirection = getDirection(rollA.get(cnt - 3),rollA.get(cnt - 2),rollA.get(cnt - 1),rollA.get(cnt));
         if ((tempDirection == -1 && rollDirection == 1)||(tempDirection == 1 && rollDirection == -1))
         {
-            rollDirection = tempDirection
-            if (checkOK(d0:lastRoll,d1:rollA[cnt - 3],limit:Float(rollStepper.value),count: cnt - 3 - lastRollCount,ms:rollStepper2.value) == 5)
+            rollDirection = tempDirection;
+            if (checkOK(lastRoll,rollA.get(cnt - 3),rollDegree, cnt - 3 - lastRollCount,rollSec) == 5)
             {
-                incRollOK()
-                soundANDvibe()
+                incRollOK();
+//                soundANDvibe()
 //                AudioServicesPlaySystemSound(1103)//1519)
             }
-            lastRoll = rollA[cnt-3]
-            lastRollCount = cnt-3
+            lastRoll = rollA.get(cnt-3);
+            lastRollCount = cnt-3;
         }
-        if (tempDirection != 0){rollDirection = tempDirection}
+        if (tempDirection != 0){rollDirection = tempDirection;}
 
         // yaw
-        tempDirection = getDirection(a:yawA[cnt-3], b:yawA[cnt - 2], c:yawA[cnt - 1], d:yawA[cnt]);
+        tempDirection = getDirection(yawA.get(cnt-3), yawA.get(cnt - 2),yawA.get(cnt - 1),yawA.get(cnt));
         if ((tempDirection == -1 && yawDirection == 1)||(tempDirection == 1 && yawDirection == -1))
         {
-            yawDirection = tempDirection
-            if (checkOK(d0:lastYaw, d1:yawA[cnt-3],limit:Float(yawStepper.value),count: cnt-3 - lastYawCount,ms:yawStepper2.value) == 5)
+            yawDirection = tempDirection;
+            if (checkOK(lastYaw,yawA.get(cnt-3),yawDegree, cnt-3 - lastYawCount,yawSec) == 5)
             {
-                incYawOK()
-                soundANDvibe()
+                incYawOK();
+//                soundANDvibe()
 //                AudioServicesPlaySystemSound(1519)
             }
-            lastYaw = yawA[cnt-3]
-            lastYawCount = cnt-3
+            lastYaw = yawA.get(cnt-3);
+            lastYawCount = cnt-3;
         }
-        if (tempDirection != 0){yawDirection = tempDirection}
-
+        if (tempDirection != 0){yawDirection = tempDirection;}
     }
-*/
+
     // センサーの精度が変更されると呼ばれる
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
