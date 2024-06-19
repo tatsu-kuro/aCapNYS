@@ -59,9 +59,11 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -88,7 +90,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     private EditText pitchDegreeE,pitchSecE,rollDegreeE,rollSecE,yawDegreeE,yawSecE;
     private EditText pitchCurrentE,pitchCountE,rollCurrentE,rollCountE,yawCurrentE,yawCountE;
     private int pitchDegree,rollDegree,yawDegree;
-    private double pitchSec,rollSec,yawSec;
+    private float pitchSec,rollSec,yawSec;
     private Button ipSetBtn;
     private Button rehaStartBtn;
     private Button rehaStopBtn;
@@ -107,6 +109,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     private Button yawDegreeDownBtn;
     private Button yawSecUpBtn;
     private Button yawSecDownBtn;
+    private Spinner soundSpin,vibrationSpin;
 
     private int soundType;
     private int vibrationType;
@@ -155,6 +158,9 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         yawDegreeE = (EditText) findViewById(R.id.yaw2);
         yawSecE = (EditText) findViewById(R.id.yaw3);
 
+        soundSpin = (Spinner) findViewById(R.id.soundSpinner);
+        vibrationSpin = (Spinner)findViewById(R.id.vibrationSpinner);
+
         loadData();
 
         mAlertDialog = new AlertDialog.Builder(this);
@@ -178,6 +184,14 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
             }
         });
    */
+   /*     soundSpin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("spin****", (String) soundSpin.getSelectedItem());
+            }
+        });*/
+        soundSpin.setOnItemSelectedListener(new soundSpinnerSelectedListener());
+        vibrationSpin.setOnItemSelectedListener(new vibrationSpinnerSelectedListener());
         ipSetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -357,16 +371,54 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
             }
         });
     }
+    public class soundSpinnerSelectedListener implements AdapterView.OnItemSelectedListener{
+        public void onItemSelected(AdapterView parent, View view, int position, long id) {
+            // Spinner を取得
+            Spinner spinner = (Spinner) parent;
+            // 選択されたアイテムのテキストを取得
+            //String str = spinner.getSelectedItem().toString();
+            //Log.d(TAG,str);
+            soundType=Math.toIntExact (spinner.getSelectedItemId());
+            saveData();
+            loadData();
+            //TextView textView1 = (TextView)findViewById(R.id.textView1);
+            //textView1.setText(str);
+        }
 
+        // 何も選択されなかった時の動作
+        public void onNothingSelected(AdapterView parent) {
+        }
+    }
+    public class vibrationSpinnerSelectedListener implements AdapterView.OnItemSelectedListener{
+        public void onItemSelected(AdapterView parent, View view, int position, long id) {
+            // Spinner を取得
+            Spinner spinner = (Spinner) parent;
+            // 選択されたアイテムのテキストを取得
+        //    String str = String.valueOf(spinner.getSelectedItemId());
+            //vibrationType=
+            vibrationType=Math.toIntExact (spinner.getSelectedItemId());
+            saveData();
+            loadData();
+     //       Log.d(TAG,str);
+            //TextView textView1 = (TextView)findViewById(R.id.textView1);
+            //textView1.setText(str);
+        }
+
+        // 何も選択されなかった時の動作
+        public void onNothingSelected(AdapterView parent) {
+        }
+    }
     private void saveData() {
         SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
         SharedPreferences.Editor editor = data.edit();
-        editor.putString("pitchDegree",String.valueOf(pitchDegree));
-        editor.putString("pitchSec",String.valueOf(pitchSec));
-        editor.putString("rollDegree",String.valueOf(rollDegree));
-        editor.putString("rollSec",String.valueOf(rollSec));
-        editor.putString("yawDegree",String.valueOf(yawDegree));
-        editor.putString("yawSec",String.valueOf(yawSec));
+        editor.putInt("pitchDegree",pitchDegree);
+        editor.putFloat("pitchSec",pitchSec);
+        editor.putInt("rollDegree",rollDegree);
+        editor.putFloat("rollSec",rollSec);
+        editor.putInt("yawDegree",yawDegree);
+        editor.putFloat("yawSec",yawSec);
+        editor.putInt("soundType",soundType);
+        editor.putInt("vibrationType",vibrationType);
         editor.putString("ip1", ipe1.getText().toString());
         editor.putString("ip2", ipe2.getText().toString());
         editor.putString("ip3", ipe3.getText().toString());
@@ -389,25 +441,23 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
  */
     private void loadData() {
         SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
-        String pd = data.getString("pitchDegree","30");
-        String ps = data.getString("pitchSec","2.0");
-        String rd = data.getString("rollDegree","30");
-        String rs = data.getString("rollSec","2.0");
-        String yd = data.getString("yawDegree","30");
-        String ys = data.getString("yawSec","2.0");
-        // pitchText4.text=(round(pitchStepper2.value*10)/10).description + "s"
-        pitchDegree= Integer.parseInt(pd);
-        pitchSec=Double.parseDouble(ps);
-        rollDegree=Integer.parseInt(rd);
-        rollSec=Double.parseDouble(rs);
-        yawDegree=Integer.parseInt(yd);
-        yawSec=Double.parseDouble(ys);
-        pitchDegreeE.setText(pd + "d");
+        pitchDegree = data.getInt("pitchDegree",30);
+        pitchSec = data.getFloat("pitchSec", 2F);
+        rollDegree = data.getInt("rollDegree",30);
+        rollSec = data.getFloat("rollSec",2F);
+        yawDegree = data.getInt("yawDegree",30);
+        yawSec = data.getFloat("yawSec", 2F);
+        soundType = data.getInt("soundType",1);
+        vibrationType = data.getInt("vibrationType",1);
+
+        pitchDegreeE.setText(String.format("%dd",pitchDegree));
         pitchSecE.setText(String.format("%.1fs",pitchSec));
-        rollDegreeE.setText(rd + "d");
+        rollDegreeE.setText(String.format("%dd",rollDegree));
         rollSecE.setText(String.format("%.1fs", rollSec));
-        yawDegreeE.setText(yd + "d");
+        yawDegreeE.setText(String.format("%dd",yawDegree));
         yawSecE.setText(String.format("%.1fs",yawSec));
+        soundSpin.setSelection(soundType);
+        vibrationSpin.setSelection(vibrationType);
 
         ipe1.setText(data.getString("ip1","192"));
         ipe2.setText(data.getString("ip2","168"));
