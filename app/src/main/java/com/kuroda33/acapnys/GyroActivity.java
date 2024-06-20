@@ -3,6 +3,7 @@ package com.kuroda33.acapnys;
 //import static androidx.transition.GhostViewHolder.getHolder;
 
 import static android.app.PendingIntent.getActivity;
+import static android.os.VibrationEffect.DEFAULT_AMPLITUDE;
 import static android.util.Log.i;
 import static android.view.View.SYSTEM_UI_FLAG_FULLSCREEN;
 import static android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
@@ -55,6 +56,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.method.ScrollingMovementMethod;
@@ -374,6 +377,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         rehaStartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                rehaF=true;
            //     i(TAG,ips1+ips2+ips3+ips4);
                 Log.d(TAG,"onclickStart");
             }
@@ -381,6 +385,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         rehaStopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                rehaF=false;
                 //     i(TAG,ips1+ips2+ips3+ips4);
                 Log.d(TAG,"onclickStop");
             }
@@ -672,7 +677,36 @@ private int checkOK( float d0,float d1,float limit,int count,float ms)
         yawCountE.setText(String.valueOf(t));
     }
 void soundANDvibe(){
-        soundPool.play(sound1,1.0F,1.0F,1,0,1);
+        if(soundType==1) {
+            soundPool.play(sound1, 1.0F, 1.0F, 1, 0, 1);
+        }else if(soundType==2){
+            soundPool.play(sound2, 1.0F, 1.0F, 1, 0, 1);
+        }else if(soundType==3){
+            soundPool.play(sound3, 1.0F, 1.0F, 1, 0, 1);
+        }
+        long ms = 0;
+         if(vibrationType==1)ms=50;
+        else if(vibrationType==2)ms=100;
+        else if(vibrationType==3)ms=150;
+// Vibrate for 500 milliseconds
+    if(ms!=0) {
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(ms, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26
+            v.vibrate(ms);
+        }
+    }
+    /*val vibrationEffect = VibrationEffect.createOneShot(300, DEFAULT_AMPLITUDE)
+    vibrator.vibrate(vibrationEffect)
+    vibrationEffect = VibrationEffect.createWaveform(longArrayOf(300, 300), intArrayOf(0, DEFAULT_AMPLITUDE), -1)
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        val vibrationEffect = VibrationEffect.createOneShot(300, VDEFAULT_AMPLITUDE)
+        vibrator.vibrate(vibrationEffect)
+    } else {
+        vibrator.vibrate(300);*/
 }
     private void checkRotation()
     {
