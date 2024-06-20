@@ -10,7 +10,10 @@
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="365dp"
+        tools:layout_editor_absoluteY="0dp">
+
 
     </androidx.camera.view.PreviewView>
 
@@ -26,12 +29,11 @@
         android:id="@+id/seekBar"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="4dp"
         android:clickable="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/helpButton"
-        app:layout_constraintStart_toEndOf="@+id/playButton" />
-
+        app:layout_constraintEnd_toStartOf="@+id/playButton"
+        app:layout_constraintStart_toEndOf="@+id/zoomButton" />
 
     <Button
         android:id="@+id/video_capture_button"
@@ -45,37 +47,62 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
     <ImageButton
         android:id="@+id/playButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@android:drawable/editbox_background_normal"
+        android:src="@drawable/play"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="NULL"/>
+
+    <EditText
+        android:id="@+id/zoomButton"
+        android:layout_width="80dp"
+        android:layout_height="50dp"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
-        android:src="@drawable/play"
+        android:text="zoom"
+        android:textAlignment="center"
+        android:focusableInTouchMode="false"
         android:background="@android:drawable/editbox_background_normal"
         app:layout_constraintBottom_toBottomOf="parent" />
+    <Button
+        android:id="@+id/gyroButton"
+        android:layout_width="80dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
 
+        android:background="@android:drawable/editbox_background_normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
+        android:text="Gyro" />
+    <ImageButton
+        android:id="@+id/helpButton"
+        android:layout_width="80dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="8dp"
+        android:background="@android:drawable/editbox_background_normal"
+        android:src="@drawable/help"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/cameraButton"
+        android:contentDescription="NULL"/>
     <ImageButton
         android:id="@+id/cameraButton"
-        android:layout_width="50dp"
+        android:layout_width="80dp"
         android:layout_height="50dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="@android:drawable/editbox_background_normal"
         android:src="@drawable/camera"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <ImageButton
-        android:id="@+id/helpButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@android:drawable/editbox_background_normal"
-        android:src="@drawable/help"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:contentDescription="NULL"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

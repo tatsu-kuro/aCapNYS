@@ -100,14 +100,14 @@ class MainActivity : AppCompatActivity() , SensorEventListener{//},SurfaceHolder
       //  viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
         viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
         viewBinding.helpButton.setOnClickListener {
-   //         val intent = Intent(/* packageContext = */ application,/* cls = */ GridButtons::class.java)
-   //         startActivity(/* intent = */ intent)
+            val intent = Intent(/* packageContext = */ application,/* cls = */ How2Activity::class.java)
+            startActivity(/* intent = */ intent)
+        }
+        viewBinding.gyroButton.setOnClickListener {
+            //         val intent = Intent(/* packageContext = */ application,/* cls = */ GridButtons::class.java)
+            //         startActivity(/* intent = */ intent)
             val intent = Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
             startActivity(/* intent = */ intent)
-
-
-   //         val intent = Intent(/* packageContext = */ application,/* cls = */ How2Activity::class.java)
-     //       startActivity(/* intent = */ intent)
         }
         viewBinding.playButton.setOnClickListener {
             val intent =
@@ -199,6 +199,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener{//},SurfaceHolder
             viewBinding.seekBar.visibility=View.VISIBLE
             viewBinding.playButton.visibility=View.VISIBLE
             viewBinding.helpButton.visibility=View.VISIBLE
+            viewBinding.zoomButton.visibility=View.VISIBLE
+            viewBinding.gyroButton.visibility=View.VISIBLE
             viewBinding.myView.alpha=1f
             viewBinding.viewFinder.alpha=1f
             viewBinding.videoCaptureButton.alpha=0.1f
@@ -218,6 +220,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener{//},SurfaceHolder
             viewBinding.seekBar.visibility=View.INVISIBLE
             viewBinding.playButton.visibility=View.INVISIBLE
             viewBinding.helpButton.visibility=View.INVISIBLE
+            viewBinding.zoomButton.visibility=View.INVISIBLE
+            viewBinding.gyroButton.visibility=View.INVISIBLE
             viewBinding.videoCaptureButton.alpha=0.015f
             if(camera_num==0){
                 viewBinding.myView.alpha=0f

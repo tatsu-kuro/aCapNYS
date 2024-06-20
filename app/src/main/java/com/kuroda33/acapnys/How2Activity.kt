@@ -11,11 +11,11 @@ class How2Activity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_how2)
         val exitBtn=findViewById<Button>(R.id.exitButton)
-        val sendBtn=findViewById<Button>(R.id.sendButton)
-        sendBtn.setOnClickListener{
-            val intent = Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
-            startActivity(/* intent = */ intent)
-        }
+    //    val sendBtn=findViewById<Button>(R.id.sendButton)
+    //    sendBtn.setOnClickListener{
+    //        val intent = Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
+    //        startActivity(/* intent = */ intent)
+    //    }
         exitBtn.setOnClickListener(View.OnClickListener {
             //Log.d(TAG, "surfaceDestroyed...")
             finish()
