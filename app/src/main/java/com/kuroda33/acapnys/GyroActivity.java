@@ -97,13 +97,14 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     long millis = TimeUnit.MILLISECONDS.ordinal();
     private final String TAG = "MainActivity";
     InetSocketAddress inetSocketAddress = null;
-    private AlertDialog.Builder mAlertDialog;
+  //  private AlertDialog.Builder mAlertDialog;
     private EditText ipe1,ipe2,ipe3,ipe4;
     private EditText pitchDegreeE,pitchSecE,rollDegreeE,rollSecE,yawDegreeE,yawSecE;
     private EditText pitchCurrentE,pitchCountE,rollCurrentE,rollCountE,yawCurrentE,yawCountE;
     private float pitchDegree,rollDegree,yawDegree;
     private float pitchSec,rollSec,yawSec;
     private Button ipSetBtn;
+    private Button exitBtn;
     private Button rehaStartBtn;
     private Button rehaStopBtn;
     private Button rehaResetBtn;
@@ -177,7 +178,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         yawDegreeUpBtn = (Button) findViewById(R.id.yawDegreeUpButton);
         yawSecDownBtn = (Button) findViewById(R.id.yawSecDownButton);
         yawSecUpBtn = (Button) findViewById(R.id.yawSecUpButton);
-
+        exitBtn = (Button) findViewById(R.id.exitButton);
         ipe1 = (EditText) findViewById(R.id.ip1);
         ipe2 = (EditText) findViewById(R.id.ip2);
         ipe3 = (EditText) findViewById(R.id.ip3);
@@ -195,39 +196,15 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         rollSecE = (EditText) findViewById(R.id.roll3);
         yawDegreeE = (EditText) findViewById(R.id.yaw2);
         yawSecE = (EditText) findViewById(R.id.yaw3);
-
         soundSpin = (Spinner) findViewById(R.id.soundSpinner);
         vibrationSpin = (Spinner)findViewById(R.id.vibrationSpinner);
 
-        loadData();
+  //      loadData();
 
-        mAlertDialog = new AlertDialog.Builder(this);
-        mAlertDialog.setTitle("Alert");
-        mAlertDialog.setPositiveButton("OK", null);
+  //      mAlertDialog = new AlertDialog.Builder(this);
+  //      mAlertDialog.setTitle("Alert");
+  //      mAlertDialog.setPositiveButton("OK", null);
 
-  /*      CamSelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                prepareSerialCommunication();
-                i(TAG, "onClick CamSelBtn.");
-            }
-        });
-        Selbtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                getTargetAddress();
-                //   prepareSerialCommunication();
-            }
-        });
-   */
-   /*     soundSpin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i("spin****", (String) soundSpin.getSelectedItem());
-            }
-        });*/
         soundSpin.setOnItemSelectedListener(new soundSpinnerSelectedListener());
         vibrationSpin.setOnItemSelectedListener(new vibrationSpinnerSelectedListener());
         ipSetBtn.setOnClickListener(new View.OnClickListener() {
@@ -393,23 +370,27 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         rehaResetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                pitchCountE.setText("0");
+                rollCountE.setText("0");
+                yawCountE.setText("0");
                 //     i(TAG,ips1+ips2+ips3+ips4);
-                Log.d(TAG,"onclickReset");
+              //  Log.d(TAG,"onclickReset");
+            }
+        });
+
+        exitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //   Log.d(TAG, "surfaceDestroyed...");
+                finish();
             }
         });
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         //     sma.registerListener(this,sma.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR),SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),SensorManager.SENSOR_DELAY_FASTEST);
         //set_rpk_ppk();
+        loadData();
 
-        Button ExitBtn=findViewById(R.id.exitButton);
-        ExitBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-             //   Log.d(TAG, "surfaceDestroyed...");
-                finish();
-            }
-        });
     }
     public class soundSpinnerSelectedListener implements AdapterView.OnItemSelectedListener{
         public void onItemSelected(AdapterView parent, View view, int position, long id) {
