@@ -12,14 +12,14 @@
     </string>
     <string-array name="spinner_items1">
         <item>OFF</item>
-        <item>small</item>
-        <item>mid</item>
-        <item>big</item>
+        <item>A</item>
+        <item>B</item>
+        <item>C</item>
     </string-array>
     <string-array name="spinner_items2">
         <item>OFF</item>
-        <item>small</item>
-        <item>mid</item>
-        <item>big</item>
+        <item>S</item>
+        <item>M</item>
+        <item>L</item>
     </string-array>
 </resources>

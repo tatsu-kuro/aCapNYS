@@ -451,6 +451,19 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     private void saveData() {
         SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
         SharedPreferences.Editor editor = data.edit();
+        if(pitchDegree>120)pitchDegree=120;
+        else if(pitchDegree<20)pitchDegree=20;
+        if(rollDegree>120)rollDegree=120;
+        else if(rollDegree<20)rollDegree=20;
+        if(yawDegree>120)yawDegree=120;
+        else if(yawDegree<20)yawDegree=20;
+        if(pitchSec>4)pitchSec=4;
+        else if(pitchSec<0.3)pitchSec=0.3F;
+        if(rollSec>4)rollSec=4;
+        else if(rollSec<0.3)rollSec=0.3F;
+        if(yawSec>4)yawSec=4;
+        else if(yawSec<0.3)yawSec=0.3F;
+
         editor.putFloat("pitchDegree",pitchDegree);
         editor.putFloat("pitchSec",pitchSec);
         editor.putFloat("rollDegree",rollDegree);
@@ -738,7 +751,7 @@ void soundANDvibe(){
             if (checkOK(lastRoll,rollA.get(cnt - 3),rollDegree, cnt - 3 - lastRollCount,rollSec) == 5)
             {
                 incRollOK();
-//                soundANDvibe()
+                soundANDvibe();
 //                AudioServicesPlaySystemSound(1103)//1519)
             }
             lastRoll = rollA.get(cnt-3);
@@ -754,7 +767,7 @@ void soundANDvibe(){
             if (checkOK(lastYaw,yawA.get(cnt-3),yawDegree, cnt-3 - lastYawCount,yawSec) == 5)
             {
                 incYawOK();
-//                soundANDvibe()
+                soundANDvibe();
 //                AudioServicesPlaySystemSound(1519)
             }
             lastYaw = yawA.get(cnt-3);
