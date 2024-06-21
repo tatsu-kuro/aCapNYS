@@ -53,7 +53,7 @@ import java.util.concurrent.Executors
 
 typealias LumaListener = (luma: Double) -> Unit
 
-class MainActivity : AppCompatActivity() , SensorEventListener{//},SurfaceHolder.Callback{
+class MainActivity : AppCompatActivity() , SensorEventListener{
     private var videoURI: String ="no video"
     private lateinit var sensorManager: SensorManager
     private var quaternionSensor: Sensor? = null
@@ -130,12 +130,12 @@ class MainActivity : AppCompatActivity() , SensorEventListener{//},SurfaceHolder
                     progress: Int,
                     fromUser: Boolean
                 ) {
-
                     if (fromUser==true){
-
                         zoom100 = progress
                         savePara()
-                        startCamera()//   Log.d("kdkdkdkdkdk","$progress")
+                        val cameraController = camera!!.cameraControl
+                        cameraController.setLinearZoom(zoom100/100f)
+//                        startCamera()//   Log.d("kdkdkdkdkdk","$progress")
                     }
                 }
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
