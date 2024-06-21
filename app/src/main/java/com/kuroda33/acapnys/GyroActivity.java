@@ -382,6 +382,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void onClick(View v) {
                 //   Log.d(TAG, "surfaceDestroyed...");
+                rehaF=false;
                 finish();
             }
         });
