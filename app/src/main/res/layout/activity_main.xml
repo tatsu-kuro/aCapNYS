@@ -27,10 +27,16 @@
 
     <SeekBar
         android:id="@+id/seekBar"
+        style="@style/Base.Theme.ACapNYS"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="4dp"
-        android:clickable="false"
+        android:layout_height="42dp"
+        android:layout_marginBottom="12dp"
+
+
+        android:background="#ccc"
+        android:clickable="true"
+
+        android:progressTint="@color/design_default_color_primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/playButton"
         app:layout_constraintStart_toEndOf="@+id/zoomButton" />
