@@ -7,13 +7,13 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
-import android.graphics.ColorSpace.Rgb
+//import android.graphics.Color
+//import android.graphics.ColorSpace.Rgb
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.net.Uri
+//import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -21,15 +21,17 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.view.WindowManager
-import android.widget.MediaController
+//import android.widget.MediaController
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageProxy
+//import androidx.camera.core.ImageAnalysis
+//import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.MediaStoreOutputOptions
@@ -39,24 +41,25 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
-import androidx.camera.view.LifecycleCameraController
+//import androidx.camera.view.LifecycleCameraController
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
+//import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import com.kuroda33.acapnys.databinding.ActivityMainBinding
-import java.net.URI
-import java.nio.ByteBuffer
+//import java.net.URI
+//import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-typealias LumaListener = (luma: Double) -> Unit
+//typealias LumaListener = (luma: Double) -> Unit
 
 class MainActivity : AppCompatActivity() , SensorEventListener{
     private var videoURI: String ="no video"
     private lateinit var sensorManager: SensorManager
-    private var quaternionSensor: Sensor? = null
+//    private var quaternionSensor: Sensor? = null
 
     private lateinit var viewBinding: ActivityMainBinding
 
@@ -64,20 +67,32 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
     private var recording: Recording? = null
 
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var cameraController: LifecycleCameraController
+//    private lateinit var cameraController: LifecycleCameraController
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) hideSystemUI()
     }
 
     private fun hideSystemUI() {
-        val decorView = window.decorView
-        decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_FULLSCREEN)
+    //    val decorView = window.decorView
+        // API 30以上の場合
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.decorView.windowInsetsController?.apply {
+                // systemBars : Status barとNavigation bar両方
+                hide(WindowInsets.Type.systemBars())
+                // hide(WindowInsets.Type.statusBars())
+                // hide(WindowInsets.Type.navigationBars())
+                systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
+            }
+            // API 29以下の場合
+        } else {
+            window.decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            or View.SYSTEM_UI_FLAG_FULLSCREEN)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,9 +100,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
         val seekBar = findViewById<SeekBar>(R.id.seekBar)
-        val width=viewBinding.root.maxWidth
+      // val width=viewBinding.root.maxWidth
+
         getPara()
-        viewBinding.myView.setCamera(camera_num)
+        viewBinding.myView.setCamera(cameraNum)
         // Request camera permissions
         if (allPermissionsGranted()) {
             startCamera()
@@ -112,7 +128,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         viewBinding.playButton.setOnClickListener {
             val intent =
                 Intent(/* packageContext = */ application,/* cls = */ PlayActivity::class.java)
-            if (!(videoURI == "no video")){
+            if (videoURI != "no video"){
             intent.putExtra("videouri", videoURI)
             startActivity(/* intent = */ intent)
             }
@@ -130,7 +146,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                     progress: Int,
                     fromUser: Boolean
                 ) {
-                    if (fromUser==true){
+                    if (fromUser){
                         zoom100 = progress
                         savePara()
                         val cameraController = camera!!.cameraControl
@@ -152,14 +168,14 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             SensorManager.SENSOR_DELAY_FASTEST
         )
         viewBinding.myView.set_rpk_ppk()
-        setPreviewSize(camera_num)
+        setPreviewSize(cameraNum)
         setButtons(true)
       //  val videoview=viewBinding.videoView
       //  videoview.alpha=0f
      //   viewBinding.viewFinder.background=Rgb(255,255,255,255)
       //  viewBinding.helpButton.setBackgroundColor(Color.rgb(255, 255, 255))
     }
-    fun setPreviewSize(cameraN:Int){
+    private fun setPreviewSize(cameraN:Int){
         if(cameraN==0) {
             viewBinding.viewFinder.scaleX = 0.2f
             viewBinding.viewFinder.scaleY = 0.2f
@@ -170,7 +186,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.viewFinder.translationX = 0f
         }
     }
-
+/*
     private class LuminosityAnalyzer(private val listener: LumaListener) : ImageAnalysis.Analyzer {
 
         private fun ByteBuffer.toByteArray(): ByteArray {
@@ -191,9 +207,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
             image.close()
         }
-    }
-    private fun setButtons(ON:Boolean){
-        if(ON){
+    }*/
+    private fun setButtons(on:Boolean){
+        if(on){
             viewBinding.helpButton.visibility=View.VISIBLE
             viewBinding.cameraButton.visibility=View.VISIBLE
             viewBinding.seekBar.visibility=View.VISIBLE
@@ -205,7 +221,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.viewFinder.alpha=1f
             viewBinding.videoCaptureButton.alpha=0.1f
             val windowAttributes = window.attributes
-          //  if(camera_num==0) {
+          //  if(cameraNum==0) {
           //      windowAttributes.screenBrightness =
           //          WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
           //      window.attributes = windowAttributes
@@ -223,7 +239,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.zoomButton.visibility=View.INVISIBLE
             viewBinding.gyroButton.visibility=View.INVISIBLE
             viewBinding.videoCaptureButton.alpha=0.015f
-            if(camera_num==0){
+            if(cameraNum==0){
                 viewBinding.myView.alpha=0f
                 viewBinding.viewFinder.alpha=0f
                 val windowAttributes = window.attributes
@@ -339,7 +355,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 */
             // Select back camera as a default
             var cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-            if(camera_num==1) {
+            if(cameraNum==1) {
                 cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
             }
             try {
@@ -407,9 +423,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
     override fun onDestroy() {
         super.onDestroy()
-        if (sensorManager != null) {
+      //  if (sensorManager != null) {
             sensorManager.unregisterListener(this)
-        }
+        //}
         cameraExecutor.shutdown()
     }
 
@@ -442,21 +458,21 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             }
         }
     }
-    var camera_num:Int=0
+    private var cameraNum:Int=0
     var zoom100:Int=0
 
     private fun savePara(){
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val editor = sharedPreferences.edit()
-        editor.putInt("camera_num",camera_num)
+        editor.putInt("cameraNum",cameraNum)
         editor.putInt("zoom100",zoom100)
         editor.apply()
-        viewBinding.myView.setCamera(camera_num)
+        viewBinding.myView.setCamera(cameraNum)
     }
     private fun getPara(){
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val editor = sharedPreferences.edit()
-        camera_num = sharedPreferences.getInt("camera_num",1)
+       // val editor = sharedPreferences.edit()
+        cameraNum = sharedPreferences.getInt("cameraNum",1)
         zoom100=sharedPreferences.getInt("zoom100",10)
     }
     private var camera: Camera?= null
@@ -464,23 +480,23 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
     //  private var videoCapture: VideoCapture?= null
     private fun changeCamera(){
         getPara()
-        if(camera_num==1){
-            camera_num=0//front
+        if (cameraNum == 1) {
+            cameraNum = 0//front
         }else{
-            camera_num=1//back
+            cameraNum = 1//back
         }
         savePara()
         startCamera()
         sensorReset()
-        setPreviewSize(camera_num)
+        setPreviewSize(cameraNum)
     }
 
-    var tempTime:Long = 0
+    private var tempTime:Long = 0
     override fun onSensorChanged(event: SensorEvent) {
-        var nq0 = event.values[3]
-        var nq1 = event.values[0]
-        var nq2 = event.values[1]
-        var nq3 = event.values[2]
+        val nq0 = event.values[3]
+        val nq1 = event.values[0]
+        val nq2 = event.values[1]
+        val nq3 = event.values[2]
         val currentTime =System.currentTimeMillis()
         if(currentTime>tempTime+30) {
             tempTime=currentTime
@@ -489,7 +505,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         //    Log.e("tetetete",str)
         }
     }
-    fun sensorReset(){
+    private fun sensorReset(){
         sensorManager.unregisterListener(this)
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         sensorManager.registerListener(
@@ -502,7 +518,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
     override fun onTouchEvent(event: MotionEvent?): Boolean {
 
         if (event != null) {
-            when(event!!.action){
+            when(event.action){
                 MotionEvent.ACTION_DOWN -> sensorReset()
             }
         }
