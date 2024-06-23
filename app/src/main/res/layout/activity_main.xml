@@ -59,11 +59,18 @@
         android:layout_height="50dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
+
         android:background="@android:drawable/editbox_background_normal"
+        android:backgroundTint="@color/design_default_color_primary"
+        android:contentDescription="NULL"
+
+        app:tint="@color/white"
+
+
         android:src="@drawable/play"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:contentDescription="NULL"/>
+     />
 
     <EditText
         android:id="@+id/zoomButton"

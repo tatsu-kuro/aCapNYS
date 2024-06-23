@@ -788,7 +788,7 @@ void soundANDvibe(){
 
 
 
-    @Override
+ /*   @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) hideSystemUI();
@@ -805,5 +805,5 @@ void soundANDvibe(){
                         | View.SYSTEM_UI_FLAG_FULLSCREEN
         );
     }
-
+*/
 }

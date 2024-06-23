@@ -21,7 +21,7 @@ class How2Activity : AppCompatActivity() {
             finish()
         })
     }
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
+   /* override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) hideSystemUI()
     }
@@ -34,5 +34,5 @@ class How2Activity : AppCompatActivity() {
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_FULLSCREEN)
-    }
+    }*/
 }

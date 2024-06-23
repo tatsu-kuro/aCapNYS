@@ -27,6 +27,7 @@ import android.view.WindowManager
 //import android.widget.MediaController
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -68,12 +69,12 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
     private lateinit var cameraExecutor: ExecutorService
 //    private lateinit var cameraController: LifecycleCameraController
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
+ /*   override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) hideSystemUI()
     }
-
-    private fun hideSystemUI() {
+*/
+ /*   private fun hideSystemUI() {
     //    val decorView = window.decorView
         // API 30以上の場合
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -94,14 +95,14 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                             or View.SYSTEM_UI_FLAG_FULLSCREEN)
         }
     }
-
+*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
         val seekBar = findViewById<SeekBar>(R.id.seekBar)
       // val width=viewBinding.root.maxWidth
-
+        videoURI="no video"
         getPara()
         viewBinding.myView.setCamera(cameraNum)
         // Request camera permissions
@@ -114,7 +115,11 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         seekBar.progress=zoom100
         // Set up the listeners for take photo and video capture buttons
       //  viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
-        viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
+        viewBinding.videoCaptureButton.setOnClickListener {
+    //        hideSystemUI()
+
+            captureVideo()
+        }
         viewBinding.helpButton.setOnClickListener {
             val intent = Intent(/* packageContext = */ application,/* cls = */ How2Activity::class.java)
             startActivity(/* intent = */ intent)
@@ -170,6 +175,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         viewBinding.myView.set_rpk_ppk()
         setPreviewSize(cameraNum)
         setButtons(true)
+
       //  val videoview=viewBinding.videoView
       //  videoview.alpha=0f
      //   viewBinding.viewFinder.background=Rgb(255,255,255,255)
@@ -210,10 +216,18 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
     }*/
     private fun setButtons(on:Boolean){
         if(on){
+            Log.e(TAG, "Video capture ends with error: " + videoURI)
+            if (videoURI == "no video"){
+                         viewBinding.playButton.visibility=View.INVISIBLE
+                Log.e(TAG, "Video capture no: " + videoURI)
+            }else{
+                viewBinding.playButton.visibility=View.VISIBLE
+                Log.e(TAG, "Video capture yes: " + videoURI)
+            }
             viewBinding.helpButton.visibility=View.VISIBLE
             viewBinding.cameraButton.visibility=View.VISIBLE
             viewBinding.seekBar.visibility=View.VISIBLE
-            viewBinding.playButton.visibility=View.VISIBLE
+           // viewBinding.playButton.visibility=View.VISIBLE
             viewBinding.helpButton.visibility=View.VISIBLE
             viewBinding.zoomButton.visibility=View.VISIBLE
             viewBinding.gyroButton.visibility=View.VISIBLE
@@ -259,10 +273,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
         val curRecording = recording
         if (curRecording != null) {
-            setButtons(true)
             // Stop the current recording session.
             curRecording.stop()
             recording = null
+            setButtons(true)
             return
         }
         setButtons(false)
@@ -307,6 +321,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                             Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT)
                                 .show()
                             Log.d(TAG, msg)
+                            viewBinding.playButton.visibility=View.VISIBLE
                         } else {
                             recording?.close()
                             recording = null
