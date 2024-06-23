@@ -7,6 +7,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 //import android.graphics.Color
 //import android.graphics.ColorSpace.Rgb
 import android.hardware.Sensor
@@ -21,12 +22,14 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.view.Window
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 //import android.widget.MediaController
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
@@ -46,6 +49,7 @@ import androidx.camera.video.VideoRecordEvent
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
+import androidx.core.view.WindowInsetsControllerCompat
 //import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import com.kuroda33.acapnys.databinding.ActivityMainBinding
 //import java.net.URI
@@ -264,7 +268,52 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                 viewBinding.viewFinder.alpha=1f
             }
         }
+        window.navigationBarColor = Color.parseColor("#000000")
+    //    window.setDarkBackgroundNavigationBar()
     }
+   /* private fun Window.setDarkBackgroundNavigationBar() {
+        when {
+            Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 -> {
+                return
+            }
+
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                insetsController?.run {
+                    WindowInsetsControllerCompat.toWindowInsetsControllerCompat(this).isAppearanceLightNavigationBars =
+                        false
+                }
+            }
+
+            else -> {
+                @Suppress("DEPRECATION")
+                @RequiresApi(Build.VERSION_CODES.M)
+                decorView.systemUiVisibility = when {
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+                    else -> decorView.systemUiVisibility
+                }
+            }
+        }
+    }
+    private fun Window.setLightBackgroundNavigationBar() {
+        when {
+            Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 -> {
+                return
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                insetsController?.run {
+                    WindowInsetsControllerCompat.toWindowInsetsControllerCompat(this).isAppearanceLightNavigationBars =
+                        true
+                }
+            }
+            else -> {
+                @Suppress("DEPRECATION")
+                decorView.systemUiVisibility = when {
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                    else -> decorView.systemUiVisibility
+                }
+            }
+        }
+    }*/
     // Implements VideoCapture use case, including start and stop capturing.
     private fun captureVideo() {
         val videoCapture = this.videoCapture ?: return
@@ -274,12 +323,14 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         val curRecording = recording
         if (curRecording != null) {
             // Stop the current recording session.
+            window.navigationBarColor = Color.parseColor("#000000")
             curRecording.stop()
             recording = null
             setButtons(true)
             return
         }
         setButtons(false)
+        if(cameraNum==0)window.navigationBarColor = Color.parseColor("#FFFFFF")
         // create and start a new recording session
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
