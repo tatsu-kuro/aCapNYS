@@ -2,40 +2,41 @@ package com.kuroda33.acapnys
 //import androidx.camera.core.ImageCapture
 //import com.kuroda33.databinding.ActivityMainBinding
 //import androidx.camera.core.ImageCaptureException
+//import android.graphics.Color
+//import android.graphics.ColorSpace.Rgb
+//import android.net.Uri
+//import android.widget.MediaController
+//import androidx.camera.core.ImageAnalysis
+//import androidx.camera.core.ImageProxy
+//import androidx.camera.view.LifecycleCameraController
+//import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+//import java.net.URI
+//import java.nio.ByteBuffer
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-//import android.graphics.Color
-//import android.graphics.ColorSpace.Rgb
+import android.graphics.Rect
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-//import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.provider.MediaStore
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.view.Window
-import android.view.WindowInsets
-import android.view.WindowInsetsController
 import android.view.WindowManager
-//import android.widget.MediaController
 import android.widget.SeekBar
 import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
-//import androidx.camera.core.ImageAnalysis
-//import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.MediaStoreOutputOptions
@@ -45,19 +46,15 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
-//import androidx.camera.view.LifecycleCameraController
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
-import androidx.core.view.WindowInsetsControllerCompat
-//import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import com.kuroda33.acapnys.databinding.ActivityMainBinding
-//import java.net.URI
-//import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+
 
 //typealias LumaListener = (luma: Double) -> Unit
 
@@ -185,11 +182,15 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
      //   viewBinding.viewFinder.background=Rgb(255,255,255,255)
       //  viewBinding.helpButton.setBackgroundColor(Color.rgb(255, 255, 255))
     }
+
     private fun setPreviewSize(cameraN:Int){
         if(cameraN==0) {
+            val size = Rect()
+            window.decorView.getWindowVisibleDisplayFrame(size)
+            val width=size.width()
             viewBinding.viewFinder.scaleX = 0.2f
             viewBinding.viewFinder.scaleY = 0.2f
-            viewBinding.viewFinder.translationX = -700f//適当。ちゃんと要修正
+            viewBinding.viewFinder.translationX = (- 0.4*width).toFloat() + 8
         }else{
             viewBinding.viewFinder.scaleX = 1.0f
             viewBinding.viewFinder.scaleY = 1.0f

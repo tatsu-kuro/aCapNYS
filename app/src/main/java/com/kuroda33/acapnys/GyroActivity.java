@@ -94,7 +94,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     SensorManager sensorManager;
     private SoundPool soundPool;
     private int sound1,sound2,sound3;
-    long millis = TimeUnit.MILLISECONDS.ordinal();
+    long millis0 = TimeUnit.MILLISECONDS.ordinal();
     private final String TAG = "MainActivity";
     InetSocketAddress inetSocketAddress = null;
   //  private AlertDialog.Builder mAlertDialog;
@@ -144,6 +144,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        millis0 = TimeUnit.MILLISECONDS.ordinal();
         setContentView(R.layout.activity_gyro);
         AudioAttributes audioAttributes= new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
@@ -566,10 +567,10 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
     }
 //    func checkOK( d0:Float,d1:Float,limit:Float,count:Int,ms:Double)->Int
 
-private int checkOK( float d0,float d1,float limit,int count,float ms)
+private int checkOK( float d0,float d1,float limit,long  millis,float ms)
     {
         float d = d0 - d1;
-        if (count < 5){return 0;}//5*40ms
+     //   if (millis < 100){return 0;}//5*40ms
         if (d > limit || d < -limit)
         {
             //int i = (count) * 40;
@@ -577,7 +578,7 @@ private int checkOK( float d0,float d1,float limit,int count,float ms)
             //long tmp=Float(count);
 
 //            print("pitch:",count*40,Int(ms*1000))
-            if (count*40F < ms*1000F){
+            if (millis < ms*1000){
                 return 5;
             }
             else{
@@ -595,7 +596,7 @@ private int checkOK( float d0,float d1,float limit,int count,float ms)
         float[] floats = new float[12];
         //floats[0]:header
         //floats[1-7]:damy
-        millis = TimeUnit.MILLISECONDS.ordinal();
+      //  millis = TimeUnit.MILLISECONDS.ordinal();
         float nq0=floats[8] = (float) event.values[3];
         float nq1=floats[9] = (float) event.values[0];
         float nq2=floats[10] = (float) event.values[1];
@@ -646,11 +647,14 @@ private int checkOK( float d0,float d1,float limit,int count,float ms)
     int rollDirection = 0;
     int yawDirection = 0;
     float lastPitch = 0F;
-    int lastPitchCount = 0;
+
+    long lastPitchMilli=0;
+    long lastRollMilli=0;
+    long lastYawMilli=0;
     float lastRoll = 0F;
-    int lastRollCount = 0;
+
     float lastYaw = 0F;
-    int lastYawCount = 0;
+
     void incPitchOK(){
         String str = pitchCountE.getText().toString();
         int t = parseInt(str);
@@ -713,7 +717,7 @@ void soundANDvibe(){
         if((tempDirection == -1 && pitchDirection == 1)||(tempDirection == 1 && pitchDirection == -1))//向きが代わった時
         {
             pitchDirection = tempDirection;  //向きを新しくする
-            if(checkOK(lastPitch,pitchA.get(cnt-3),pitchDegree, cnt-3 - lastPitchCount,pitchSec) == 5)
+            if(checkOK(lastPitch,pitchA.get(cnt-3),pitchDegree,TimeUnit.MILLISECONDS.ordinal() - lastPitchMilli,pitchSec) == 5)
             {
                 incPitchOK();
                 soundANDvibe();
@@ -721,7 +725,8 @@ void soundANDvibe(){
                 //              print("o:",lastPitch-pitchA[cnt-3],cnt-3-lastPitchCount)
             }
             lastPitch = pitchA.get(cnt-3);
-            lastPitchCount = cnt-3;
+        //    lastPitchCount = cnt-3;
+            lastPitchMilli = TimeUnit.MILLISECONDS.ordinal();
         }
         if (tempDirection != 0){pitchDirection = tempDirection;}
 
@@ -730,14 +735,14 @@ void soundANDvibe(){
         if ((tempDirection == -1 && rollDirection == 1)||(tempDirection == 1 && rollDirection == -1))
         {
             rollDirection = tempDirection;
-            if (checkOK(lastRoll,rollA.get(cnt - 3),rollDegree, cnt - 3 - lastRollCount,rollSec) == 5)
+            if (checkOK(lastRoll,rollA.get(cnt - 3),rollDegree, TimeUnit.MILLISECONDS.ordinal() - lastRollMilli,rollSec) == 5)
             {
                 incRollOK();
                 soundANDvibe();
 //                AudioServicesPlaySystemSound(1103)//1519)
             }
             lastRoll = rollA.get(cnt-3);
-            lastRollCount = cnt-3;
+            lastRollMilli = TimeUnit.MILLISECONDS.ordinal();
         }
         if (tempDirection != 0){rollDirection = tempDirection;}
 
@@ -746,14 +751,14 @@ void soundANDvibe(){
         if ((tempDirection == -1 && yawDirection == 1)||(tempDirection == 1 && yawDirection == -1))
         {
             yawDirection = tempDirection;
-            if (checkOK(lastYaw,yawA.get(cnt-3),yawDegree, cnt-3 - lastYawCount,yawSec) == 5)
+            if (checkOK(lastYaw,yawA.get(cnt-3),yawDegree, TimeUnit.MILLISECONDS.ordinal() - lastYawMilli,yawSec) == 5)
             {
                 incYawOK();
                 soundANDvibe();
 //                AudioServicesPlaySystemSound(1519)
             }
             lastYaw = yawA.get(cnt-3);
-            lastYawCount = cnt-3;
+            lastYawMilli = TimeUnit.MILLISECONDS.ordinal();
         }
         if (tempDirection != 0){yawDirection = tempDirection;}
     }
