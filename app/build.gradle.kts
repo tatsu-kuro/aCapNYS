@@ -11,7 +11,7 @@ android {
         applicationId = "com.kuroda33.acapnys"
         minSdk = 24
         targetSdk = 34
-        versionCode = 15
+        versionCode = 16
         versionName = "1.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -40,14 +40,14 @@ android {
 
 dependencies {
     implementation("androidx.gridlayout:gridlayout:1.0.0")
-    val camerax_version = "1.1.0-beta01"
-    implementation ("androidx.camera:camera-core:${camerax_version}")
-    implementation ("androidx.camera:camera-camera2:${camerax_version}")
-    implementation ("androidx.camera:camera-lifecycle:${camerax_version}")
-    implementation ("androidx.camera:camera-video:${camerax_version}")
+    val cameraxVersion = "1.1.0-beta01"
+    implementation ("androidx.camera:camera-core:${cameraxVersion}")
+    implementation ("androidx.camera:camera-camera2:${cameraxVersion}")
+    implementation ("androidx.camera:camera-lifecycle:${cameraxVersion}")
+    implementation ("androidx.camera:camera-video:${cameraxVersion}")
 
-    implementation ("androidx.camera:camera-view:${camerax_version}")
-    implementation ("androidx.camera:camera-extensions:${camerax_version}")
+    implementation ("androidx.camera:camera-view:${cameraxVersion}")
+    implementation ("androidx.camera:camera-extensions:${cameraxVersion}")
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
