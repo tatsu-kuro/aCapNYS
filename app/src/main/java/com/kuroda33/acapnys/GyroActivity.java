@@ -552,8 +552,8 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
 
     int getDirection(float a, float b, float c, float d)
     {
-        if ((a+1 < b) && (b+1 < c) && (c+1 < d)){  return 1;}
-        else if ((a > b+1) && (b > c+1) && (c > d+1)){return -1;}
+        if ((a+0.1F < b) && (b+0.1F < c) && (c+0.1F < d)){  return 1;}
+        else if ((a > b+0.1F) && (b > c+0.1F) && (c > d+0.1F)){return -1;}
         else {return 0;}
     }
     void pushPRY(float p,float r,float y){
@@ -745,8 +745,12 @@ void soundANDvibe(){
                 incPitchOK();
                 soundANDvibe();
             }
+            String Str = String.format ("1:%f 2:%f",lastPitch,pitchs[0]);
+            Log.e("test",Str);
+
             lastPitch = pitchs[0];
             lastPitchMilli = System.nanoTime();// bTimeUnit.MILLISECONDS.ordinal();
+
         }
         if (tempPitchDirection != 0){pitchDirection = tempPitchDirection;}
         // roll
