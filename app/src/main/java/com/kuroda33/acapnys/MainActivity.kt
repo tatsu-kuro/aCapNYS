@@ -27,7 +27,7 @@ import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.provider.MediaStore
-import android.util.DisplayMetrics
+//import android.util.DisplayMetrics
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -70,11 +70,18 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
     private lateinit var cameraExecutor: ExecutorService
 //    private lateinit var cameraController: LifecycleCameraController
- /*   override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) hideSystemUI()
+    private var focusChangedInitFlag:Boolean=true;
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+    super.onWindowFocusChanged(hasFocus)
+        if (focusChangedInitFlag) {
+            focusChangedInitFlag = false;
+            return;
+        }
+        getPara()
+        val cameraController = camera!!.cameraControl
+        cameraController.setLinearZoom(zoom100 / 100f)
     }
-*/
+
  /*   private fun hideSystemUI() {
     //    val decorView = window.decorView
         // API 30以上の場合
@@ -176,11 +183,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         viewBinding.myView.set_rpk_ppk()
         setPreviewSize(cameraNum)
         setButtons(true)
-
-      //  val videoview=viewBinding.videoView
-      //  videoview.alpha=0f
-     //   viewBinding.viewFinder.background=Rgb(255,255,255,255)
-      //  viewBinding.helpButton.setBackgroundColor(Color.rgb(255, 255, 255))
     }
 
     private fun setPreviewSize(cameraN:Int){
@@ -587,11 +589,12 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         if (event != null) {
             when(event.action){
                 MotionEvent.ACTION_DOWN -> sensorReset()
+
             }
         }
+
         //再描画を実行させる呪文
      //   Log.e("kdiidiid","motion touch")
-        //invalidate()
         return super.onTouchEvent(event)
     }
     //センサの精度が変更されたときに呼ばれる

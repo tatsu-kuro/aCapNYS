@@ -23,7 +23,7 @@
         android:theme="@style/Theme.ACapNYS"
         tools:targetApi="31">
         <activity
-            android:name=".GridButtons"
+            android:name=".MyView"
             android:exported="false"
             android:screenOrientation="landscape"/>
         <activity
