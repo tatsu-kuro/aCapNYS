@@ -680,13 +680,14 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
     {
         long milli= millis/1000000;
         long mslong=(long)(ms*1000F);
-       String Str = String.format ("Q:%f time:%S range:%s",d0-d1,Long.toString(milli),Long.toString(mslong));
-        Log.e("test",Str);
+
         float d = d0 - d1;
         //   if (millis < 100){return 0;}//5*40ms
         if (d > limit || d < -limit)
         {
-            if (milli < mslong ){
+            if (milli < mslong){// && milli>200){
+                String Str = String.format ("d:%f ms:%S limit:%s",d0-d1,Long.toString(milli),Long.toString(mslong));
+                Log.e("test",Str);
                 return 5;
             }
             else{
@@ -745,8 +746,8 @@ void soundANDvibe(){
                 incPitchOK();
                 soundANDvibe();
             }
-            String Str = String.format ("1:%f 2:%f",lastPitch,pitchs[0]);
-            Log.e("test",Str);
+     //       String Str = String.format ("1:%f 2:%f",lastPitch,pitchs[0]);
+     //       Log.e("test",Str);
 
             lastPitch = pitchs[0];
             lastPitchMilli = System.nanoTime();// bTimeUnit.MILLISECONDS.ordinal();

@@ -31,15 +31,12 @@
         android:layout_width="0dp"
         android:layout_height="42dp"
         android:layout_marginBottom="12dp"
-
-
         android:background="#ccc"
         android:clickable="true"
-
         android:progressTint="@color/design_default_color_primary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/playButton"
-        app:layout_constraintStart_toEndOf="@+id/zoomButton" />
+        app:layout_constraintEnd_toStartOf="@+id/zoomTextRight"
+        app:layout_constraintStart_toEndOf="@+id/zoomTextLeft" />
 
     <Button
         android:id="@+id/video_capture_button"
@@ -53,43 +50,57 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/zoomTextRight"
+        android:layout_width="70dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:paddingRight="0dp"
+        android:paddingLeft="0dp"
+        android:text="zoom"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:focusableInTouchMode="false"
+        android:background="@android:drawable/editbox_background_normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
     <ImageButton
         android:id="@+id/playButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-
         android:background="@android:drawable/editbox_background_normal"
         android:backgroundTint="@color/design_default_color_primary"
         android:contentDescription="NULL"
-
         app:tint="@color/white"
-
-
         android:src="@drawable/play"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-     />
+        app:layout_constraintEnd_toStartOf="@+id/helpButton"/>
 
     <EditText
-        android:id="@+id/zoomButton"
-        android:layout_width="80dp"
+        android:id="@+id/zoomTextLeft"
+        android:layout_width="70dp"
         android:layout_height="50dp"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
         android:text="zoom"
+        android:textSize="14sp"
         android:textAlignment="center"
         android:focusableInTouchMode="false"
         android:background="@android:drawable/editbox_background_normal"
         app:layout_constraintBottom_toBottomOf="parent" />
     <Button
         android:id="@+id/gyroButton"
-        android:layout_width="80dp"
+        android:layout_width="70dp"
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
 
         android:background="@android:drawable/editbox_background_normal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -99,7 +110,7 @@
 
     <ImageButton
         android:id="@+id/helpButton"
-        android:layout_width="80dp"
+        android:layout_width="70dp"
         android:layout_height="50dp"
         android:layout_marginBottom="8dp"
         android:background="@android:drawable/editbox_background_normal"
@@ -112,7 +123,7 @@
 
     <ImageButton
         android:id="@+id/cameraButton"
-        android:layout_width="80dp"
+        android:layout_width="70dp"
         android:layout_height="50dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
@@ -120,6 +131,7 @@
         android:backgroundTint="@color/design_default_color_primary"
         android:src="@drawable/camera"
         app:tint="@color/white"
+        android:contentDescription="NULL"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

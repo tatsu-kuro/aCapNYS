@@ -11,7 +11,7 @@ android {
         applicationId = "com.kuroda33.acapnys"
         minSdk = 24
         targetSdk = 34
-        versionCode = 16
+        versionCode = 17
         versionName = "1.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

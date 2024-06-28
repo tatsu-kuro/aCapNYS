@@ -236,7 +236,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.seekBar.visibility=View.VISIBLE
            // viewBinding.playButton.visibility=View.VISIBLE
             viewBinding.helpButton.visibility=View.VISIBLE
-            viewBinding.zoomButton.visibility=View.VISIBLE
+            viewBinding.zoomTextRight.visibility=View.VISIBLE
+            viewBinding.zoomTextLeft.visibility=View.VISIBLE
             viewBinding.gyroButton.visibility=View.VISIBLE
             viewBinding.myView.alpha=1f
             viewBinding.viewFinder.alpha=1f
@@ -257,7 +258,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.seekBar.visibility=View.INVISIBLE
             viewBinding.playButton.visibility=View.INVISIBLE
             viewBinding.helpButton.visibility=View.INVISIBLE
-            viewBinding.zoomButton.visibility=View.INVISIBLE
+            viewBinding.zoomTextLeft.visibility=View.INVISIBLE
+            viewBinding.zoomTextRight.visibility=View.INVISIBLE
             viewBinding.gyroButton.visibility=View.INVISIBLE
             viewBinding.videoCaptureButton.alpha=0.015f
             if(cameraNum==0){
