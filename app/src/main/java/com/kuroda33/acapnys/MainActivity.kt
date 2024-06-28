@@ -78,6 +78,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             return;
         }
         getPara()
+ //       setPreviewSize(cameraNum)
         val cameraController = camera!!.cameraControl
         cameraController.setLinearZoom(zoom100 / 100f)
     }
@@ -114,6 +115,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         getPara()
         viewBinding.myView.setCamera(cameraNum)
         // Request camera permissions
+  //   viewBinding.post {
+  //       Log.i("", "width:" + binding.view.width + ", height:" + binding.view.height)
+  //   }
         if (allPermissionsGranted()) {
             startCamera()
         } else {
@@ -190,9 +194,15 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             val size = Rect()
             window.decorView.getWindowVisibleDisplayFrame(size)
             val width=size.width()
+            val height=size.height()
+
             viewBinding.viewFinder.scaleX = 0.2f
             viewBinding.viewFinder.scaleY = 0.2f
-            viewBinding.viewFinder.translationX = (- 0.4*width).toFloat() + 8
+            if(width>height) {
+                viewBinding.viewFinder.translationX = (-0.4 * width).toFloat() + 8
+            }else{
+                viewBinding.viewFinder.translationX = (-0.4 * height).toFloat() + 8
+            }
         }else{
             viewBinding.viewFinder.scaleX = 1.0f
             viewBinding.viewFinder.scaleY = 1.0f
@@ -236,7 +246,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.seekBar.visibility=View.VISIBLE
            // viewBinding.playButton.visibility=View.VISIBLE
             viewBinding.helpButton.visibility=View.VISIBLE
-            viewBinding.zoomTextRight.visibility=View.VISIBLE
+            viewBinding.zoomTextRight.visibility=View.INVISIBLE
             viewBinding.zoomTextLeft.visibility=View.VISIBLE
             viewBinding.gyroButton.visibility=View.VISIBLE
             viewBinding.myView.alpha=1f

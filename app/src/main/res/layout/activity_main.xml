@@ -53,7 +53,7 @@
 
     <EditText
         android:id="@+id/zoomTextRight"
-        android:layout_width="70dp"
+        android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
@@ -88,7 +88,6 @@
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
         android:text="zoom"
-        android:textSize="14sp"
         android:textAlignment="center"
         android:focusableInTouchMode="false"
         android:background="@android:drawable/editbox_background_normal"
@@ -101,7 +100,6 @@
         android:layout_marginEnd="8dp"
         android:paddingLeft="0dp"
         android:paddingRight="0dp"
-
         android:background="@android:drawable/editbox_background_normal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
