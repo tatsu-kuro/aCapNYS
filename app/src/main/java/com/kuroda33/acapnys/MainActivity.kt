@@ -156,7 +156,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             changeCamera()
         }
         cameraExecutor = Executors.newSingleThreadExecutor()
-
         viewBinding.seekBar.setOnSeekBarChangeListener(
             object :SeekBar.OnSeekBarChangeListener{
                 @SuppressLint("RestrictedApi")
@@ -211,28 +210,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.viewFinder.translationX = 0f
         }
     }
-    /*
-        private class LuminosityAnalyzer(private val listener: LumaListener) : ImageAnalysis.Analyzer {
 
-            private fun ByteBuffer.toByteArray(): ByteArray {
-                rewind()    // Rewind the buffer to zero
-                val data = ByteArray(remaining())
-                get(data)   // Copy the buffer into a byte array
-                return data // Return the byte array
-            }
-
-            override fun analyze(image: ImageProxy) {
-
-                val buffer = image.planes[0].buffer
-                val data = buffer.toByteArray()
-                val pixels = data.map { it.toInt() and 0xFF }
-                val luma = pixels.average()
-
-                listener(luma)
-
-                image.close()
-            }
-        }*/
     private fun setButtons(on:Boolean){
         if(on){
             Log.e(TAG, "Video capture ends with error: " + videoURI)
@@ -255,11 +233,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.viewFinder.alpha=1f
             viewBinding.videoCaptureButton.alpha=0.1f
             val windowAttributes = window.attributes
-            //  if(cameraNum==0) {
-            //      windowAttributes.screenBrightness =
-            //          WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
-            //      window.attributes = windowAttributes
-            //  }else{
             windowAttributes.screenBrightness =
                 WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
             window.attributes = windowAttributes
