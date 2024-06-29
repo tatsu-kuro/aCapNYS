@@ -1,3 +1,5 @@
+
+
 package com.kuroda33.acapnys
 //import androidx.camera.core.ImageCapture
 //import com.kuroda33.databinding.ActivityMainBinding
@@ -69,55 +71,55 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
     private var recording: Recording? = null
 
     private lateinit var cameraExecutor: ExecutorService
-//    private lateinit var cameraController: LifecycleCameraController
+    //    private lateinit var cameraController: LifecycleCameraController
     private var focusChangedInitFlag:Boolean=true;
     override fun onWindowFocusChanged(hasFocus: Boolean) {
-    super.onWindowFocusChanged(hasFocus)
+        super.onWindowFocusChanged(hasFocus)
         if (focusChangedInitFlag) {
             focusChangedInitFlag = false;
             return;
         }
         getPara()
- //       setPreviewSize(cameraNum)
+        //       setPreviewSize(cameraNum)
         val cameraController = camera!!.cameraControl
         cameraController.setLinearZoom(zoom100 / 100f)
     }
 
- /*   private fun hideSystemUI() {
-    //    val decorView = window.decorView
-        // API 30以上の場合
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.decorView.windowInsetsController?.apply {
-                // systemBars : Status barとNavigation bar両方
-                hide(WindowInsets.Type.systemBars())
-                // hide(WindowInsets.Type.statusBars())
-                // hide(WindowInsets.Type.navigationBars())
-                systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
-            }
-            // API 29以下の場合
-        } else {
-            window.decorView.systemUiVisibility = (
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            or View.SYSTEM_UI_FLAG_FULLSCREEN)
-        }
-    }
-*/
+    /*   private fun hideSystemUI() {
+       //    val decorView = window.decorView
+           // API 30以上の場合
+           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+               window.decorView.windowInsetsController?.apply {
+                   // systemBars : Status barとNavigation bar両方
+                   hide(WindowInsets.Type.systemBars())
+                   // hide(WindowInsets.Type.statusBars())
+                   // hide(WindowInsets.Type.navigationBars())
+                   systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
+               }
+               // API 29以下の場合
+           } else {
+               window.decorView.systemUiVisibility = (
+                       View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                               or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                               or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                               or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                               or View.SYSTEM_UI_FLAG_FULLSCREEN)
+           }
+       }
+   */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
         val seekBar = findViewById<SeekBar>(R.id.seekBar)
-      // val width=viewBinding.root.maxWidth
+        // val width=viewBinding.root.maxWidth
         videoURI="no video"
         getPara()
         viewBinding.myView.setCamera(cameraNum)
         // Request camera permissions
-  //   viewBinding.post {
-  //       Log.i("", "width:" + binding.view.width + ", height:" + binding.view.height)
-  //   }
+        //   viewBinding.post {
+        //       Log.i("", "width:" + binding.view.width + ", height:" + binding.view.height)
+        //   }
         if (allPermissionsGranted()) {
             startCamera()
         } else {
@@ -126,9 +128,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         }
         seekBar.progress=zoom100
         // Set up the listeners for take photo and video capture buttons
-      //  viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
+        //  viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
         viewBinding.videoCaptureButton.setOnClickListener {
-    //        hideSystemUI()
+            //        hideSystemUI()
 
             captureVideo()
         }
@@ -146,8 +148,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             val intent =
                 Intent(/* packageContext = */ application,/* cls = */ PlayActivity::class.java)
             if (videoURI != "no video"){
-            intent.putExtra("videouri", videoURI)
-            startActivity(/* intent = */ intent)
+                intent.putExtra("videouri", videoURI)
+                startActivity(/* intent = */ intent)
             }
         }
         viewBinding.cameraButton.setOnClickListener{
@@ -209,33 +211,33 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.viewFinder.translationX = 0f
         }
     }
-/*
-    private class LuminosityAnalyzer(private val listener: LumaListener) : ImageAnalysis.Analyzer {
+    /*
+        private class LuminosityAnalyzer(private val listener: LumaListener) : ImageAnalysis.Analyzer {
 
-        private fun ByteBuffer.toByteArray(): ByteArray {
-            rewind()    // Rewind the buffer to zero
-            val data = ByteArray(remaining())
-            get(data)   // Copy the buffer into a byte array
-            return data // Return the byte array
-        }
+            private fun ByteBuffer.toByteArray(): ByteArray {
+                rewind()    // Rewind the buffer to zero
+                val data = ByteArray(remaining())
+                get(data)   // Copy the buffer into a byte array
+                return data // Return the byte array
+            }
 
-        override fun analyze(image: ImageProxy) {
+            override fun analyze(image: ImageProxy) {
 
-            val buffer = image.planes[0].buffer
-            val data = buffer.toByteArray()
-            val pixels = data.map { it.toInt() and 0xFF }
-            val luma = pixels.average()
+                val buffer = image.planes[0].buffer
+                val data = buffer.toByteArray()
+                val pixels = data.map { it.toInt() and 0xFF }
+                val luma = pixels.average()
 
-            listener(luma)
+                listener(luma)
 
-            image.close()
-        }
-    }*/
+                image.close()
+            }
+        }*/
     private fun setButtons(on:Boolean){
         if(on){
             Log.e(TAG, "Video capture ends with error: " + videoURI)
             if (videoURI == "no video"){
-                         viewBinding.playButton.visibility=View.INVISIBLE
+                viewBinding.playButton.visibility=View.INVISIBLE
                 Log.e(TAG, "Video capture no: " + videoURI)
             }else{
                 viewBinding.playButton.visibility=View.VISIBLE
@@ -244,7 +246,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.helpButton.visibility=View.VISIBLE
             viewBinding.cameraButton.visibility=View.VISIBLE
             viewBinding.seekBar.visibility=View.VISIBLE
-           // viewBinding.playButton.visibility=View.VISIBLE
+            // viewBinding.playButton.visibility=View.VISIBLE
             viewBinding.helpButton.visibility=View.VISIBLE
             viewBinding.zoomTextRight.visibility=View.INVISIBLE
             viewBinding.zoomTextLeft.visibility=View.VISIBLE
@@ -253,15 +255,15 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.viewFinder.alpha=1f
             viewBinding.videoCaptureButton.alpha=0.1f
             val windowAttributes = window.attributes
-          //  if(cameraNum==0) {
-          //      windowAttributes.screenBrightness =
-          //          WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
-          //      window.attributes = windowAttributes
-          //  }else{
-                windowAttributes.screenBrightness =
-                    WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
-                window.attributes = windowAttributes
-          //  }
+            //  if(cameraNum==0) {
+            //      windowAttributes.screenBrightness =
+            //          WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+            //      window.attributes = windowAttributes
+            //  }else{
+            windowAttributes.screenBrightness =
+                WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+            window.attributes = windowAttributes
+            //  }
         }else{
             viewBinding.helpButton.visibility=View.INVISIBLE
             viewBinding.cameraButton.visibility=View.INVISIBLE
@@ -284,51 +286,51 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             }
         }
         window.navigationBarColor = Color.parseColor("#000000")
-    //    window.setDarkBackgroundNavigationBar()
+        //    window.setDarkBackgroundNavigationBar()
     }
-   /* private fun Window.setDarkBackgroundNavigationBar() {
-        when {
-            Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 -> {
-                return
-            }
+    /* private fun Window.setDarkBackgroundNavigationBar() {
+         when {
+             Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 -> {
+                 return
+             }
 
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-                insetsController?.run {
-                    WindowInsetsControllerCompat.toWindowInsetsControllerCompat(this).isAppearanceLightNavigationBars =
-                        false
-                }
-            }
+             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                 insetsController?.run {
+                     WindowInsetsControllerCompat.toWindowInsetsControllerCompat(this).isAppearanceLightNavigationBars =
+                         false
+                 }
+             }
 
-            else -> {
-                @Suppress("DEPRECATION")
-                @RequiresApi(Build.VERSION_CODES.M)
-                decorView.systemUiVisibility = when {
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
-                    else -> decorView.systemUiVisibility
-                }
-            }
-        }
-    }
-    private fun Window.setLightBackgroundNavigationBar() {
-        when {
-            Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 -> {
-                return
-            }
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-                insetsController?.run {
-                    WindowInsetsControllerCompat.toWindowInsetsControllerCompat(this).isAppearanceLightNavigationBars =
-                        true
-                }
-            }
-            else -> {
-                @Suppress("DEPRECATION")
-                decorView.systemUiVisibility = when {
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-                    else -> decorView.systemUiVisibility
-                }
-            }
-        }
-    }*/
+             else -> {
+                 @Suppress("DEPRECATION")
+                 @RequiresApi(Build.VERSION_CODES.M)
+                 decorView.systemUiVisibility = when {
+                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+                     else -> decorView.systemUiVisibility
+                 }
+             }
+         }
+     }
+     private fun Window.setLightBackgroundNavigationBar() {
+         when {
+             Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 -> {
+                 return
+             }
+             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                 insetsController?.run {
+                     WindowInsetsControllerCompat.toWindowInsetsControllerCompat(this).isAppearanceLightNavigationBars =
+                         true
+                 }
+             }
+             else -> {
+                 @Suppress("DEPRECATION")
+                 decorView.systemUiVisibility = when {
+                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                     else -> decorView.systemUiVisibility
+                 }
+             }
+         }
+     }*/
     // Implements VideoCapture use case, including start and stop capturing.
     private fun captureVideo() {
         val videoCapture = this.videoCapture ?: return
@@ -382,6 +384,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                     is VideoRecordEvent.Finalize -> {
                         if (!recordEvent.hasError()) {
                             videoURI=recordEvent.outputResults.outputUri.toString()
+                            savePara()
                             val msg = "Video capture succeeded: " +
                                     "${recordEvent.outputResults.outputUri}"
                             Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT)
@@ -424,16 +427,16 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             videoCapture = VideoCapture.withOutput(recorder)
 
 
-          //  imageCapture = ImageCapture.Builder().build()
-/*
-            val imageAnalyzer = ImageAnalysis.Builder()
-                .build()
-                .also {
-                    it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
-                        Log.d(TAG, "Average luminosity: $luma")
-                    })
-                }
-*/
+            //  imageCapture = ImageCapture.Builder().build()
+            /*
+                        val imageAnalyzer = ImageAnalysis.Builder()
+                            .build()
+                            .also {
+                                it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
+                                    Log.d(TAG, "Average luminosity: $luma")
+                                })
+                            }
+            */
             // Select back camera as a default
             var cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
             if(cameraNum==1) {
@@ -504,8 +507,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
     override fun onDestroy() {
         super.onDestroy()
-      //  if (sensorManager != null) {
-            sensorManager.unregisterListener(this)
+        //  if (sensorManager != null) {
+        sensorManager.unregisterListener(this)
         //}
         cameraExecutor.shutdown()
     }
@@ -547,14 +550,16 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         val editor = sharedPreferences.edit()
         editor.putInt("cameraNum",cameraNum)
         editor.putInt("zoom100",zoom100)
+        editor.putString("videoURI",videoURI)
         editor.apply()
         viewBinding.myView.setCamera(cameraNum)
     }
     private fun getPara(){
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-       // val editor = sharedPreferences.edit()
+        // val editor = sharedPreferences.edit()
         cameraNum = sharedPreferences.getInt("cameraNum",1)
         zoom100=sharedPreferences.getInt("zoom100",10)
+        videoURI= sharedPreferences.getString("videoURI","no video").toString()
     }
     private var camera: Camera?= null
     // private var imageCapture: ImageCapture?= null
@@ -582,8 +587,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         if(currentTime>tempTime+30) {
             tempTime=currentTime
             viewBinding.myView.setQuats(nq0, nq1, nq2, nq3)
-         //   val str: String = "x=" + nq0 + "\n" + "y=" + nq1 + "\n" + "z=" + nq2 + "\n" + "w=" + nq3
-        //    Log.e("tetetete",str)
+            //   val str: String = "x=" + nq0 + "\n" + "y=" + nq1 + "\n" + "z=" + nq2 + "\n" + "w=" + nq3
+            //    Log.e("tetetete",str)
         }
     }
     private fun sensorReset(){
@@ -606,7 +611,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         }
 
         //再描画を実行させる呪文
-     //   Log.e("kdiidiid","motion touch")
+        //   Log.e("kdiidiid","motion touch")
         return super.onTouchEvent(event)
     }
     //センサの精度が変更されたときに呼ばれる
@@ -636,3 +641,4 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
     }
 
 }
+
