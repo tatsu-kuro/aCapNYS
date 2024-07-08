@@ -1,0 +1,625 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#ffffff"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+
+        <EditText
+            android:id="@+id/motionSensorText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:text="Send motion data via WiFi"
+            android:textAlignment="center" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        >
+
+        <EditText
+            android:id="@+id/ipLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusable="auto"
+            android:focusableInTouchMode="false"
+            android:text="IP"
+            android:textAlignment="center" />
+
+        <EditText
+            android:id="@+id/ip1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:digits="0123456789"
+            android:inputType="number"
+            android:maxLength="3"
+            android:text="192"
+            android:textAlignment="textEnd" />
+
+        <EditText
+            android:id="@+id/ip2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:text="168"
+            android:digits="0123456789"
+            android:maxLength="3"
+            android:inputType="number"
+            android:textAlignment="textEnd"  />
+
+        <EditText
+            android:id="@+id/ip3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:text="0"
+            android:digits="0123456789"
+            android:maxLength="3"
+            android:inputType="number"
+            android:textAlignment="textEnd" />
+
+        <EditText
+            android:id="@+id/ip4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:text="0"
+            android:digits="0123456789"
+            android:maxLength="3"
+            android:inputType="number"
+            android:textAlignment="textEnd" />
+        <EditText
+            android:id="@+id/portLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusable="auto"
+            android:focusableInTouchMode="false"
+            android:background="@android:drawable/editbox_background_normal"
+            android:text="Port"
+            android:textAlignment="center" />
+
+        <EditText
+            android:id="@+id/portNum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusableInTouchMode="false"
+            android:background="@android:drawable/editbox_background_normal"
+            android:text="1108"
+            android:textAlignment="center"/>
+
+        <Button
+            android:id="@+id/ipSetButton"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_weight="0.1"
+            android:text="Set" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+
+        <EditText
+            android:id="@+id/rehabilitationText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:text="Head Rotations Vestibular Rehabilitation"
+            android:textAlignment="center" />
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/pitchTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:text="Pitch"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:textAlignment="center"
+            android:focusableInTouchMode="false"
+            android:tooltipText="kkkkkkkkk" />
+
+        <EditText
+            android:id="@+id/pitch0"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusableInTouchMode="false"
+            android:text="0"
+            android:textAlignment="textEnd"/>
+
+        <EditText
+            android:id="@+id/pitch1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusableInTouchMode="false"
+            android:text="0"
+            android:textAlignment="textEnd"/>
+
+        <EditText
+            android:id="@+id/pitch2"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusableInTouchMode="false"
+            android:text="30d"
+            android:inputType="number"
+            android:textAlignment="textEnd"/>
+        <Button
+            android:id="@+id/pitchDegreeDownButton"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginRight="-3dp"
+            android:layout_marginLeft="-5dp"
+            android:text="-"
+            android:textAlignment="center" />
+
+        <Button
+            android:id="@+id/pitchDegreeUpButton"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginLeft="-3dp"
+            android:text="+"
+            android:textAlignment="center" />
+        <EditText
+            android:id="@+id/pitch3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:text="2.0s"
+            android:textAlignment="textEnd"/>
+        <Button
+            android:id="@+id/pitchSecDownButton"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginRight="-3dp"
+            android:layout_marginLeft="-5dp"
+            android:text="-"
+            android:textAlignment="center" />
+
+        <Button
+            android:id="@+id/pitchSecUpButton"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginLeft="-3dp"
+            android:text="+"
+            android:textAlignment="center" />
+
+        <Button
+            android:id="@+id/stopButton"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_weight="0.1"
+            android:text="Stop" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/rollTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+
+            android:text="Roll"
+            android:textAlignment="center" />
+
+        <EditText
+            android:id="@+id/roll0"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusableInTouchMode="false"
+            android:text="0"
+            android:textAlignment="textEnd"/>
+
+        <EditText
+            android:id="@+id/roll1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusableInTouchMode="false"
+            android:text="0"
+            android:textAlignment="textEnd"/>
+
+        <EditText
+            android:id="@+id/roll2"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusableInTouchMode="false"
+            android:text="30d"
+            android:inputType="number"
+            android:textAlignment="textEnd"/>
+        <Button
+            android:id="@+id/rollDegreeDownButton"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginRight="-3dp"
+            android:layout_marginLeft="-5dp"
+            android:text="-"
+            android:textAlignment="center" />
+
+        <Button
+            android:id="@+id/rollDegreeUpButton"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginLeft="-3dp"
+            android:text="+"
+            android:textAlignment="center" />
+        <EditText
+            android:id="@+id/roll3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:text="2.0s"
+            android:textAlignment="textEnd"/>
+        <Button
+            android:id="@+id/rollSecDownButton"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginRight="-3dp"
+            android:layout_marginLeft="-5dp"
+            android:text="-"
+            android:textAlignment="center" />
+
+        <Button
+            android:id="@+id/rollSecUpButton"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginLeft="-3dp"
+            android:text="+"
+            android:textAlignment="center" />
+
+        <Button
+            android:id="@+id/startButton"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_weight="0.1"
+            android:text="Start" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/yawTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:text="Yaw"
+            android:textAlignment="center"
+            android:focusableInTouchMode="false"
+            android:tooltipText="kkkkkkkkk" />
+
+        <EditText
+            android:id="@+id/yaw0"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusableInTouchMode="false"
+            android:text="0"
+            android:textAlignment="textEnd"/>
+
+        <EditText
+            android:id="@+id/yaw1"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusableInTouchMode="false"
+            android:text="0"
+            android:textAlignment="textEnd"/>
+
+        <EditText
+            android:id="@+id/yaw2"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusableInTouchMode="false"
+            android:text="30d"
+            android:inputType="number"
+            android:textAlignment="textEnd"/>
+        <Button
+            android:id="@+id/yawDegreeDownButton"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginRight="-3dp"
+            android:layout_marginLeft="-5dp"
+            android:text="-"
+            android:textAlignment="center" />
+
+        <Button
+            android:id="@+id/yawDegreeUpButton"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginLeft="-3dp"
+            android:text="+"
+            android:textAlignment="center" />
+
+        <EditText
+            android:id="@+id/yaw3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusableInTouchMode="false"
+            android:background="@android:drawable/editbox_background_normal"
+            android:text="2.0s"
+            android:textAlignment="textEnd"/>
+
+        <Button
+            android:id="@+id/yawSecDownButton"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginRight="-3dp"
+            android:layout_marginLeft="-5dp"
+            android:text="-"
+            android:textAlignment="center" />
+
+        <Button
+            android:id="@+id/yawSecUpButton"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/editbox_background_normal"
+            android:focusableInTouchMode="false"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            android:layout_marginLeft="-3dp"
+            android:text="+"
+            android:textAlignment="center" />
+        <Button
+            android:id="@+id/resetButton"
+            android:background="@android:drawable/editbox_background_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_weight="0.1"
+            android:text="Reset" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/sound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:text="Sound"
+            android:focusableInTouchMode="false"/>
+        <Spinner
+            android:id="@+id/soundSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:entries="@array/spinner_items1"
+            android:spinnerMode="dropdown" />
+        <EditText
+            android:id="@+id/vibration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:text="Vibration"
+            android:focusableInTouchMode="false"/>
+        <Spinner
+            android:id="@+id/vibrationSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:entries="@array/spinner_items2"
+            android:spinnerMode="dropdown" />
+
+
+        <EditText
+            android:id="@+id/button49"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="100"
+            android:text=" "
+            android:visibility="invisible" />
+
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/button56"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:text="Button"
+            android:visibility="invisible" />
+
+        <EditText
+            android:id="@+id/button57"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Button"
+            android:visibility="invisible" />
+
+        <EditText
+            android:id="@+id/button58"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Button"
+            android:visibility="invisible" />
+
+        <EditText
+            android:id="@+id/button59"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Button"
+            android:visibility="invisible" />
+
+        <EditText
+            android:id="@+id/button60"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Button"
+            android:visibility="invisible" />
+
+        <EditText
+            android:id="@+id/button61"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Button"
+            android:visibility="invisible" />
+
+        <EditText
+            android:id="@+id/button62"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Button"
+            android:visibility="invisible" />
+        <Button
+            android:id="@+id/exitButton"
+            android:background="@android:drawable/editbox_background_normal"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_weight="0.1"
+            android:text="Exit" />
+    </LinearLayout>
+</LinearLayout>

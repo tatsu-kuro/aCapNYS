@@ -18,6 +18,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Rect
@@ -112,7 +113,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
         val seekBar = findViewById<SeekBar>(R.id.seekBar)
-        // val width=viewBinding.root.maxWidth
         videoURI="no video"
         getPara()
         viewBinding.myView.setCamera(cameraNum)
@@ -130,8 +130,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         // Set up the listeners for take photo and video capture buttons
         //  viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
         viewBinding.videoCaptureButton.setOnClickListener {
-            //        hideSystemUI()
-
             captureVideo()
         }
         viewBinding.helpButton.setOnClickListener {
@@ -139,10 +137,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             startActivity(/* intent = */ intent)
         }
         viewBinding.gyroButton.setOnClickListener {
-            //         val intent = Intent(/* packageContext = */ application,/* cls = */ GridButtons::class.java)
-            //         startActivity(/* intent = */ intent)
-            val intent = Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
-            startActivity(/* intent = */ intent)
+                     val intent = Intent(/* packageContext = */ application,/* cls = */ RehaActivity::class.java)
+                     startActivity(/* intent = */ intent)
+         //   val intent = Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
+         //   startActivity(/* intent = */ intent)
         }
         viewBinding.playButton.setOnClickListener {
             val intent =
@@ -575,11 +573,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         viewBinding.myView.initData()
     }
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-
         if (event != null) {
             when(event.action){
-                MotionEvent.ACTION_DOWN -> sensorReset()
-
+                     MotionEvent.ACTION_DOWN -> sensorReset()
             }
         }
 
