@@ -232,7 +232,9 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
 
             editor.commit();
             editor.apply();
-
+            rehaStopBtn.setFocusable(true);
+            rehaStopBtn.setFocusableInTouchMode(true);
+            rehaStopBtn.requestFocus();
 //             LinearLayout linearLayout = findViewById(com.google.android.material.R.id.linear);// LinearLayout);
 //             linearLayout.requestFocus();// setFocusableInTouchMode(true);
 //                linearLayout.setFocusableInTouchMode(true);
