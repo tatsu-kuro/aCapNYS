@@ -167,11 +167,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         sound2 = soundPool.load(this,R.raw.beep2,1);
         sound3 = soundPool.load(this,R.raw.beep3,1);
 
-
         i(TAG, "onCreate 0");
-        //  quaterView = (TextView) findViewById(R.id.quaternionData);
-        //  quaterView.setMovementMethod(new ScrollingMovementMethod());
- //       Selbtn = (Button) findViewById(R.id.selectButton);
         ipSetBtn = (Button) findViewById(R.id.ipSetButton);
         rehaStartBtn = (Button) findViewById(R.id.startButton);
         rehaStopBtn = (Button) findViewById(R.id.stopButton);

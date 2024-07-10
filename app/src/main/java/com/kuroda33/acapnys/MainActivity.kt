@@ -33,9 +33,12 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -85,7 +88,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         cameraController.setLinearZoom(zoom100 / 100f)
     }
 
-    /*   private fun hideSystemUI() {
+       private fun hideSystemUI() {
        //    val decorView = window.decorView
            // API 30以上の場合
            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -106,7 +109,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                                or View.SYSTEM_UI_FLAG_FULLSCREEN)
            }
        }
-   */
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -130,8 +134,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         // Set up the listeners for take photo and video capture buttons
         //  viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
         viewBinding.videoCaptureButton.setOnClickListener {
-            //        hideSystemUI()
-
             captureVideo()
         }
         viewBinding.helpButton.setOnClickListener {
@@ -189,6 +191,35 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         setPreviewSize(cameraNum)
         setButtons(true)
     }
+    private fun setNavigationBar(flag:Boolean) {
+        if (flag == false) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window.decorView.windowInsetsController?.apply {
+                    // ナビゲーションバーを非表示にする
+                    hide(WindowInsets.Type.navigationBars())
+                    // スワイプで一時的に表示する動作を設定
+                    //systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                   // systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
+                }
+            } else {
+                // API 29以下の場合
+                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window.decorView.windowInsetsController?.apply {
+                    // ナビゲーションバーを表示にする
+                    show(WindowInsets.Type.navigationBars())
+//                    hide(WindowInsets.Type.navigationBars())
+                    // スワイプで一時的に表示する動作を設定
+                    //  systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                }
+            } else {
+                // API 29以下の場合
+                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            }
+        }
+    }
 
     private fun setPreviewSize(cameraN:Int){
         if(cameraN==0) {
@@ -224,7 +255,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.helpButton.visibility=View.VISIBLE
             viewBinding.cameraButton.visibility=View.VISIBLE
             viewBinding.seekBar.visibility=View.VISIBLE
-            // viewBinding.playButton.visibility=View.VISIBLE
             viewBinding.helpButton.visibility=View.VISIBLE
             viewBinding.zoomTextRight.visibility=View.INVISIBLE
             viewBinding.zoomTextLeft.visibility=View.VISIBLE
@@ -236,7 +266,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             windowAttributes.screenBrightness =
                 WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
             window.attributes = windowAttributes
-            //  }
         }else{
             viewBinding.helpButton.visibility=View.INVISIBLE
             viewBinding.cameraButton.visibility=View.INVISIBLE
@@ -258,53 +287,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                 viewBinding.viewFinder.alpha=1f
             }
         }
-        window.navigationBarColor = Color.parseColor("#000000")
-        //    window.setDarkBackgroundNavigationBar()
     }
-    /* private fun Window.setDarkBackgroundNavigationBar() {
-         when {
-             Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 -> {
-                 return
-             }
 
-             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-                 insetsController?.run {
-                     WindowInsetsControllerCompat.toWindowInsetsControllerCompat(this).isAppearanceLightNavigationBars =
-                         false
-                 }
-             }
-
-             else -> {
-                 @Suppress("DEPRECATION")
-                 @RequiresApi(Build.VERSION_CODES.M)
-                 decorView.systemUiVisibility = when {
-                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
-                     else -> decorView.systemUiVisibility
-                 }
-             }
-         }
-     }
-     private fun Window.setLightBackgroundNavigationBar() {
-         when {
-             Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1 -> {
-                 return
-             }
-             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-                 insetsController?.run {
-                     WindowInsetsControllerCompat.toWindowInsetsControllerCompat(this).isAppearanceLightNavigationBars =
-                         true
-                 }
-             }
-             else -> {
-                 @Suppress("DEPRECATION")
-                 decorView.systemUiVisibility = when {
-                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-                     else -> decorView.systemUiVisibility
-                 }
-             }
-         }
-     }*/
     // Implements VideoCapture use case, including start and stop capturing.
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun captureVideo() {
         val videoCapture = this.videoCapture ?: return
 
@@ -312,15 +298,15 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
         val curRecording = recording
         if (curRecording != null) {
-            // Stop the current recording session.
-            window.navigationBarColor = Color.parseColor("#000000")
-            curRecording.stop()
+            // ナビゲーションバー表示
+            setNavigationBar(true)
+              curRecording.stop()
             recording = null
             setButtons(true)
             return
         }
         setButtons(false)
-        if(cameraNum==0)window.navigationBarColor = Color.parseColor("#FFFFFF")
+        setNavigationBar(false)
         // create and start a new recording session
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
