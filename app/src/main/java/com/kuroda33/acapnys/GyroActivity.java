@@ -30,20 +30,21 @@ import androidx.appcompat.app.AppCompatActivity;
 //import androidx.core.app.ActivityCompat;
 //import androidx.recyclerview.widget.DefaultItemAnimator;
 
-import android.Manifest;
-import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothSocket;
+//import android.Manifest;
+//import android.app.Activity;
+//import android.bluetooth.BluetoothAdapter;
+//import android.bluetooth.BluetoothDevice;
+//import android.bluetooth.BluetoothManager;
+//import android.bluetooth.BluetoothSocket;
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
+//import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
+//import android.content.pm.PackageManager;
+//import android.graphics.Canvas;
+//import android.graphics.Color;
+//import android.graphics.Paint;
+//import android.graphics.Path;
 //import android.graphics.PixelFormat;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -54,41 +55,41 @@ import android.media.SoundPool;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+//import android.os.Handler;
+//import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.preference.PreferenceManager;
-import android.text.Editable;
-import android.text.method.ScrollingMovementMethod;
+//import android.preference.PreferenceManager;
+//import android.text.Editable;
+//import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+//import android.view.SurfaceHolder;
+//import android.view.SurfaceView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+//import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
+//import android.widget.TextView;
+//import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
+//import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
+//import java.io.ObjectOutput;
+//import java.io.ObjectOutputStream;
+//import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
+//import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.UUID;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
+//import java.util.ArrayList;
+//import java.util.Set;
+//import java.util.UUID;
+//import static java.util.concurrent.TimeUnit.NANOSECONDS;
 //import static java.util.concurrent.TimeUnit.NANOSECONDS;
 public class GyroActivity extends AppCompatActivity implements SensorEventListener{
     SensorManager sensorManager;
@@ -103,25 +104,25 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     private EditText pitchCurrentE,pitchCountE,rollCurrentE,rollCountE,yawCurrentE,yawCountE;
     private float pitchDegree,rollDegree,yawDegree;
     float pitchSec,rollSec,yawSec;
-    private Button ipSetBtn;
-    private Button exitBtn;
-    private Button rehaStartBtn;
-    private Button rehaStopBtn;
-    private Button rehaResetBtn;
-    private Button pitchDegreeUpBtn;
-    private Button pitchDegreeDownBtn;
-    private Button pitchSecUpBtn;
-    private Button pitchSecDownBtn;
+    Button ipSetBtn;
+    Button exitBtn;
+    Button rehaStartBtn;
+    Button rehaStopBtn;
+    Button rehaResetBtn;
+    Button pitchDegreeUpBtn;
+    Button pitchDegreeDownBtn;
+    Button pitchSecUpBtn;
+    Button pitchSecDownBtn;
 
-    private Button rollDegreeUpBtn;
-    private Button rollDegreeDownBtn;
-    private Button rollSecUpBtn;
-    private Button rollSecDownBtn;
+    Button rollDegreeUpBtn;
+    Button rollDegreeDownBtn;
+    Button rollSecUpBtn;
+    Button rollSecDownBtn;
 
-    private Button yawDegreeUpBtn;
-    private Button yawDegreeDownBtn;
-    private Button yawSecUpBtn;
-    private Button yawSecDownBtn;
+    Button yawDegreeUpBtn;
+    Button yawDegreeDownBtn;
+    Button yawSecUpBtn;
+    Button yawSecDownBtn;
     private Spinner soundSpin,vibrationSpin;
 
     private int soundType;
@@ -148,6 +149,10 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         KalmanInit();
+
+        View decor = getWindow().getDecorView();
+        // ナビゲーションバーを非表示にする
+        decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
       //  millis0 = TimeUnit.MILLISECONDS.ordinal();
         setContentView(R.layout.activity_gyro);
         AudioAttributes audioAttributes= new AudioAttributes.Builder()
@@ -184,6 +189,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         yawSecDownBtn = (Button) findViewById(R.id.yawSecDownButton);
         yawSecUpBtn = (Button) findViewById(R.id.yawSecUpButton);
         exitBtn = (Button) findViewById(R.id.exitButton);
+     //   motionSensorE = (EditText) findViewById(R.id.motionSensorText);
         ipe1 = (EditText) findViewById(R.id.ip1);
         ipe2 = (EditText) findViewById(R.id.ip2);
         ipe3 = (EditText) findViewById(R.id.ip3);
@@ -194,7 +200,6 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         rollCountE = (EditText) findViewById(R.id.roll1);
         yawCurrentE = (EditText) findViewById(R.id.yaw0);
         yawCountE = (EditText) findViewById(R.id.yaw1);
-
         pitchDegreeE = (EditText) findViewById(R.id.pitch2);
         pitchSecE= (EditText) findViewById(R.id.pitch3);
         rollDegreeE = (EditText) findViewById(R.id.roll2);
@@ -212,184 +217,137 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
 
         soundSpin.setOnItemSelectedListener(new soundSpinnerSelectedListener());
         vibrationSpin.setOnItemSelectedListener(new vibrationSpinnerSelectedListener());
-        ipSetBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String ips1=ipe1.getText().toString();
-                String ips2=ipe2.getText().toString();
-                String ips3=ipe3.getText().toString();
-                String ips4=ipe4.getText().toString();
-          //      saveData();
-                SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
-                SharedPreferences.Editor editor = data.edit();
+        ipSetBtn.setOnClickListener(v -> {
+            SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
+            SharedPreferences.Editor editor = data.edit();
 
-                editor.putString("ip1", ipe1.getText().toString());
-                editor.putString("ip2", ipe2.getText().toString());
-                editor.putString("ip3", ipe3.getText().toString());
-                editor.putString("ip4", ipe4.getText().toString());
-                ipad=String.format("%s.%s.%s.%s",ipe1.getText().toString(),ipe2.getText().toString(),ipe3.getText().toString(),ipe4.getText().toString());
-                Log.i("kuroa****",ipad);
+            editor.putString("ip1", ipe1.getText().toString());
+            editor.putString("ip2", ipe2.getText().toString());
+            editor.putString("ip3", ipe3.getText().toString());
+            editor.putString("ip4", ipe4.getText().toString());
+            ipad=String.format("%s.%s.%s.%s",ipe1.getText().toString(),ipe2.getText().toString(),ipe3.getText().toString(),ipe4.getText().toString());
+            Log.i("kuroa****",ipad);
 
-                inetSocketAddress = new InetSocketAddress(ipad, portn);
+            inetSocketAddress = new InetSocketAddress(ipad, portn);
 
-                editor.commit();
-                editor.apply();
+            editor.commit();
+            editor.apply();
 
+//             LinearLayout linearLayout = findViewById(com.google.android.material.R.id.linear);// LinearLayout);
+//             linearLayout.requestFocus();// setFocusableInTouchMode(true);
+//                linearLayout.setFocusableInTouchMode(true);
+    //        ipSetBtn.isFocusable();
+     //       ipSetBtn.isFocusableInTouchMode()
+            //parent = parent as View;
+            //parent.isFocusable = true;
+//            motionSensorE.isFocusableInTouchMode();
+//               motionSensorE.requestFocus();
 
-           //     i(TAG,ips1+ips2+ips3+ips4);
-                Log.d(TAG,"onclick ips");
-            }
+       //     i(TAG,ips1+ips2+ips3+ips4);
+            Log.d(TAG,"onclick ips");
         });
-        pitchDegreeDownBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pitchDegree -= 1;
-                saveData();
-       //         loadData();
-                //     i(TAG,ips1+ips2+ips3+ips4);
-                Log.d(TAG,"onclickStart");
-            }
+        pitchDegreeDownBtn.setOnClickListener(v -> {
+            pitchDegree -= 1;
+            saveData();
+   //         loadData();
+            //     i(TAG,ips1+ips2+ips3+ips4);
+            Log.d(TAG,"onclickStart");
         });
-        pitchDegreeUpBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pitchDegree += 1;
-                saveData();
-       //         loadData();
-                //     i(TAG,ips1+ips2+ips3+ips4);
-                Log.d(TAG,"onclickStart");
-            }
+        pitchDegreeUpBtn.setOnClickListener(v -> {
+            pitchDegree += 1;
+            saveData();
+   //         loadData();
+            //     i(TAG,ips1+ips2+ips3+ips4);
+            Log.d(TAG,"onclickStart");
         });
-        pitchSecDownBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pitchSec -= 0.1;
-                saveData();
-    //            loadData();
-                //     i(TAG,ips1+ips2+ips3+ips4);
-                Log.d(TAG,"onclickStart");
-            }
+        pitchSecDownBtn.setOnClickListener(v -> {
+            pitchSec -= 0.1;
+            saveData();
+//            loadData();
+            //     i(TAG,ips1+ips2+ips3+ips4);
+            Log.d(TAG,"onclickStart");
         });
-        pitchSecUpBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pitchSec += 0.1;
-                saveData();
-      //          loadData();
-                Log.d(TAG,"onclickStart");
-            }
+        pitchSecUpBtn.setOnClickListener(v -> {
+            pitchSec += 0.1;
+            saveData();
+  //          loadData();
+            Log.d(TAG,"onclickStart");
         });
-        rollDegreeDownBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                rollDegree -= 1;
-                saveData();
-         //       loadData();
-                //     i(TAG,ips1+ips2+ips3+ips4);
-                Log.d(TAG,"onclick rolldegreedown");
-            }
+        rollDegreeDownBtn.setOnClickListener(v -> {
+            rollDegree -= 1;
+            saveData();
+     //       loadData();
+            //     i(TAG,ips1+ips2+ips3+ips4);
+            Log.d(TAG,"onclick rolldegreedown");
         });
-        rollDegreeUpBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                rollDegree += 1;
-                saveData();
-       //         loadData();
-                //     i(TAG,ips1+ips2+ips3+ips4);
-                Log.d(TAG,"onclickStart");
-            }
+        rollDegreeUpBtn.setOnClickListener(v -> {
+            rollDegree += 1;
+            saveData();
+   //         loadData();
+            //     i(TAG,ips1+ips2+ips3+ips4);
+            Log.d(TAG,"onclickStart");
         });
-        rollSecDownBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                rollSec -= 0.1;
-                saveData();
-       //         loadData();
-                Log.d(TAG,"onclickStart");
-            }
+        rollSecDownBtn.setOnClickListener(v -> {
+            rollSec -= 0.1;
+            saveData();
+   //         loadData();
+            Log.d(TAG,"onclickStart");
         });
-        rollSecUpBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                rollSec += 0.1;
-                saveData();
-     //           loadData();
-                Log.d(TAG,"onclick rollsecup");
-            }
+        rollSecUpBtn.setOnClickListener(v -> {
+            rollSec += 0.1;
+            saveData();
+ //           loadData();
+            Log.d(TAG,"onclick rollsecup");
         });
-        yawDegreeDownBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                yawDegree -= 1;
-                saveData();
-     //           loadData();
-                //     i(TAG,ips1+ips2+ips3+ips4);
-                Log.d(TAG,"onclick yawdegreedown");
-            }
+        yawDegreeDownBtn.setOnClickListener(v -> {
+            yawDegree -= 1;
+            saveData();
+ //           loadData();
+            //     i(TAG,ips1+ips2+ips3+ips4);
+            Log.d(TAG,"onclick yawdegreedown");
         });
-        yawDegreeUpBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                yawDegree += 1;
-                saveData();
-     //           loadData();
-                //     i(TAG,ips1+ips2+ips3+ips4);
-                Log.d(TAG,"onclick yawdegreeup");
-            }
+        yawDegreeUpBtn.setOnClickListener(v -> {
+            yawDegree += 1;
+            saveData();
+ //           loadData();
+            //     i(TAG,ips1+ips2+ips3+ips4);
+            Log.d(TAG,"onclick yawdegreeup");
         });
-        yawSecDownBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                yawSec -= 0.1;
-                saveData();
-     //           loadData();
-                Log.d(TAG,"onclickStart");
-            }
+        yawSecDownBtn.setOnClickListener(v -> {
+            yawSec -= 0.1;
+            saveData();
+ //           loadData();
+            Log.d(TAG,"onclickStart");
         });
-        yawSecUpBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                yawSec += 0.1;
-                saveData();
-     //           loadData();
-                Log.d(TAG,"onclickStart");
-            }
+        yawSecUpBtn.setOnClickListener(v -> {
+            yawSec += 0.1;
+            saveData();
+ //           loadData();
+            Log.d(TAG,"onclickStart");
         });
 
-        rehaStartBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                rehaF=true;
-           //     i(TAG,ips1+ips2+ips3+ips4);
-                Log.d(TAG,"onclickStart");
-            }
+        rehaStartBtn.setOnClickListener(v -> {
+            rehaF=true;
+       //     i(TAG,ips1+ips2+ips3+ips4);
+            Log.d(TAG,"onclickStart");
         });
-        rehaStopBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                rehaF=false;
-                //     i(TAG,ips1+ips2+ips3+ips4);
-                Log.d(TAG,"onclickStop");
-            }
+        rehaStopBtn.setOnClickListener(v -> {
+            rehaF=false;
+            //     i(TAG,ips1+ips2+ips3+ips4);
+            Log.d(TAG,"onclickStop");
         });
-        rehaResetBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pitchCountE.setText("0");
-                rollCountE.setText("0");
-                yawCountE.setText("0");
-                //     i(TAG,ips1+ips2+ips3+ips4);
-              //  Log.d(TAG,"onclickReset");
-            }
+        rehaResetBtn.setOnClickListener(v -> {
+            pitchCountE.setText("0");
+            rollCountE.setText("0");
+            yawCountE.setText("0");
+            //     i(TAG,ips1+ips2+ips3+ips4);
+          //  Log.d(TAG,"onclickReset");
         });
 
-        exitBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //   Log.d(TAG, "surfaceDestroyed...");
-                rehaF=false;
-                finish();
-            }
+        exitBtn.setOnClickListener(v -> {
+            //   Log.d(TAG, "surfaceDestroyed...");
+            rehaF=false;
+            finish();
         });
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         //     sma.registerListener(this,sma.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR),SensorManager.SENSOR_DELAY_FASTEST);
@@ -435,6 +393,7 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         public void onNothingSelected(AdapterView parent) {
         }
     }
+    @SuppressLint("DefaultLocale")
     private void saveData() {
         SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
         SharedPreferences.Editor editor = data.edit();
@@ -492,6 +451,7 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
         rollStepper2.value=myFunctions().getUserDefaultDouble(str: "rollLimit2", ret:2.0)
         yawStepper2.value=myFunctions().getUserDefaultDouble(str: "yawLimit2", ret:2.0)
  */
+    @SuppressLint("DefaultLocale")
     private void loadData() {
         SharedPreferences data = getSharedPreferences("Data", MODE_PRIVATE);
         pitchDegree = data.getFloat("pitchDegree",30);
@@ -567,7 +527,7 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
         yaws[3]=y;
     }
 
-    int[][] arr = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    //int[][] arr = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     float[][] kalVs= {{0.0001F, 0.001F, 0F, 0F, 0F},{0.0001F, 0.001F, 0F, 0F, 0F},
         {0.0001F, 0.001F, 0, 0, 0},{0.0001F, 0.001F, 0, 0, 0},
         {0.0001F, 0.001F, 0, 0, 0},{0.0001F, 0.001F, 0, 0, 0},
@@ -590,7 +550,8 @@ soundSegmentCtl.selectedSegmentIndex=myFunctions().getUserDefaultInt(str:"soundT
         }
     }
     float RAD_TO_DEG=180F/3.1415F;
-    void QuaternionToEuler(float q0, float q1,float q2, float q3) {
+    @SuppressLint("DefaultLocale")
+    void QuaternionToEuler(float q0, float q1, float q2, float q3) {
         float pitch,roll,yaw;
         pitch = (float) Math.asin(-2 * q1 * q3 + 2 * q0 * q2);    // pitch
         roll = (float) Math.atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2 * q2 + 1);

@@ -10,16 +10,16 @@ class How2Activity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_how2)
-        val exitBtn=findViewById<Button>(R.id.exitButton)
+    //    val exitBtn=findViewById<Button>(R.id.exitButton)
     //    val sendBtn=findViewById<Button>(R.id.sendButton)
     //    sendBtn.setOnClickListener{
     //        val intent = Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
     //        startActivity(/* intent = */ intent)
     //    }
-        exitBtn.setOnClickListener(View.OnClickListener {
+    //    exitBtn.setOnClickListener(View.OnClickListener {
             //Log.d(TAG, "surfaceDestroyed...")
-            finish()
-        })
+    //        finish()
+    //    })
     }
    /* override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)

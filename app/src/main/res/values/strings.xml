@@ -9,7 +9,9 @@
         "ブレの少ない眼振が撮れます。\n\n2：録画録画\n使用するカメラを選択し、ズームを設定します。"
         "\n〇画面の中央の録画スタートボタンをタップ\n〇中央の録画ストップボタンをタップ\nで録画完了です。"
         "\n\n3：右上隅の [Gyro] ボタンをタップすると、スマホの pitch, roll, yaw の動きをチェックしてアラームを鳴らし、回数を表示します。前庭リハビリのための機能です。"
-        "また、Windows アプリ CapNYS が指定する IP-Address, Port を設定するとジャイロデータを WiFi でその CapNYS に送信できます。Windows用 CapNYS は kuroda33.com/jibika からダウンロード出来ます。"
+        "また、Windows アプリ CapNYS が指定する IP-Address, Port を設定するとジャイロデータを WiFi でその CapNYS に送信できます。"
+        "Windows用 CapNYS は kuroda33.com/jibika からダウンロード出来ます。\n"
+        "         "
     </string>
     <string-array name="spinner_items1">
         <item>OFF</item>
