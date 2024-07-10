@@ -19,7 +19,7 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
+//import android.graphics.Color
 import android.graphics.Rect
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -34,7 +34,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowInsets
-import android.view.WindowInsetsController
+//import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.SeekBar
 import android.widget.Toast
@@ -75,12 +75,12 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
     private lateinit var cameraExecutor: ExecutorService
     //    private lateinit var cameraController: LifecycleCameraController
-    private var focusChangedInitFlag:Boolean=true;
+    private var focusChangedInitFlag:Boolean=true
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (focusChangedInitFlag) {
-            focusChangedInitFlag = false;
-            return;
+            focusChangedInitFlag = false
+            return
         }
         getPara()
         //       setPreviewSize(cameraNum)
@@ -88,27 +88,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         cameraController.setLinearZoom(zoom100 / 100f)
     }
 
-       private fun hideSystemUI() {
-       //    val decorView = window.decorView
-           // API 30以上の場合
-           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-               window.decorView.windowInsetsController?.apply {
-                   // systemBars : Status barとNavigation bar両方
-                   hide(WindowInsets.Type.systemBars())
-                   // hide(WindowInsets.Type.statusBars())
-                   // hide(WindowInsets.Type.navigationBars())
-                   systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
-               }
-               // API 29以下の場合
-           } else {
-               window.decorView.systemUiVisibility = (
-                       View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                               or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                               or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                               or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                               or View.SYSTEM_UI_FLAG_FULLSCREEN)
-           }
-       }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -192,7 +171,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         setButtons(true)
     }
     private fun setNavigationBar(flag:Boolean) {
-        if (flag == false) {
+        if (!flag) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 window.decorView.windowInsetsController?.apply {
                     // ナビゲーションバーを非表示にする
@@ -244,13 +223,13 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
     private fun setButtons(on:Boolean){
         if(on){
-            Log.e(TAG, "Video capture ends with error: " + videoURI)
+            Log.e(TAG, "Video capture ends with error: $videoURI")
             if (videoURI == "no video"){
                 viewBinding.playButton.visibility=View.INVISIBLE
-                Log.e(TAG, "Video capture no: " + videoURI)
+                Log.e(TAG, "Video capture no: $videoURI")
             }else{
                 viewBinding.playButton.visibility=View.VISIBLE
-                Log.e(TAG, "Video capture yes: " + videoURI)
+                Log.e(TAG, "Video capture yes: $videoURI")
             }
             viewBinding.helpButton.visibility=View.VISIBLE
             viewBinding.cameraButton.visibility=View.VISIBLE
@@ -525,10 +504,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
     //  private var videoCapture: VideoCapture?= null
     private fun changeCamera(){
         getPara()
-        if (cameraNum == 1) {
-            cameraNum = 0//front
+        cameraNum = if (cameraNum == 1) {
+            0//front
         }else{
-            cameraNum = 1//back
+            1//back
         }
         savePara()
         startCamera()
