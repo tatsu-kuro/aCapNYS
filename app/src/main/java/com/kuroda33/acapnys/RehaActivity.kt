@@ -4,10 +4,20 @@ package com.kuroda33.acapnys
 //import android.hardware.SensorManager
 //import com.kuroda33.acapnys.GyroActivity.soundSpinnerSelectedListener
 //import com.kuroda33.acapnys.GyroActivity.vibrationSpinnerSelectedListener
+
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.media.SoundPool
+import android.os.AsyncTask
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.preference.PreferenceManager
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Button
@@ -16,12 +26,18 @@ import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import com.kuroda33.acapnys.databinding.ActivityRehaBinding
 import com.kuroda33.acapnys.databinding.ActivityRehaBinding.*
+import java.io.IOException
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetSocketAddress
+import java.net.SocketException
+import java.nio.charset.StandardCharsets
 
 
 //import java.util.prefs.Preferences
 
-class RehaActivity : AppCompatActivity() {
-
+class RehaActivity : AppCompatActivity() , SensorEventListener {
+    private lateinit var sensorManager: SensorManager
   //  var sensorManager: SensorManager? = null
     private var soundPool: SoundPool? = null
     private var sound1 = 0
@@ -30,7 +46,7 @@ class RehaActivity : AppCompatActivity() {
 
     //  long millis0 = TimeUnit.MILLISECONDS.ordinal();
     private val TAG = "MainActivity"
-  //  var inetSocketAddress: InetSocketAddress? = null
+    var inetSocketAddress: InetSocketAddress? = null
 
     //  private AlertDialog.Builder mAlertDialog;
     private var ipe1: EditText? = null //  private AlertDialog.Builder mAlertDialog;
@@ -83,7 +99,8 @@ class RehaActivity : AppCompatActivity() {
 
     var pitchs = floatArrayOf(0f, 0f, 0f, 0f, 0f)
     var rolls = floatArrayOf(0f, 0f, 0f, 0f, 0f)
-    var yaws: FloatArray? = floatArrayOf(0f, 0f, 0f, 0f, 0f)
+    var yaws = floatArrayOf(0f, 0f, 0f, 0f, 0f)
+    //var arr1 = arrayOf(8)(float)
     var kalVs = arrayOf(
         floatArrayOf(0.0001f, 0.001f, 0f, 0f, 0f),
         floatArrayOf(0.0001f, 0.001f, 0f, 0f, 0f),
@@ -257,7 +274,7 @@ class RehaActivity : AppCompatActivity() {
             editor.putString("ip4", ips4)
             ipad = String.format("%s.%s.%s.%s",ips1,ips2,ips3,ips4)
             Log.i("kuroa****", ipad)
-    //        inetSocketAddress = InetSocketAddress(ipad, portn)
+            inetSocketAddress = InetSocketAddress(ipad, portn)
             editor.commit()
             editor.apply()
             Log.d(TAG, "onclick ips")
@@ -340,14 +357,23 @@ class RehaActivity : AppCompatActivity() {
             rehaF = false
             finish()
         }
-     //   sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+
+   /*     sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        sensorManager.registerListener(
+            this,
+            sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
+            SensorManager.SENSOR_DELAY_FASTEST
+        )
+*/
+
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         //     sma.registerListener(this,sma.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR),SensorManager.SENSOR_DELAY_FASTEST);
         //     sma.registerListener(this,sma.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR),SensorManager.SENSOR_DELAY_FASTEST);
-       /* sensorManager.registerListener(
+        sensorManager.registerListener(
             this,
             sensorManager!!.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
             SensorManager.SENSOR_DELAY_FASTEST
-        )*/
+        )
       //  loadData()
     }
 
@@ -416,8 +442,378 @@ class RehaActivity : AppCompatActivity() {
         ipe4!!.setText(sharedPreferences.getString("ip4", "99"))
         ipad = String.format("%s.%s.%s.%s",ipe1.toString(),ipe2.toString(),ipe3.toString(),ipe4.toString())
    //     Log.i("kuroa****", ipad)
-        //inetSocketAddress = InetSocketAddress(ipad, portn)
+        inetSocketAddress = InetSocketAddress(ipad, portn)
+    }
+   /* private var yaw180cnt = 0 //180°or -180°を越えた回数
+
+    private var theLastYaw = 0f
+    private var getYawInitF = true
+    private fun getYaw(yaw: Float): Float {
+        if (getYawInitF) {
+            theLastYaw = yaw
+            getYawInitF = false
+            return yaw
+        }
+        if (theLastYaw > 100 && yaw < -100) {
+            yaw180cnt += 1
+        } else if (theLastYaw < -100 && yaw > 100) {
+            yaw180cnt -= 1
+        }
+        theLastYaw = yaw
+        val tmp: Float = yaw180cnt * 360f
+        return yaw + tmp
     }
 
+    fun getDirection(a: Float, b: Float, c: Float, d: Float): Int {
+        return if (a + 0.1f < b && b + 0.1f < c && c + 0.1f < d) {
+            1
+        } else if (a > b + 0.1f && b > c + 0.1f && c > d + 0.1f) {
+            -1
+        } else {
+            0
+        }
+    }
+
+    fun pushPRY(p: Float, r: Float, y: Float) {
+        for (i in 0..2) {
+            pitchs[i] = pitchs[i + 1]
+            rolls[i] = rolls[i + 1]
+            yaws!![i] = yaws!![i + 1]
+        }
+        pitchs[3] = p
+        rolls[3] = r
+        yaws!![3] = y
+    }
+
+    var arr = arrayOf(intArrayOf(1, 2, 3), intArrayOf(4, 5, 6), intArrayOf(7, 8, 9))*/
+  /*  var kalVs = arrayOf(
+        floatArrayOf(0.0001f, 0.001f, 0f, 0f, 0f),
+        floatArrayOf(0.0001f, 0.001f, 0f, 0f, 0f),
+        floatArrayOf(0.0001f, 0.001f, 0f, 0f, 0f),
+        floatArrayOf(0.0001f, 0.001f, 0f, 0f, 0f),
+        floatArrayOf(0.0001f, 0.001f, 0f, 0f, 0f),
+        floatArrayOf(0.0001f, 0.001f, 0f, 0f, 0f),
+        floatArrayOf(0.0001f, 0.001f, 0f, 0f, 0f),
+        floatArrayOf(0.0001f, 0.001f, 0f, 0f, 0f)
+    )
+
+    fun KalmanS(Q: Float, R: Float, num: Int) {
+        kalVs.get(num).get(4) = (kalVs.get(num).get(3) + Q) / (kalVs.get(num).get(3) + Q + R)
+        kalVs.get(num).get(3) = R * (kalVs.get(num).get(3) + Q) / (R + kalVs.get(num).get(3) + Q)
+    }
+
+    fun Kalman(value: Float, num: Int): Float {
+        KalmanS(kalVs.get(num).get(0), kalVs.get(num).get(1), num)
+        val result: Float =
+            kalVs.get(num).get(2) + (value - kalVs.get(num).get(2)) * kalVs.get(num).get(4)
+        kalVs.get(num).get(2) = result
+        return result
+    }
+
+    fun KalmanInit() {
+        for (i in 0..5) {
+            kalVs.get(i).get(2) = 0
+            kalVs.get(i).get(3) = 0
+            kalVs.get(i).get(4) = 0
+        }
+    }*/
+
+    var RAD_TO_DEG = 180f / 3.1415f
+    fun QuaternionToEuler(q0: Float, q1: Float, q2: Float, q3: Float) {
+        var pitch: Float
+        var roll: Float
+        var yaw: Float
+        pitch = Math.asin((-2 * q1 * q3 + 2 * q0 * q2).toDouble()).toFloat() // pitch
+        roll = Math.atan2(
+            (2 * q2 * q3 + 2 * q0 * q1).toDouble(),
+            (-2 * q1 * q1 - 2 * q2 * q2 + 1).toDouble()
+        ).toFloat()
+        yaw = Math.atan2(
+            (2 * (q1 * q2 + q0 * q3)).toDouble(),
+            (q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3).toDouble()
+        ).toFloat()
+        pitch *= RAD_TO_DEG
+        yaw *= RAD_TO_DEG
+        // Declination of SparkFun Electronics (40°05'26.6"N 105°11'05.9"W) is
+        //     8° 30' E  ± 0° 21' (or 8.5°) on 2016-07-19
+        // - http://www.ngdc.noaa.gov/geomag-web/#declination
+        //    yawf -= 8.5;
+        roll *= RAD_TO_DEG
+        //  pitchA.add(pitch);//(Kalman(value: pitch, num: 0));
+        // rollA.add(roll);//(Kalman(value: roll, num: 1));
+        pitch = Kalman(pitch, 0)
+        roll = Kalman(roll, 1)
+        yaw = Kalman(getYaw(yaw), 2)
+        pushPRY(pitch, roll, yaw)
+        pitchCurrentE!!.setText(String.format("%.0f", pitch))
+        rollCurrentE!!.setText(String.format("%.0f", roll))
+        yawCurrentE!!.setText(String.format("%.0f", yaw))
+    }
+//    func checkOK( d0:Float,d1:Float,limit:Float,count:Int,ms:Double)->Int
+
+    //    func checkOK( d0:Float,d1:Float,limit:Float,count:Int,ms:Double)->Int
+    override fun onSensorChanged(event: SensorEvent){
+        val floats = FloatArray(12)
+        floats[8] = event.values[3]
+        val nq0 = floats[8]
+        floats[9] = event.values[0]
+        val nq1 = floats[9]
+        floats[10] = event.values[1]
+        val nq2 = floats[10]
+        floats[11] = event.values[2]
+        val nq3 = floats[11]
+        val b0 = ((nq0 + 1.0) * 128.0).toInt()
+        val b1 = ((nq1 + 1.0) * 128.0).toInt()
+        val b2 = ((nq2 + 1.0) * 128.0).toInt()
+        val b3 = ((nq3 + 1.0) * 128.0).toInt()
+        val Str = String.format("Q:%03d%03d%03d%03d", b0, b1, b2, b3)
+        //  send(StringStr, String "192.168.0.209", int 1108) throws IOException {
+        val dataStr = Str.toByteArray(StandardCharsets.UTF_8)
+         //     ipad = "192.168.0.209";
+         //  InetSocketAddress inetSocketAddress = new InetSocketAddress(ipad, portn);
+        val datagramPacket: DatagramPacket =
+            DatagramPacket(dataStr, dataStr.size, inetSocketAddress)
+
+        // Androidではソケット通信は別スレッドにする必要がある。ここで非同期通信。
+        val task: AsyncTask<DatagramPacket, Void, Void> =
+            object : AsyncTask<DatagramPacket?, Void?, Void?>() {
+                protected fun doInBackground(vararg datagramPackets: DatagramPacket): Void? {
+                    var datagramSocket: DatagramSocket? = null
+                    try {
+                        datagramSocket = DatagramSocket()
+                        datagramSocket.send(datagramPackets[0])
+                        datagramSocket.close()
+                    } catch (e: SocketException) {
+                        e.printStackTrace()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                    return null
+                }
+            }
+        task.execute(datagramPacket)
+        if (rehaF == true) {
+            QuaternionToEuler(nq0, nq1, nq2, nq3)
+            checkRotation()
+        }
+    }
+/*
+        button_send.setOnClickListener()
+        {
+            val IPAddress = spinner1.selectedItem.toString() + '.'.toString() +
+                            spinner2.selectedItem.toString() + '.'.toString() +
+                            spinner3.selectedItem.toString() + '.'.toString() +
+                            spinner4.selectedItem.toString()
+            // ② ポートはC#側とあわせています。
+            // ソケット通信用にポート設定。送信したいデータとIPアドレス設定。
+            val inetSocketAddress = InetSocketAddress(IPAddress, 60001)
+            // Androidではソケット通信は別スレッドで非同期通信。
+            val task = object : AsyncTask<InetSocketAddress, Void, Void>() {
+                override fun doInBackground(vararg inetSocketAddresses: InetSocketAddress): Void? {
+                    var socket: Socket? = null
+                    try {
+                        // 接続
+                        socket = Socket()
+                        socket!!.connect(inetSocketAddresses[0])
+                        val writer = BufferedWriter(OutputStreamWriter(socket!!.getOutputStream()))
+                        //　① kotolin extensionsで便利。
+                        // データを送信。
+                        writer.write(edit_text.text.toString())
+                        // クローズ
+                        writer.close()
+                        socket!!.close()
+                    } catch (e: SocketException) {
+                        e.printStackTrace()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                    return null
+                }
+            }
+            task.execute(inetSocketAddress)
+        }
+
+ */
+    var pitchDirection = 0
+    var rollDirection = 0
+    var yawDirection = 0
+    var lastPitch = 0f
+
+    var lastPitchMilli: Long = 0
+    var lastRollMilli: Long = 0
+    var lastYawMilli: Long = 0
+    var lastRoll = 0f
+
+    var lastYaw = 0f
+
+    fun incPitchOK() {
+        val str = pitchCountE!!.text.toString()
+        var t: Int = str.toInt()
+        t += 1
+        pitchCountE!!.setText(t.toString())
+    }
+
+    private fun checkOK(d0: Float, d1: Float, limit: Float, millis: Long, ms: Float): Int {
+        val milli = millis / 1000000
+        val mslong = (ms * 1000f).toLong()
+        val d = d0 - d1
+        //   if (millis < 100){return 0;}//5*40ms
+        return if (d > limit || d < -limit) {
+            if (milli < mslong) { // && milli>200){
+                val Str = String.format(
+                    "d:%f ms:%S limit:%s",
+                    d0 - d1,
+                    java.lang.Long.toString(milli),
+                    java.lang.Long.toString(mslong)
+                )
+                Log.e("test", Str)
+                5
+            } else {
+                0
+            }
+        } else 0
+    }
+
+    fun incRollOK() {
+        val str = rollCountE!!.text.toString()
+        var t: Int = str.toInt()
+        t += 1
+        rollCountE!!.setText(t.toString())
+    }
+
+    fun incYawOK() {
+        val str = yawCountE!!.text.toString()
+        var t: Int = str.toInt()
+        t += 1
+        yawCountE!!.setText(t.toString())
+    }
+
+    fun soundANDvibe() {
+        if (soundType == 1) {
+            soundPool!!.play(sound1, 1.0f, 1.0f, 1, 0, 1f)
+        } else if (soundType == 2) {
+            soundPool!!.play(sound2, 1.0f, 1.0f, 1, 0, 1f)
+        } else if (soundType == 3) {
+            soundPool!!.play(sound3, 1.0f, 1.0f, 1, 0, 1f)
+        }
+        var ms: Long = 0
+        if (vibrationType == 1) ms = 50 else if (vibrationType == 2) ms =
+            100 else if (vibrationType == 3) ms = 150
+        // Vibrate for 500 milliseconds
+        if (ms != 0L) {
+            val v = getSystemService(VIBRATOR_SERVICE) as Vibrator
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                v.vibrate(VibrationEffect.createOneShot(ms, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                //deprecated in API 26
+                v.vibrate(ms)
+            }
+        }
+    }
+
+    private fun checkRotation() {
+        //int tempDirection=0;
+        // pitch
+        val tempPitchDirection: Int = getDirection(pitchs[0], pitchs[1], pitchs[2], pitchs[3])
+        if (tempPitchDirection == -1 && pitchDirection == 1 || tempPitchDirection == 1 && pitchDirection == -1) //向きが代わった時
+        {
+            pitchDirection = tempPitchDirection //向きを新しくする
+            val nowTime = System.nanoTime()
+            if (checkOK(
+                    lastPitch,
+                    pitchs[0],
+                    pitchDegree,
+                    nowTime - lastPitchMilli,
+                    pitchSec
+                ) == 5
+            ) {
+                incPitchOK()
+                soundANDvibe()
+            }
+            //       String Str = String.format ("1:%f 2:%f",lastPitch,pitchs[0]);
+            //       Log.e("test",Str);
+            lastPitch = pitchs[0]
+            lastPitchMilli = System.nanoTime() // bTimeUnit.MILLISECONDS.ordinal();
+        }
+        if (tempPitchDirection != 0) {
+            pitchDirection = tempPitchDirection
+        }
+        // roll
+        val tempRollDirection: Int = getDirection(rolls[0], rolls[1], rolls[2], rolls[3])
+        if (tempRollDirection == -1 && rollDirection == 1 || tempRollDirection == 1 && rollDirection == -1) {
+            rollDirection = tempRollDirection
+            val nowTime = System.nanoTime()
+            if (checkOK(lastRoll, rolls[0], rollDegree, nowTime - lastRollMilli, rollSec) == 5) {
+                incRollOK()
+                soundANDvibe()
+            }
+            lastRoll = rolls[0]
+            lastRollMilli = System.nanoTime()
+        }
+        if (tempRollDirection != 0) {
+            rollDirection = tempRollDirection
+        }
+        // yaw
+        val tempYawDirection: Int = getDirection(yaws!![0], yaws!![1], yaws!![2], yaws!![3])
+        if (tempYawDirection == -1 && yawDirection == 1 || tempYawDirection == 1 && yawDirection == -1) {
+            yawDirection = tempYawDirection
+            val nowTime = System.nanoTime()
+            if (checkOK(lastYaw, yaws!![0], yawDegree, nowTime - lastYawMilli, yawSec) == 5) {
+                incYawOK()
+                soundANDvibe()
+            }
+            lastYaw = yaws!![0]
+            lastYawMilli = System.nanoTime()
+        }
+        if (tempYawDirection != 0) {
+            yawDirection = tempYawDirection
+        }
+    }
+   /* private fun sensorReset(){
+        sensorManager.unregisterListener(this)
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        sensorManager.registerListener(
+            this,
+            sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
+            SensorManager.SENSOR_DELAY_FASTEST
+        )
+        viewBinding.myView.initData()
+    }
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            when(event.action){
+                MotionEvent.ACTION_DOWN -> sensorReset()
+            }
+        }
+
+        //再描画を実行させる呪文
+        //   Log.e("kdiidiid","motion touch")
+        return super.onTouchEvent(event)
+    }*/
+    //センサの精度が変更されたときに呼ばれる
+    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
+    }
+
+    override fun onResume() {
+        super.onResume()
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        sensorManager.registerListener(
+            this,
+            sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
+            SensorManager.SENSOR_DELAY_FASTEST
+        )
+        //リスナーとセンサーオブジェクトを渡す
+        //第一引数はインターフェースを継承したクラス、今回はthis
+        //第二引数は取得したセンサーオブジェクト
+        //第三引数は更新頻度 UIはUI表示向き、FASTはできるだけ早く、GAMEはゲーム向き
+        //sensorManager.registerListener(this, quaternionSensor, SensorManager.SENSOR_DELAY_FASTEST)
+    }
+
+    //アクティビティが閉じられたときにリスナーを解除する
+    override fun onPause() {
+        super.onPause()
+        //リスナーを解除しないとバックグラウンドにいるとき常にコールバックされ続ける
+        sensorManager.unregisterListener(this)
+    }
 }
 
