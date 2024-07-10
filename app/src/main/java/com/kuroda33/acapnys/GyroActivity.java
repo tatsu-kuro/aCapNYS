@@ -67,6 +67,7 @@ import android.view.MotionEvent;
 //import android.view.SurfaceHolder;
 //import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowInsets;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -145,14 +146,25 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
         yawA = new ArrayList<>();
     }
 */
+    private void setNavigationBar(){//わからない
+        View decor = getWindow().getDecorView();
+        // API 30以上の場合
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            decor.getWindowInsetsController().hide(WindowInsets.Type.systemBars());
+        } else {
+            // API 29以下の場合
+            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         KalmanInit();
-
-        View decor = getWindow().getDecorView();
+        setNavigationBar();
+ //       View decor = getWindow().getDecorView();
         // ナビゲーションバーを非表示にする
-        decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+ //       decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
       //  millis0 = TimeUnit.MILLISECONDS.ordinal();
         setContentView(R.layout.activity_gyro);
         AudioAttributes audioAttributes= new AudioAttributes.Builder()
