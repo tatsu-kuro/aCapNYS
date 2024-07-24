@@ -13,6 +13,18 @@
         "Windows用 CapNYS は kuroda33.com/jibika からダウンロード出来ます。\n"
         "         "
     </string>
+    <string name="permissionText">
+        "  \n"
+        "      aCapNYSにカメラ、ファイルとメディア、マイクに対する権限を与えると\n"
+        "      aCapNYSが動きます。下記の手順で権限を与えてください。\n\n"
+        "　１：Android画面にもどって、設定（歯車アイコン）\n"
+        "　２：アプリと通知\n"
+        "　３：aCapNYS を探して、それをタップ\n"
+        "　４：権限\n"
+        "　　　カメラ、ファイルとメディア、マイクの３個をタップして、すべて許可\n"
+
+
+    </string>
     <string-array name="spinner_items1">
         <item>OFF</item>
         <item>A</item>

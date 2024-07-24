@@ -14,29 +14,30 @@ package com.kuroda33.acapnys
 //import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 //import java.net.URI
 //import java.nio.ByteBuffer
+//import android.graphics.Color
+//import android.util.DisplayMetrics
+//import android.view.WindowInsetsController
+
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
-//import android.graphics.Color
 import android.graphics.Rect
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.icu.text.DateTimePatternGenerator.PatternInfo.OK
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.provider.MediaStore
-//import android.util.DisplayMetrics
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowInsets
-//import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.ListView
@@ -45,6 +46,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -57,10 +59,10 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import com.kuroda33.acapnys.databinding.ActivityMainBinding
+import java.security.AccessController.getContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -93,35 +95,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         val cameraController = camera!!.cameraControl
         cameraController.setLinearZoom(zoom100 / 100f)
     }
-   /*override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                // 権限が付与された場合
-                //performFileOperations()
-                Toast.makeText(this,"granted",Toast.LENGTH_SHORT).show()
-            } else {
-                // 権限が拒否された場合
-                Toast.makeText(this, "外部ストレージへのアクセスが拒否されました", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }*/
-   private var PERMISSIONS = arrayOf(
 
-       Manifest.permission.READ_EXTERNAL_STORAGE,
-       Manifest.permission.WRITE_EXTERNAL_STORAGE,
-       Manifest.permission.CAMERA,
-       Manifest.permission.RECORD_AUDIO
-   )
-  /*  private val requestPermissionsLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { isGranted: Map<String, Boolean> ->
-        if (isGranted.containsValue(false)) {
-            Toast.makeText(this, "permission1", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "permission2", Toast.LENGTH_SHORT).show()
-        }
-    }*/
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -137,187 +111,99 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         //   viewBinding.post {
         //       Log.i("", "width:" + binding.view.width + ", height:" + binding.view.height)
         //   }
-   /*     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_CODE_PERMISSIONS)
-            } else {
-                // 権限が既に付与されている場合
-  //              performFileOperations()
-                Toast.makeText(this,"already granted",Toast.LENGTH_SHORT).show()
-
-            }
-        } else {
-            // 古いバージョンでは権限が自動的に付与されます
-//            performFileOperations()
-            Toast.makeText(this,"old version granted",Toast.LENGTH_SHORT).show()
-
-        }
-
-*/
-    /*    for (perm in PERMISSIONS) {
-            if (ActivityCompat.checkSelfPermission(this, perm)
-                == PackageManager.PERMISSION_GRANTED
-            ) {
-                Toast.makeText(this, "message3", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "message4", Toast.LENGTH_SHORT).show()
-                requestPermissionsLauncher.launch(PERMISSIONS)
-            }
-        }
-*/
-
-
-
-
-        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissionLauncher_one.launch(
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-        } else {
-         //   setListView()
-        }
-/*
-        if (checkSelfPermission(Manifest.permission.CAMERA) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissionLauncher_one.launch(
-                Manifest.permission.CAMERA
-            )
-        } else {
-            startCamera()
-            //data.removeAt(0)
-            //readContent()
-            //data.reverse()
-        }
-        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissionLauncher_one.launch(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-        } else {
-
-        }
-        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissionLauncher_one.launch(
-                Manifest.permission.RECORD_AUDIO
-            )
-            finish()
-        } else {
-            //setListView()
-        }*/
-        /*
         if (allPermissionsGranted()) {
             startCamera()
-        } else {
-            ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
-        }*/
-        seekBar.progress=zoom100
-        // Set up the listeners for take photo and video capture buttons
-        //  viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
-        viewBinding.videoCaptureButton.setOnClickListener {
-            captureVideo()
-        }
-        viewBinding.helpButton.setOnClickListener {
-            val intent = Intent(/* packageContext = */ application,/* cls = */ How2Activity::class.java)
-            startActivity(/* intent = */ intent)
-        }
-        viewBinding.gyroButton.setOnClickListener {
-            //         val intent = Intent(/* packageContext = */ application,/* cls = */ GridButtons::class.java)
-            //         startActivity(/* intent = */ intent)
-            val intent = Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
-            startActivity(/* intent = */ intent)
-        }
-        viewBinding.playButton.setOnClickListener {
-            val intent =
-                Intent(/* packageContext = */ application,/* cls = */ PlayActivity::class.java)
-            if (videoURI != "no video"){
-                intent.putExtra("videouri", videoURI)
+            setListView()
+
+            seekBar.progress = zoom100
+            // Set up the listeners for take photo and video capture buttons
+            //  viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
+            viewBinding.videoCaptureButton.setOnClickListener {
+                captureVideo()
+            }
+            viewBinding.helpButton.setOnClickListener {
+                val intent =
+                    Intent(/* packageContext = */ application,/* cls = */ How2Activity::class.java)
                 startActivity(/* intent = */ intent)
             }
-        }
-        viewBinding.cameraButton.setOnClickListener{
-            changeCamera()
-        }
-        cameraExecutor = Executors.newSingleThreadExecutor()
-        viewBinding.seekBar.setOnSeekBarChangeListener(
-            object :SeekBar.OnSeekBarChangeListener{
-                @SuppressLint("RestrictedApi")
-                override fun onProgressChanged(
-                    seekBar: SeekBar?,
-                    progress: Int,
-                    fromUser: Boolean
-                ) {
-                    if (fromUser){
-                        zoom100 = progress
-                        savePara()
-                        val cameraController = camera!!.cameraControl
-                        cameraController.setLinearZoom(zoom100/100f)
-//                        startCamera()//   Log.d("kdkdkdkdkdk","$progress")
-                    }
-                }
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                }
-
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            viewBinding.gyroButton.setOnClickListener {
+                //         val intent = Intent(/* packageContext = */ application,/* cls = */ GridButtons::class.java)
+                //         startActivity(/* intent = */ intent)
+                val intent =
+                    Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
+                startActivity(/* intent = */ intent)
             }
-        )
+            viewBinding.playButton.setOnClickListener {
+                val intent =
+                    Intent(/* packageContext = */ application,/* cls = */ PlayActivity::class.java)
+                if (videoURI != "no video") {
+                    intent.putExtra("videouri", videoURI)
+                    startActivity(/* intent = */ intent)
+                }
+            }
+            viewBinding.cameraButton.setOnClickListener {
+                changeCamera()
+            }
+            cameraExecutor = Executors.newSingleThreadExecutor()
+            viewBinding.seekBar.setOnSeekBarChangeListener(
+                object : SeekBar.OnSeekBarChangeListener {
+                    @SuppressLint("RestrictedApi")
+                    override fun onProgressChanged(
+                        seekBar: SeekBar?,
+                        progress: Int,
+                        fromUser: Boolean
+                    ) {
+                        if (fromUser) {
+                            zoom100 = progress
+                            savePara()
+                            val cameraController = camera!!.cameraControl
+                            cameraController.setLinearZoom(zoom100 / 100f)
+//                        startCamera()//   Log.d("kdkdkdkdkdk","$progress")
+                        }
+                    }
 
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        sensorManager.registerListener(
-            this,
-            sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
-            SensorManager.SENSOR_DELAY_FASTEST
-        )
-        viewBinding.myView.set_rpk_ppk()
-        setPreviewSize(cameraNum)
-        setButtons(true)
+                    override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                    }
 
-        /*if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
-              requestPermissionLauncher.launch(
-                  Manifest.permission.READ_EXTERNAL_STORAGE
+                    override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+                }
             )
-        } else {
-            data.removeAt(0)
-            readContent()
-            data.reverse()
-        }*/
-  /*      val lv: ListView =findViewById(R.id.video_list_view)
-        val adapter= ArrayAdapter(
-            this,
-            android.R.layout.simple_list_item_1,
-            data
-        )
 
-        //4)adapterをlistviewにセット
-        lv.adapter =adapter
-
-        //5)クリックしてトースト表示
-        lv.setOnItemClickListener { adapterView, view, i, l->
-            Toast.makeText(this,data[i],Toast.LENGTH_SHORT).show()
-        }*/
-
-  /*      if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissionLauncher.launch(
-                Manifest.permission.READ_EXTERNAL_STORAGE
+            sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+            sensorManager.registerListener(
+                this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
+                SensorManager.SENSOR_DELAY_FASTEST
             )
-        } else {
-            readContent()
-        }*/
-       // captureVideo()
-       // setListView()
+            viewBinding.myView.set_rpk_ppk()
+            setPreviewSize(cameraNum)
+            setButtons(true)
+            viewBinding.videoCaptureButton.bringToFront()
+            //val permissionText = findViewById<TextView>(R.id.permission)
+            //permissionText.translationX(1000f)
+        }else{
+            setButtons(false)
+            viewBinding.myView.alpha=0f
+            viewBinding.permission.visibility=View.VISIBLE
+
+
+
+            /*   val builder = AlertDialog.Builder(this)
+                    builder.setTitle("title")
+                   builder.setMessage("メッセージ")
+                   builder.setPositiveButton(OK, null)
+                   builder.show()*/
+            //  AlertDialog.show(Test02_01.this, "Alert Test",
+            //    "Hello, This is Alert Dialog.", "ok", false);
+            //android.os.Process.killProcess(android.os.Process.myPid())
+            //   requestPermissionLauncher.launch(
+            //       Manifest.permission.READ_EXTERNAL_STORAGE
+            //  )
+            //    ActivityCompat.requestPermissions(
+            //        this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+        }
+        //     setListView()
     }
-
     private fun setNavigationBar(flag:Boolean) {
         if (!flag) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -326,7 +212,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                     hide(WindowInsets.Type.navigationBars())
                     // スワイプで一時的に表示する動作を設定
                     //systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                   // systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
+                    // systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
                 }
             } else {
                 // API 29以下の場合
@@ -389,6 +275,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.myView.alpha=1f
             viewBinding.viewFinder.alpha=1f
             viewBinding.videoCaptureButton.alpha=0.1f
+            viewBinding.permission.visibility=View.INVISIBLE
+            viewBinding.videoListView.visibility=View.VISIBLE
             val windowAttributes = window.attributes
             windowAttributes.screenBrightness =
                 WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
@@ -403,6 +291,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.zoomTextRight.visibility=View.INVISIBLE
             viewBinding.gyroButton.visibility=View.INVISIBLE
             viewBinding.videoCaptureButton.alpha=0.015f
+            viewBinding.permission.visibility=View.INVISIBLE
+            viewBinding.videoListView.visibility=View.INVISIBLE
             if(cameraNum==0){
                 viewBinding.myView.alpha=0f
                 viewBinding.viewFinder.alpha=0f
@@ -427,7 +317,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         if (curRecording != null) {
             // ナビゲーションバー表示
             setNavigationBar(true)
-              curRecording.stop()
+            curRecording.stop()
             recording = null
             setButtons(true)
             return
@@ -435,19 +325,13 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         setButtons(false)
         setNavigationBar(false)
         // create and start a new recording session
-
-        // フォーマットパターンを指定してSimpleDateFormatインスタンスを作成
-        val name = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss",Locale.US)
-
-        // 日付を指定したフォーマットに変換
- //       val formattedDate = dateFormat.format(date)
- //       val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/aCapNYS")
+                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/CameraX-Video")
             }
         }
 
@@ -619,16 +503,27 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                 }
             }.toTypedArray()
     }
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            readContent()
+        } else {
+            // それでも拒否された時の対応
+            val toast = Toast.makeText(
+                this,
+                "これ以上なにもできません", Toast.LENGTH_SHORT
+            )
+            toast.show()
+        }
+    }
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
         IntArray) {
-        finish()
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                finish()
-//                startCamera()
- //               setListView()
+                startCamera()
             } else {
                 Toast.makeText(this,
                     "Permissions not granted by the user.",
@@ -735,29 +630,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         sensorManager.unregisterListener(this)
     }
     val data = mutableListOf(" ")
-    private val requestPermissionLauncher_one = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            readContent()
-        } else {
-            // それでも拒否された時の対応
-            val toast = Toast.makeText(
-                this,
-                "これ以上なにもできません", Toast.LENGTH_SHORT
-            )
-            toast.show()
-        }
-    }
- /*   private val requestPermissionsLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { isGranted: Map<String, Boolean> ->
-        if (isGranted.containsValue(false)) {
-            Toast.makeText(this, "mess1", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "mess2", Toast.LENGTH_SHORT).show()
-        }
-    }*/
     private fun setListView(){
         //} else {
         data.removeAt(0)
