@@ -25,7 +25,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ListView
-        android:id="@+id/video_list_view"
+        android:id="@+id/videoListView"
         android:layout_width="0dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/zoomTextLeft"
@@ -35,7 +35,7 @@
         app:layout_constraintEnd_toStartOf="@+id/video_capture_button"
         app:layout_constraintStart_toEndOf="@+id/zoomTextLeft" />
     <SeekBar
-        android:id="@+id/seekBar"
+        android:id="@+id/zoomSeekBar"
         style="@style/Base.Theme.ACapNYS"
         android:layout_width="0dp"
         android:layout_height="42dp"

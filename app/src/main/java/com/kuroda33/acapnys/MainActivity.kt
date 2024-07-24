@@ -19,9 +19,11 @@ package com.kuroda33.acapnys
 //import android.view.WindowInsetsController
 
 import android.Manifest
+import android.R
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Rect
@@ -29,7 +31,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.icu.text.DateTimePatternGenerator.PatternInfo.OK
+import android.media.MediaPlayer.OnPreparedListener
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -42,11 +44,9 @@ import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.SeekBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -62,7 +62,6 @@ import androidx.camera.video.VideoRecordEvent
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import com.kuroda33.acapnys.databinding.ActivityMainBinding
-import java.security.AccessController.getContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -102,7 +101,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        val seekBar = findViewById<SeekBar>(R.id.seekBar)
+      //  val seekBar=viewBinding.zoomSeekBar
+        //val seekBar = findViewById<SeekBar>(R.id.zoomSeekBar)
         // val width=viewBinding.root.maxWidth
         videoURI="no video"
         getPara()
@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             startCamera()
             setListView()
 
-            seekBar.progress = zoom100
+            viewBinding.zoomSeekBar.progress = zoom100
             // Set up the listeners for take photo and video capture buttons
             //  viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
             viewBinding.videoCaptureButton.setOnClickListener {
@@ -137,6 +137,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                 val intent =
                     Intent(/* packageContext = */ application,/* cls = */ PlayActivity::class.java)
                 if (videoURI != "no video") {
+                    Toast.makeText(baseContext, videoURI, Toast.LENGTH_SHORT).show()
                     intent.putExtra("videouri", videoURI)
                     startActivity(/* intent = */ intent)
                 }
@@ -145,7 +146,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                 changeCamera()
             }
             cameraExecutor = Executors.newSingleThreadExecutor()
-            viewBinding.seekBar.setOnSeekBarChangeListener(
+            viewBinding.zoomSeekBar.setOnSeekBarChangeListener(
                 object : SeekBar.OnSeekBarChangeListener {
                     @SuppressLint("RestrictedApi")
                     override fun onProgressChanged(
@@ -204,6 +205,22 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         }
         //     setListView()
     }
+ /*   private fun playVideo(){
+        val path = intent.getStringExtra("path")
+        videoView = findViewById<View>(R.id.videoView)
+        videoView.setVideoPath(path)
+
+        videoView.setOnPreparedListener(OnPreparedListener { mediaPlayer ->
+            if (mediaPlayer.videoWidth > mediaPlayer.videoHeight) {
+                // 横表示にする
+                this@Mp4Activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+            } else {
+                // 縦表示にする
+                this@Mp4Activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+            }
+            videoView.start()
+        })
+    }*/
     private fun setNavigationBar(flag:Boolean) {
         if (!flag) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -267,7 +284,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             }
             viewBinding.helpButton.visibility=View.VISIBLE
             viewBinding.cameraButton.visibility=View.VISIBLE
-            viewBinding.seekBar.visibility=View.VISIBLE
+            viewBinding.zoomSeekBar.visibility=View.VISIBLE
             viewBinding.helpButton.visibility=View.VISIBLE
             viewBinding.zoomTextRight.visibility=View.INVISIBLE
             viewBinding.zoomTextLeft.visibility=View.VISIBLE
@@ -284,7 +301,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         }else{
             viewBinding.helpButton.visibility=View.INVISIBLE
             viewBinding.cameraButton.visibility=View.INVISIBLE
-            viewBinding.seekBar.visibility=View.INVISIBLE
+            viewBinding.zoomSeekBar.visibility=View.INVISIBLE
             viewBinding.playButton.visibility=View.INVISIBLE
             viewBinding.helpButton.visibility=View.INVISIBLE
             viewBinding.zoomTextLeft.visibility=View.INVISIBLE
@@ -353,7 +370,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                 when(recordEvent) {
                     is VideoRecordEvent.Start -> {
                         viewBinding.videoCaptureButton.apply {
-                            text = getString(R.string.stop_capture)
+                            text = "stop_capture"
+                          //  text = getString(R.string.stop_capture)
                             isEnabled = true
                         }
                     }
@@ -374,7 +392,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                                     "${recordEvent.error}")
                         }
                         viewBinding.videoCaptureButton.apply {
-                            text = getString(R.string.start_capture)
+                            text = "start_capture"//getString(R.string.start_capture)
                             isEnabled = true
                         }
                     }
@@ -636,7 +654,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         readContent()
         data.reverse()
         //}
-        val lv: ListView =findViewById(R.id.video_list_view)
+        val lv: ListView = viewBinding.videoListView// findViewById(R.id.video_list_view)
 
         //3)アダプター
         val adapter= ArrayAdapter(
