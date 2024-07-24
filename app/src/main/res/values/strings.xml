@@ -25,4 +25,18 @@
         <item>M</item>
         <item>L</item>
     </string-array>
+    <string-array name="video_files">
+        <item>OFF34</item>
+        <item>S3224</item>
+        <item>M3134</item>
+        <item>L1141</item>
+        <item>OFF34</item>
+        <item>S3224</item>
+        <item>M3134</item>
+        <item>L1141</item>
+        <item>OFF34</item>
+        <item>S3224</item>
+        <item>M3134</item>
+        <item>L1141</item>
+    </string-array>
 </resources>
