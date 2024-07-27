@@ -32,6 +32,8 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.media.MediaPlayer.OnPreparedListener
+import android.net.Uri
+import android.net.Uri.*
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -668,6 +670,15 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             var str=onePath.substring(0,onePath.indexOf("CapNYS")+7) + data[i].substring(4) + ".mp4"
             Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
         //    Toast.makeText(this,data[i],Toast.LENGTH_SHORT).show()
+          //  val videoUri = parse(str)
+
+            val intent =
+                Intent(/* packageContext = */ application,/* cls = */ PlayActivity::class.java)
+
+              //  Toast.makeText(baseContext, videoUri, Toast.LENGTH_SHORT).show()
+                intent.putExtra("videouri", str)
+                startActivity(/* intent = */ intent)
+
         }
     }
     var onePath:String=""
