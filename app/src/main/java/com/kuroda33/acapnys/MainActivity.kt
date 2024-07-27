@@ -59,6 +59,7 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import com.kuroda33.acapnys.databinding.ActivityMainBinding
@@ -187,16 +188,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.myView.alpha=0f
             viewBinding.permission.visibility=View.VISIBLE
 
+            ActivityCompat.requestPermissions(
+                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
 
 
-            /*   val builder = AlertDialog.Builder(this)
-                    builder.setTitle("title")
-                   builder.setMessage("メッセージ")
-                   builder.setPositiveButton(OK, null)
-                   builder.show()*/
-            //  AlertDialog.show(Test02_01.this, "Alert Test",
-            //    "Hello, This is Alert Dialog.", "ok", false);
-            //android.os.Process.killProcess(android.os.Process.myPid())
             //   requestPermissionLauncher.launch(
             //       Manifest.permission.READ_EXTERNAL_STORAGE
             //  )
@@ -348,7 +343,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/CameraX-Video")
+                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/aCapNYS")
             }
         }
 
@@ -385,6 +380,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                                 .show()
                             Log.d(TAG, msg)
                             viewBinding.playButton.visibility=View.VISIBLE
+                            setListView()
                         } else {
                             recording?.close()
                             recording = null
@@ -509,19 +505,20 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
     companion object {
         private const val TAG = "aCapNYS"
-        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
-        private const val REQUEST_CODE_PERMISSIONS = 10
+        private const val FILENAME_FORMAT = "yyyy-MMdd-HHmm-ss"
+        private const val REQUEST_CODE_PERMISSIONS = 1
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
-                Manifest.permission.CAMERA,
-                Manifest.permission.RECORD_AUDIO
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
             ).apply {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                    add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                }
+//                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+  //                  add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    //            }
             }.toTypedArray()
     }
-    private val requestPermissionLauncher = registerForActivityResult(
+  /*  private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
@@ -534,14 +531,15 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             )
             toast.show()
         }
-    }
-    override fun onRequestPermissionsResult(
+    }*/
+  /*  override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
         IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                startCamera()
+                finish()
+                //startCamera()
             } else {
                 Toast.makeText(this,
                     "Permissions not granted by the user.",
@@ -549,7 +547,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                 finish()
             }
         }
-    }
+    }*/
     private var cameraNum:Int=0
     var zoom100:Int=0
 
@@ -666,14 +664,18 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         lv.adapter =adapter
         //5)クリックしてトースト表示
         lv.setOnItemClickListener { adapterView, view, i, l->
-            Toast.makeText(this,data[i],Toast.LENGTH_SHORT).show()
+
+            var str=onePath.substring(0,onePath.indexOf("CapNYS")+7) + data[i].substring(4) + ".mp4"
+            Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
+        //    Toast.makeText(this,data[i],Toast.LENGTH_SHORT).show()
         }
     }
+    var onePath:String=""
     @SuppressLint("Range")
     private fun readContent() {
         val contentResolver = contentResolver
         var cursor: Cursor? = null
-
+        var cnt:Int=0
         // 例外を受け取る
         try {
             cursor = contentResolver.query(
@@ -683,14 +685,19 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             if (cursor != null && cursor.moveToFirst()) {
                 do {
 
-                    var str = cursor.getString(
+                    onePath = cursor.getString(
                         cursor.getColumnIndex(
                             MediaStore.Video.Media.DATA
                         )
                     )
 
-                    if (str.contains("aCapNYS")==true) {
-                        data += str
+                    if (onePath.contains("aCapNYS")==true) {
+                        val str1 = "aCapNYS"
+                        val n = onePath.indexOf(str1)
+                        val str2: String =onePath.substring(n+8,n+25)
+                        cnt += 1
+                        data += "(" + cnt.toString() + ")" + str2
+                       // data += str
                     }
                 } while (cursor.moveToNext())
                 cursor.close()

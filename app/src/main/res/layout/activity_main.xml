@@ -27,13 +27,13 @@
     <ListView
         android:id="@+id/videoListView"
         android:layout_width="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/zoomTextLeft"
+        app:layout_constraintTop_toBottomOf="@+id/gyroButton"
+        app:layout_constraintBottom_toTopOf="@+id/helpButton"
 
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:entries="@array/video_files"
-        app:layout_constraintEnd_toStartOf="@+id/video_capture_button"
-        app:layout_constraintStart_toEndOf="@+id/zoomTextLeft" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/video_capture_button" />
     <SeekBar
         android:id="@+id/zoomSeekBar"
         style="@style/Base.Theme.ACapNYS"
