@@ -30,11 +30,11 @@
         app:layout_constraintTop_toBottomOf="@+id/gyroButton"
         app:layout_constraintBottom_toTopOf="@+id/helpButton"
         android:layout_height="0dp"
-        android:background="#fff"
+  
         android:entries="@array/video_files"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/video_capture_button"
-        android:paddingRight="4dp"/>
+        android:layout_marginEnd="4dp"/>
     <SeekBar
         android:id="@+id/zoomSeekBar"
         style="@style/Base.Theme.ACapNYS"

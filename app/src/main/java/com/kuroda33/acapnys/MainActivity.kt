@@ -642,7 +642,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
     val data = mutableListOf(" ")
     private fun setListView(){
         //} else {
-        data.removeAt(0)
+//        data.removeAt(0)
+        data.clear()
         readContent()
         data.reverse()
         //}
@@ -652,7 +653,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
         //3)アダプター
         val adapter = ArrayAdapter(this, R.layout.list, data)
-       // val adapter = ArrayAdapter(this, R.layout.simple_spinner_item , data)
+        //val adapter = ArrayAdapter(this, R.layout.simple_spinner_item , data)
 
         //val adapter1= ArrayAdapter(this, R.layout.//list, data)
         //4)adapterをlistviewにセット
@@ -662,11 +663,11 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         lv.setOnItemClickListener { adapterView, view, i, l->
 
             var str=onePath.substring(0,onePath.indexOf("CapNYS")+7) + data[i].substring(4) + ".mp4"
- //           Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
+            Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
 
             val intent =
                 Intent(/* packageContext = */ application,/* cls = */ PlayActivity::class.java)
-                intent.putExtra("videouri", str)
+                intent.putExtra("videouri",str)
                 startActivity(/* intent = */ intent)
 
         }
@@ -698,6 +699,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                         val str2: String =onePath.substring(n+8,n+25)
                         cnt += 1
                         data += "(" + cnt.toString() + ")" + str2
+//                        data +=onePath
                        // data += str
                     }
                 } while (cursor.moveToNext())
