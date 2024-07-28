@@ -44,6 +44,7 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
@@ -187,10 +188,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
 
             //   requestPermissionLauncher.launch(
-            //       Manifest.permission.READ_EXTERNAL_STORAGE
-            //  )
-            //    ActivityCompat.requestPermissions(
-            //        this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
+              //     Manifest.permission.READ_EXTERNAL_STORAGE
+             // )
+             //   ActivityCompat.requestPermissions(
+              //      this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
         //     setListView()
     }
@@ -507,12 +508,12 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.CAMERA
             ).apply {
-//                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-  //                  add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    //            }
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                    add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                }
             }.toTypedArray()
     }
-  /*  private val requestPermissionLauncher = registerForActivityResult(
+    private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
@@ -525,7 +526,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             )
             toast.show()
         }
-    }*/
+    }
   /*  override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
         IntArray) {
@@ -639,20 +640,20 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         //リスナーを解除しないとバックグラウンドにいるとき常にコールバックされ続ける
         sensorManager.unregisterListener(this)
     }
-    val data = mutableListOf(" ")
+    val videoPathList = mutableListOf(" ")
     private fun setListView(){
         //} else {
 //        data.removeAt(0)
-        data.clear()
+        videoPathList.clear()
         readContent()
-        data.reverse()
+        videoPathList.reverse()
         //}
         val lv: ListView = viewBinding.videoListView// findViewById(R.id.video_list_view)
        // val adapter = SimpleAdapter(this, lv,R.layout.layout.customlist, from, to)
 
 
         //3)アダプター
-        val adapter = ArrayAdapter(this, R.layout.list, data)
+        val adapter = ArrayAdapter(this, R.layout.list, videoPathList)
         //val adapter = ArrayAdapter(this, R.layout.simple_spinner_item , data)
 
         //val adapter1= ArrayAdapter(this, R.layout.//list, data)
@@ -661,18 +662,18 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         lv.adapter =adapter
         //5)クリックしてトースト表示
         lv.setOnItemClickListener { adapterView, view, i, l->
-
-            var str=onePath.substring(0,onePath.indexOf("CapNYS")+7) + data[i].substring(4) + ".mp4"
-            Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
+            var str=videoPathList[i].substring(videoPathList[i].indexOf(")")+1)
+            var fulPath=onePath.substring(0,onePath.indexOf("CapNYS")+7) + str + ".mp4"
+        //    Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
 
             val intent =
                 Intent(/* packageContext = */ application,/* cls = */ PlayActivity::class.java)
-                intent.putExtra("videouri",str)
+                intent.putExtra("videouri",fulPath)
                 startActivity(/* intent = */ intent)
 
         }
     }
-    var onePath:String=""
+    var onePath:String=""//fullPathに戻すために保存
     @SuppressLint("Range")
     private fun readContent() {
         val contentResolver = contentResolver
@@ -698,7 +699,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                         val n = onePath.indexOf(str1)
                         val str2: String =onePath.substring(n+8,n+25)
                         cnt += 1
-                        data += "(" + cnt.toString() + ")" + str2
+                        videoPathList += "(" + cnt.toString() + ")" + str2
 //                        data +=onePath
                        // data += str
                     }
