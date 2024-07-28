@@ -663,12 +663,12 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         //5)クリックしてトースト表示
         lv.setOnItemClickListener { adapterView, view, i, l->
             var str=videoPathList[i].substring(videoPathList[i].indexOf(")")+1)
-            var fulPath=onePath.substring(0,onePath.indexOf("CapNYS")+7) + str + ".mp4"
+            var fullPath=onePath.substring(0,onePath.indexOf("CapNYS")+7) + str + ".mp4"
         //    Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
 
             val intent =
-                Intent(/* packageContext = */ application,/* cls = */ PlayActivity::class.java)
-                intent.putExtra("videouri",fulPath)
+                Intent(application, PlayActivity::class.java)
+                intent.putExtra("videouri",fullPath)
                 startActivity(/* intent = */ intent)
 
         }
