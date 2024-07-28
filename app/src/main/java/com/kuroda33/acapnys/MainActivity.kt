@@ -19,11 +19,10 @@ package com.kuroda33.acapnys
 //import android.view.WindowInsetsController
 
 import android.Manifest
-import android.R
+//import android.R
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Rect
@@ -31,8 +30,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.media.MediaPlayer.OnPreparedListener
-import android.net.Uri
 import android.net.Uri.*
 import android.os.Build
 import android.os.Bundle
@@ -47,7 +44,6 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.SeekBar
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
@@ -104,16 +100,12 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-      //  val seekBar=viewBinding.zoomSeekBar
-        //val seekBar = findViewById<SeekBar>(R.id.zoomSeekBar)
-        // val width=viewBinding.root.maxWidth
+     //   setContentView(R.layout.activity_main)
         videoURI="no video"
         getPara()
         viewBinding.myView.setCamera(cameraNum)
-        // Request camera permissions
-        //   viewBinding.post {
-        //       Log.i("", "width:" + binding.view.width + ", height:" + binding.view.height)
-        //   }
+
+   //     val listView = findViewById<ListView>(R.id.listview)
         if (allPermissionsGranted()) {
             startCamera()
             setListView()
@@ -136,7 +128,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                     Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
                 startActivity(/* intent = */ intent)
             }
-            viewBinding.playButton.setOnClickListener {
+          /*  viewBinding.playButton.setOnClickListener {
                 val intent =
                     Intent(/* packageContext = */ application,/* cls = */ PlayActivity::class.java)
                 if (videoURI != "no video") {
@@ -144,7 +136,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                     intent.putExtra("videouri", videoURI)
                     startActivity(/* intent = */ intent)
                 }
-            }
+            }*/
             viewBinding.cameraButton.setOnClickListener {
                 changeCamera()
             }
@@ -271,19 +263,19 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
 
     private fun setButtons(on:Boolean){
         if(on){
-            Log.e(TAG, "Video capture ends with error: $videoURI")
-            if (videoURI == "no video"){
-                viewBinding.playButton.visibility=View.INVISIBLE
-                Log.e(TAG, "Video capture no: $videoURI")
-            }else{
-                viewBinding.playButton.visibility=View.VISIBLE
-                Log.e(TAG, "Video capture yes: $videoURI")
-            }
+           // Log.e(TAG, "Video capture ends with error: $videoURI")
+           // if (videoURI == "no video"){
+           //     viewBinding.playButton.visibility=View.INVISIBLE
+           //     Log.e(TAG, "Video capture no: $videoURI")
+           // }else{
+           //     viewBinding.playButton.visibility=View.VISIBLE
+           //     Log.e(TAG, "Video capture yes: $videoURI")
+           // }
             viewBinding.helpButton.visibility=View.VISIBLE
             viewBinding.cameraButton.visibility=View.VISIBLE
             viewBinding.zoomSeekBar.visibility=View.VISIBLE
             viewBinding.helpButton.visibility=View.VISIBLE
-            viewBinding.zoomTextRight.visibility=View.INVISIBLE
+            viewBinding.zoomTextRight.visibility=View.VISIBLE
             viewBinding.zoomTextLeft.visibility=View.VISIBLE
             viewBinding.gyroButton.visibility=View.VISIBLE
             viewBinding.myView.alpha=1f
@@ -299,7 +291,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.helpButton.visibility=View.INVISIBLE
             viewBinding.cameraButton.visibility=View.INVISIBLE
             viewBinding.zoomSeekBar.visibility=View.INVISIBLE
-            viewBinding.playButton.visibility=View.INVISIBLE
+            //viewBinding.playButton.visibility=View.INVISIBLE
             viewBinding.helpButton.visibility=View.INVISIBLE
             viewBinding.zoomTextLeft.visibility=View.INVISIBLE
             viewBinding.zoomTextRight.visibility=View.INVISIBLE
@@ -381,7 +373,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                             Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT)
                                 .show()
                             Log.d(TAG, msg)
-                            viewBinding.playButton.visibility=View.VISIBLE
+                           // viewBinding.playButton.visibility=View.VISIBLE
                             setListView()
                         } else {
                             recording?.close()
@@ -655,27 +647,25 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         data.reverse()
         //}
         val lv: ListView = viewBinding.videoListView// findViewById(R.id.video_list_view)
+       // val adapter = SimpleAdapter(this, lv,R.layout.layout.customlist, from, to)
+
 
         //3)アダプター
-        val adapter= ArrayAdapter(
-            this,
-            android.R.layout.simple_list_item_1,
-            data
-        )
+        val adapter = ArrayAdapter(this, R.layout.list, data)
+       // val adapter = ArrayAdapter(this, R.layout.simple_spinner_item , data)
+
+        //val adapter1= ArrayAdapter(this, R.layout.//list, data)
         //4)adapterをlistviewにセット
+       // val adapter1 = ArrayAdapter(this, R.layout.list, R.id.textView, data)
         lv.adapter =adapter
         //5)クリックしてトースト表示
         lv.setOnItemClickListener { adapterView, view, i, l->
 
             var str=onePath.substring(0,onePath.indexOf("CapNYS")+7) + data[i].substring(4) + ".mp4"
-            Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
-        //    Toast.makeText(this,data[i],Toast.LENGTH_SHORT).show()
-          //  val videoUri = parse(str)
+ //           Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
 
             val intent =
                 Intent(/* packageContext = */ application,/* cls = */ PlayActivity::class.java)
-
-              //  Toast.makeText(baseContext, videoUri, Toast.LENGTH_SHORT).show()
                 intent.putExtra("videouri", str)
                 startActivity(/* intent = */ intent)
 

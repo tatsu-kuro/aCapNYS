@@ -29,11 +29,12 @@
         android:layout_width="0dp"
         app:layout_constraintTop_toBottomOf="@+id/gyroButton"
         app:layout_constraintBottom_toTopOf="@+id/helpButton"
-
         android:layout_height="0dp"
+        android:background="#fff"
         android:entries="@array/video_files"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/video_capture_button" />
+        app:layout_constraintStart_toEndOf="@+id/video_capture_button"
+        android:paddingRight="4dp"/>
     <SeekBar
         android:id="@+id/zoomSeekBar"
         style="@style/Base.Theme.ACapNYS"
@@ -59,24 +60,26 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <EditText
         android:id="@+id/permission"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:paddingRight="8dp"
-        android:paddingLeft="8dp"
-        android:textColor="#000"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="40dp"
         android:background="#fff"
+        android:focusableInTouchMode="false"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
         android:text="@string/permissionText"
+        android:textColor="#000"
         android:textSize="16sp"
-        android:focusableInTouchMode="false" />
+        app:layout_constraintBottom_toTopOf="@+id/viewFinder"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="8dp" />
     <EditText
         android:id="@+id/zoomTextRight"
-        android:layout_width="50dp"
+        android:layout_width="80dp"
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
@@ -87,8 +90,11 @@
         android:textAlignment="center"
         android:focusableInTouchMode="false"
         android:background="@android:drawable/editbox_background_normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/playButton"/>
+        />
+    <!--
     <ImageButton
         android:id="@+id/playButton"
         android:layout_width="50dp"
@@ -103,7 +109,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         />
-
+-->
     <EditText
         android:id="@+id/zoomTextLeft"
         android:layout_width="80dp"
@@ -111,6 +117,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
         android:text="zoom"
+        android:textSize="15sp"
         android:textAlignment="center"
         android:focusableInTouchMode="false"
         android:background="@android:drawable/editbox_background_normal"
