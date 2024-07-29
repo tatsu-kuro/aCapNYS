@@ -70,9 +70,9 @@ import java.util.concurrent.Executors
 
 //typealias LumaListener = (luma: Double) -> Unit
 
-class MainActivity : AppCompatActivity() , SensorEventListener{
+class MainActivity : AppCompatActivity() {//}, SensorEventListener{
     private var videoURI: String ="no video"
-    private lateinit var sensorManager: SensorManager
+ //  private lateinit var sensorManager: SensorManager
 //    private var quaternionSensor: Sensor? = null
 
     private lateinit var viewBinding: ActivityMainBinding
@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
      //   setContentView(R.layout.activity_main)
         videoURI="no video"
         getPara()
-        viewBinding.myView.setCamera(cameraNum)
+    //    viewBinding.myView.setCamera(cameraNum)
 
    //     val listView = findViewById<ListView>(R.id.listview)
         if (allPermissionsGranted()) {
@@ -166,18 +166,19 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                 }
             )
 
-            sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+     /*       sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
             sensorManager.registerListener(
                 this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
                 SensorManager.SENSOR_DELAY_FASTEST
-            )
-            viewBinding.myView.set_rpk_ppk()
+            )*/
+           // viewBinding.myView.set_rpk_ppk()
             setPreviewSize(cameraNum)
             setButtons(true)
             viewBinding.videoCaptureButton.bringToFront()
             //val permissionText = findViewById<TextView>(R.id.permission)
             //permissionText.translationX(1000f)
+            viewBinding.myView.alpha=0f
         }else{
             setButtons(false)
             viewBinding.myView.alpha=0f
@@ -279,7 +280,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.zoomTextRight.visibility=View.VISIBLE
             viewBinding.zoomTextLeft.visibility=View.VISIBLE
             viewBinding.gyroButton.visibility=View.VISIBLE
-            viewBinding.myView.alpha=1f
+         //   viewBinding.myView.alpha=1f
             viewBinding.viewFinder.alpha=1f
             viewBinding.videoCaptureButton.alpha=0.1f
             viewBinding.permission.visibility=View.INVISIBLE
@@ -301,13 +302,13 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             viewBinding.permission.visibility=View.INVISIBLE
             viewBinding.videoListView.visibility=View.INVISIBLE
             if(cameraNum==0){
-                viewBinding.myView.alpha=0f
+            //    viewBinding.myView.alpha=0f
                 viewBinding.viewFinder.alpha=0f
                 val windowAttributes = window.attributes
                 windowAttributes.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
                 window.attributes = windowAttributes
             }else{
-                viewBinding.myView.alpha=1f
+              //  viewBinding.myView.alpha=1f
                 viewBinding.viewFinder.alpha=1f
             }
         }
@@ -371,8 +372,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                             savePara()
                             val msg = "Video capture succeeded: " +
                                     "${recordEvent.outputResults.outputUri}"
-                            Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT)
-                                .show()
+                        //    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                             Log.d(TAG, msg)
                            // viewBinding.playButton.visibility=View.VISIBLE
                             setListView()
@@ -493,7 +493,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
     override fun onDestroy() {
         super.onDestroy()
         //  if (sensorManager != null) {
-        sensorManager.unregisterListener(this)
+     //   sensorManager.unregisterListener(this)
         //}
         cameraExecutor.shutdown()
     }
@@ -553,7 +553,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         editor.putInt("zoom100",zoom100)
         editor.putString("videoURI",videoURI)
         editor.apply()
-        viewBinding.myView.setCamera(cameraNum)
+     //   viewBinding.myView.setCamera(cameraNum)
     }
     private fun getPara(){
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -574,12 +574,12 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         }
         savePara()
         startCamera()
-        sensorReset()
+  //      sensorReset()
         setPreviewSize(cameraNum)
     }
 
     private var tempTime:Long = 0
-    override fun onSensorChanged(event: SensorEvent) {
+  /*  override fun onSensorChanged(event: SensorEvent) {
         val nq0 = event.values[3]
         val nq1 = event.values[0]
         val nq2 = event.values[1]
@@ -601,13 +601,12 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
             SensorManager.SENSOR_DELAY_FASTEST
         )
         viewBinding.myView.initData()
-    }
+    }*/
     override fun onTouchEvent(event: MotionEvent?): Boolean {
 
         if (event != null) {
             when(event.action){
-                MotionEvent.ACTION_DOWN -> sensorReset()
-
+     //           MotionEvent.ACTION_DOWN -> sensorReset()
             }
         }
 
@@ -616,17 +615,17 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         return super.onTouchEvent(event)
     }
     //センサの精度が変更されたときに呼ばれる
-    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
-    }
+   // override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
+   // }
 
     override fun onResume() {
         super.onResume()
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+   /*     sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         sensorManager.registerListener(
             this,
             sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
             SensorManager.SENSOR_DELAY_FASTEST
-        )
+        )*/
         //リスナーとセンサーオブジェクトを渡す
         //第一引数はインターフェースを継承したクラス、今回はthis
         //第二引数は取得したセンサーオブジェクト
@@ -638,7 +637,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
     override fun onPause() {
         super.onPause()
         //リスナーを解除しないとバックグラウンドにいるとき常にコールバックされ続ける
-        sensorManager.unregisterListener(this)
+    //    sensorManager.unregisterListener(this)
     }
     val videoPathList = mutableListOf(" ")
     private fun setListView(){
@@ -674,7 +673,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
         }
     }
     var onePath:String=""//fullPathに戻すために保存
-    @SuppressLint("Range")
+    //@SuppressLint("Range")
     private fun readContent() {
         val contentResolver = contentResolver
         var cursor: Cursor? = null
@@ -686,24 +685,24 @@ class MainActivity : AppCompatActivity() , SensorEventListener{
                 null, null, null, null
             )
             if (cursor != null && cursor.moveToFirst()) {
-                do {
-
-                    onePath = cursor.getString(
-                        cursor.getColumnIndex(
-                            MediaStore.Video.Media.DATA
+                if(cursor.getColumnIndex(MediaStore.Video.Media.DATA) > -1){
+                    do {
+                        onePath = cursor.getString(
+                            cursor.getColumnIndex(
+                                MediaStore.Video.Media.DATA
+                            )
                         )
-                    )
-
-                    if (onePath.contains("aCapNYS")==true) {
-                        val str1 = "aCapNYS"
-                        val n = onePath.indexOf(str1)
-                        val str2: String =onePath.substring(n+8,n+25)
-                        cnt += 1
-                        videoPathList += "(" + cnt.toString() + ")" + str2
+                        if (onePath.contains("aCapNYS") == true) {
+                            val str1 = "aCapNYS"
+                            val n = onePath.indexOf(str1)
+                            val str2: String = onePath.substring(n + 8, n + 25)
+                            cnt += 1
+                            videoPathList += "(" + cnt.toString() + ")" + str2
 //                        data +=onePath
-                       // data += str
-                    }
-                } while (cursor.moveToNext())
+                            // data += str
+                        }
+                    } while (cursor.moveToNext())
+                }
                 cursor.close()
             }
         } catch (e: Exception) {
