@@ -178,10 +178,10 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
             viewBinding.videoCaptureButton.bringToFront()
             //val permissionText = findViewById<TextView>(R.id.permission)
             //permissionText.translationX(1000f)
-            viewBinding.myView.alpha=0f
+        //    viewBinding.myView.alpha=0f
         }else{
             setButtons(false)
-            viewBinding.myView.alpha=0f
+          //  viewBinding.myView.alpha=0f
             viewBinding.permission.visibility=View.VISIBLE
 
             ActivityCompat.requestPermissions(
