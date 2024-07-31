@@ -18,34 +18,38 @@ package com.kuroda33.acapnys
 //import android.util.DisplayMetrics
 //import android.view.WindowInsetsController
 
-import android.Manifest
 //import android.R
+//import kotlinx.coroutines.flow.internal.NoOpContinuation.context
+//import android.content.Context
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentResolver
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Rect
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
+import android.net.Uri
 import android.net.Uri.*
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
+import android.widget.AdapterView.OnItemLongClickListener
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -62,10 +66,17 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import com.kuroda33.acapnys.databinding.ActivityMainBinding
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+
+//import kotlin.coroutines.jvm.internal.CompletedContinuation.context
+
+//import kotlin.coroutines.jvm.internal.CompletedContinuation.context
+
+//import kotlin.coroutines.jvm.internal.CompletedContinuation.context
 
 
 //typealias LumaListener = (luma: Double) -> Unit
@@ -94,7 +105,6 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
         val cameraController = camera!!.cameraControl
         cameraController.setLinearZoom(zoom100 / 100f)
     }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -183,7 +193,15 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
             setButtons(false)
           //  viewBinding.myView.alpha=0f
             viewBinding.permission.visibility=View.VISIBLE
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val Environment =
+                    Intent().setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                        .setData(parse("package:$packageName"))
 
+                if (Environment.resolveActivity(packageManager) != null) {
+                    startActivity(Environment)
+                }
+            }
             ActivityCompat.requestPermissions(
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
 
@@ -650,7 +668,6 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
         val lv: ListView = viewBinding.videoListView// findViewById(R.id.video_list_view)
        // val adapter = SimpleAdapter(this, lv,R.layout.layout.customlist, from, to)
 
-
         //3)アダプター
         val adapter = ArrayAdapter(this, R.layout.list, videoPathList)
         //val adapter = ArrayAdapter(this, R.layout.simple_spinner_item , data)
@@ -659,8 +676,9 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
         //4)adapterをlistviewにセット
        // val adapter1 = ArrayAdapter(this, R.layout.list, R.id.textView, data)
         lv.adapter =adapter
-        //5)クリックしてトースト表示
+
         lv.setOnItemClickListener { adapterView, view, i, l->
+
             var str=videoPathList[i].substring(videoPathList[i].indexOf(")")+1)
             var fullPath=onePath.substring(0,onePath.indexOf("CapNYS")+7) + str + ".mp4"
         //    Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
@@ -671,7 +689,83 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
                 startActivity(/* intent = */ intent)
 
         }
+        lv.onItemLongClickListener =
+            OnItemLongClickListener { parent, view, i, id ->
+                var str=videoPathList[i].substring(videoPathList[i].indexOf(")")+1)
+                var fullPath=onePath.substring(0,onePath.indexOf("CapNYS")+7) + str + ".mp4"
+//                val msg = i.toString() + "番目のアイテムが長押しされました"
+  //              Toast.makeText(applicationContext, msg, Toast.LENGTH_LONG).show()
+                showAlertDialog(videoPathList[i],fullPath)
+                true
+            }
     }
+    private fun showAlertDialog(str:String,filePath:String) {
+        val builder = AlertDialog.Builder(this)
+      //  builder.setTitle("確認")
+        val mess=str +" / Delete OK?"
+        builder.setMessage(mess)
+
+        // ポジティブボタンの設定
+        builder.setPositiveButton("YES") { dialog, which ->
+            //val filePath = "/path/to/your/file.jpg"
+
+            val isDeleted = deleteVideoFile(filePath)
+            if (isDeleted) {
+ //               Toast.makeText(this,filePath + "削除に成功しました",Toast.LENGTH_SHORT).show()
+                setListView()
+//                println("削除に成功しました")
+            } else {
+                Toast.makeText(this,filePath + "削除に失敗しました",Toast.LENGTH_SHORT).show()
+
+  //              println("削除に失敗しました")
+            }
+            // はいボタンがクリックされたときの処理
+        }
+
+        // ネガティブボタンの設定
+        builder.setNegativeButton("NO") { dialog, which ->
+            // いいえボタンがクリックされたときの処理
+            dialog.dismiss()
+        }
+
+        // ダイアログの表示
+        builder.show()
+    }
+    fun deleteVideoFile(filePath: String): Boolean {
+        val context: Context = this
+
+        val file = File(filePath)
+        return if (file.exists()) {
+           // Toast.makeText(this,filePath + "存在します",Toast.LENGTH_SHORT).show()
+            file.delete()
+            deleteVideoFile_DB(context,filePath)//DBを更新
+      //      setListView()
+        } else {
+        //    Toast.makeText(this,filePath + "存在しません",Toast.LENGTH_SHORT).show()
+
+            false
+        }
+    }
+    fun deleteVideoFile_DB(context: Context, filePath: String): Boolean {
+        val contentResolver: ContentResolver = context.contentResolver
+        val uri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        val selection = MediaStore.MediaColumns.DATA + "=?"
+        val selectionArgs = arrayOf(filePath)
+        return try {
+            val rowsDeleted = contentResolver.delete(uri, selection, selectionArgs)
+            if (rowsDeleted > 0) {
+                // メディアストアを更新
+                context.contentResolver.notifyChange(uri, null)
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
     var onePath:String=""//fullPathに戻すために保存
     //@SuppressLint("Range")
     private fun readContent() {
@@ -714,4 +808,6 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
         }
     }
 }
+
+
 
