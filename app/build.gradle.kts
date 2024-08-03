@@ -11,8 +11,8 @@ android {
         applicationId = "com.kuroda33.acapnys"
         minSdk = 24
         targetSdk = 34
-        versionCode = 26
-        versionName = "2.6"
+        versionCode = 31
+        versionName = "3.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,11 +36,13 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
 }
 
 dependencies {
+
     implementation("androidx.gridlayout:gridlayout:1.0.0")
-    val cameraxVersion = "1.1.0-beta01"
+    val cameraxVersion = "1.4.0-beta02"
     implementation ("androidx.camera:camera-core:${cameraxVersion}")
     implementation ("androidx.camera:camera-camera2:${cameraxVersion}")
     implementation ("androidx.camera:camera-lifecycle:${cameraxVersion}")
