@@ -71,6 +71,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 //import androidx.lifecycle.LifecycleOwner
 import com.kuroda33.acapnys.databinding.ActivityMainBinding
+//import kotlinx.coroutines.DefaultExecutor.thread
+import kotlinx.coroutines.delay
 import java.io.File
 //import java.io.IOException
 //import java.nio.file.Files
@@ -127,7 +129,8 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
     //    viewBinding.myView.setCamera(cameraNum)
 
    //     val listView = findViewById<ListView>(R.id.listview)
-        if (allPermissionsGranted()) {
+      //  while(!allPermissionsGranted()) Thread.sleep(100)
+        if (true||allPermissionsGranted()) {
             startCamera()
             setListView()
 
@@ -211,6 +214,7 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
                 if (Environment.resolveActivity(packageManager) != null) {
                     startActivity(Environment)
                 }
+                  if (allPermissionsGranted()) {
             }*/
             ActivityCompat.requestPermissions(
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
@@ -721,9 +725,10 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
     companion object {
         private const val TAG = "aCapNYS"
         private const val FILENAME_FORMAT = "yyyy-MMdd-HHmm-ss"
-        private const val REQUEST_CODE_PERMISSIONS = 1
+        private const val REQUEST_CODE_PERMISSIONS = 5
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
+              //  Manifest.permission.READ_MEDIA_VIDEO,
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.CAMERA
@@ -747,14 +752,15 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
             toast.show()
         }
     }
-  /*  override fun onRequestPermissionsResult(
+    override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
         IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-                finish()
-                //startCamera()
+           //     finish()
+                startCamera()
+                setListView()
             } else {
                 Toast.makeText(this,
                     "Permissions not granted by the user.",
@@ -762,7 +768,7 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
                 finish()
             }
         }
-    }*/
+    }
     private var cameraNum:Int=0
     var zoom100:Int=0
 
@@ -840,12 +846,19 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
 
     override fun onResume() {
         super.onResume()
-   /*     sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        sensorManager.registerListener(
-            this,
-            sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
-            SensorManager.SENSOR_DELAY_FASTEST
-        )*/
+
+        if (!allPermissionsGranted()) {
+
+            ActivityCompat.requestPermissions(
+                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
+            )
+        }
+        /*     sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+             sensorManager.registerListener(
+                 this,
+                 sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
+                 SensorManager.SENSOR_DELAY_FASTEST
+             )*/
         //リスナーとセンサーオブジェクトを渡す
         //第一引数はインターフェースを継承したクラス、今回はthis
         //第二引数は取得したセンサーオブジェクト

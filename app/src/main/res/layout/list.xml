@@ -7,4 +7,5 @@
     android:layout_height="wrap_content"
     android:ellipsize="marquee"
     android:gravity="end"
-    android:textAlignment="inherit" />
+    android:textAlignment="inherit"
+    android:textSize="20dp"/>
