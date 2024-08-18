@@ -610,7 +610,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             if(recording != null){
                 gyroArrayList.add(str03)
             }
-            Log.e("counter",(currentTime-tempTime).toString())
+        //    Log.e("counter",(currentTime-tempTime).toString())
             tempTime=currentTime
             viewBinding.myView.setQuats(nq0, nq1, nq2, nq3)
         }
@@ -751,7 +751,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         // ダイアログの表示
         builder.show()
     }
- 
+
     var onePath:String=""//fullPathに戻すために保存
     //@SuppressLint("Range")//"Range"に関連する警告を無視する
     @SuppressLint("Range")
