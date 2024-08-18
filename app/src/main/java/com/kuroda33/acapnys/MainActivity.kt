@@ -65,10 +65,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private var quaternionSensor: Sensor? = null
     val gyroArrayList = ArrayList<String>()
-   // arrayList.add(1)
-   // arrayList.add(2)
+    // arrayList.add(1)
+    // arrayList.add(2)
     // 必要に応じて要素を追加
-   // val intArray = arrayList.toIntArray()
+    // val intArray = arrayList.toIntArray()
     private lateinit var viewBinding: ActivityMainBinding
 
     private var videoCapture: VideoCapture<Recorder>? = null
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         val cameraController = camera!!.cameraControl
         cameraController.setLinearZoom(zoom100 / 100f)
     }
-   // arrayString = intArray.joinToString(","))
+    // arrayString = intArray.joinToString(","))
     //cq0 = nq0; cq3 = -nq3;
     fun saveData(name:String,data:String){
         val db = _helper.writableDatabase
@@ -154,13 +154,13 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-     //   setContentView(R.layout.activity_main)
+        //   setContentView(R.layout.activity_main)
         videoURI="no video"
         getPara()
         viewBinding.myView.setCamera(cameraNum)
 
-   //     val listView = findViewById<ListView>(R.id.listview)
-      //  while(!allPermissionsGranted()) Thread.sleep(100)
+        //     val listView = findViewById<ListView>(R.id.listview)
+        //  while(!allPermissionsGranted()) Thread.sleep(100)
         if (true||allPermissionsGranted()) {
             startCamera()
             setListView()
@@ -172,17 +172,17 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                 captureVideo()
             }
             viewBinding.helpButton.setOnClickListener {
-
+/*
                 Log.e("data",getData(lastURI))
                 val arrayS=getStringArray(lastURI)
-               // if (array != null) {
-                    Log.e("data_size", arrayS?.size.toString())
+                // if (array != null) {
+                Log.e("data_size", arrayS?.size.toString())
                 //}
 
-            /*
-                val intent =
-                    Intent(/* packageContext = */ application,/* cls = */ How2Activity::class.java)
-                startActivity(/* intent = */ intent)*/
+                */
+                    val intent =
+                        Intent(/* packageContext = */ application,/* cls = */ How2Activity::class.java)
+                    startActivity(/* intent = */ intent)
             }
             viewBinding.gyroButton.setOnClickListener {
                 //         val intent = Intent(/* packageContext = */ application,/* cls = */ GridButtons::class.java)
@@ -232,7 +232,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             viewBinding.videoCaptureButton.bringToFront()
             //val permissionText = findViewById<TextView>(R.id.permission)
             //permissionText.translationX(1000f)
-        //    viewBinding.myView.alpha=0f
+            //    viewBinding.myView.alpha=0f
         }else{
             setButtons(false)
             viewBinding.myView.alpha=0.5f
@@ -298,14 +298,14 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
 
     private fun setButtons(on:Boolean){
         if(on){
-           // Log.e(TAG, "Video capture ends with error: $videoURI")
-           // if (videoURI == "no video"){
-           //     viewBinding.playButton.visibility=View.INVISIBLE
-           //     Log.e(TAG, "Video capture no: $videoURI")
-           // }else{
-           //     viewBinding.playButton.visibility=View.VISIBLE
-           //     Log.e(TAG, "Video capture yes: $videoURI")
-           // }
+            // Log.e(TAG, "Video capture ends with error: $videoURI")
+            // if (videoURI == "no video"){
+            //     viewBinding.playButton.visibility=View.INVISIBLE
+            //     Log.e(TAG, "Video capture no: $videoURI")
+            // }else{
+            //     viewBinding.playButton.visibility=View.VISIBLE
+            //     Log.e(TAG, "Video capture yes: $videoURI")
+            // }
             viewBinding.helpButton.visibility=View.VISIBLE
             viewBinding.cameraButton.visibility=View.VISIBLE
             viewBinding.zoomSeekBar.visibility=View.VISIBLE
@@ -397,9 +397,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
-           // if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/aCapNYS")
-           // }
+            // if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/aCapNYS")
+            // }
         }
         gyroArrayList.clear()
         val mediaStoreOutputOptions = MediaStoreOutputOptions
@@ -435,7 +435,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                             Log.d(TAG, msg)
                             // viewBinding.playButton.visibility=View.VISIBLE
                             setListView()
-                          //  Log.e("newest",videoPathList[0])
+                            //  Log.e("newest",videoPathList[0])
                             lastURI = videoPathList[0].substring(videoPathList[0].indexOf(")") + 1)
                             Log.e("newest",lastURI)
                             //var gyroArray = gyroArrayList.toIntArray()
@@ -504,8 +504,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
-          if (sensorManager != null) {
-        sensorManager.unregisterListener(this)
+        if (sensorManager != null) {
+            sensorManager.unregisterListener(this)
         }
         cameraExecutor.shutdown()
         _helper.close()
@@ -517,8 +517,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         private const val REQUEST_CODE_PERMISSIONS = 5
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
-               // Manifest.permission.MANAGE_EXTERNAL_STORAGE,
-              //  Manifest.permission.READ_MEDIA_VIDEO,
+                // Manifest.permission.MANAGE_EXTERNAL_STORAGE,
+                //  Manifest.permission.READ_MEDIA_VIDEO,
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.CAMERA
@@ -548,7 +548,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
-           //     finish()
+                //     finish()
                 startCamera()
                 setListView()
             } else {
@@ -610,14 +610,14 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             if(recording != null){
                 gyroArrayList.add(str03)
             }
-        //    Log.e("counter",(currentTime-tempTime).toString())
+            //    Log.e("counter",(currentTime-tempTime).toString())
             tempTime=currentTime
             viewBinding.myView.setQuats(nq0, nq1, nq2, nq3)
         }
 
     }
     private fun resetHead(){
-      //
+        //
         viewBinding.myView.resetHead()
 //        viewBinding.myView.initData()
 
@@ -636,8 +636,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
 
         if (event != null) {
             when(event.action){
-           //     MotionEvent.ACTION_DOWN ->  sensorReset()
-                MotionEvent.ACTION_DOWN ->  resetHead()// sensorReset()
+                MotionEvent.ACTION_DOWN ->  sensorReset()
+                //MotionEvent.ACTION_DOWN ->  resetHead()// sensorReset()
             }
         }
 
@@ -658,12 +658,12 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
-             sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-             sensorManager.registerListener(
-                 this,
-                 sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
-                 SensorManager.SENSOR_DELAY_FASTEST
-             )
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        sensorManager.registerListener(
+            this,
+            sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
+            SensorManager.SENSOR_DELAY_FASTEST
+        )
         //リスナーとセンサーオブジェクトを渡す
         //第一引数はインターフェースを継承したクラス、今回はthis
         //第二引数は取得したセンサーオブジェクト
@@ -686,7 +686,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         videoPathList.reverse()
         //}
         val lv: ListView = viewBinding.videoListView// findViewById(R.id.video_list_view)
-       // val adapter = SimpleAdapter(this, lv,R.layout.layout.customlist, from, to)
+        // val adapter = SimpleAdapter(this, lv,R.layout.layout.customlist, from, to)
 
         //3)アダプター
         val adapter = ArrayAdapter(this, R.layout.list, videoPathList)
@@ -694,19 +694,19 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
 
         //val adapter1= ArrayAdapter(this, R.layout.//list, data)
         //4)adapterをlistviewにセット
-       // val adapter1 = ArrayAdapter(this, R.layout.list, R.id.textView, data)
+        // val adapter1 = ArrayAdapter(this, R.layout.list, R.id.textView, data)
         lv.adapter =adapter
 
         lv.setOnItemClickListener { adapterView, view, i, l->
 
             var str=videoPathList[i].substring(videoPathList[i].indexOf(")")+1)
             var fullPath=onePath.substring(0,onePath.indexOf("CapNYS")+7) + str + ".mp4"
-        //    Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
-
+            //    Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
+            val strcsv=getData(str)
             val intent = Intent(application, PlayActivity::class.java)
             intent.putExtra("videouri",fullPath)
+            intent.putExtra("gyrodata",strcsv)
             startActivity(/* intent = */ intent)
-
         }
         lv.onItemLongClickListener =
             AdapterView.OnItemLongClickListener { parent, view, i, id ->
@@ -722,7 +722,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     private fun showAlertDialog(str:String,filePath:String) {
         Log.e("getMyDirectry",getAppSpecificAlbumStorageDir(this,"CapNYS").toString())
         val builder = AlertDialog.Builder(this)
-      //  builder.setTitle("確認")
+        //  builder.setTitle("確認")
         val mess=str +" / Delete OK?"
         builder.setMessage(mess)
 
@@ -730,11 +730,11 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         builder.setPositiveButton("YES") { dialog, which ->
             //val filePath = "/path/to/your/file.jpg"
 
-          //  val isDeleted = deleteVideoFile_DB(this,filePath)
+            //  val isDeleted = deleteVideoFile_DB(this,filePath)
             val isDeleted=File(filePath).delete()
-           // val isDeleted = contentResolver.delete(Uri.fromFile(File(filePath)), null, null)
+            // val isDeleted = contentResolver.delete(Uri.fromFile(File(filePath)), null, null)
             if (isDeleted) {
-    //            Toast.makeText(this,filePath + "削除に成功しました",Toast.LENGTH_SHORT).show()
+                //            Toast.makeText(this,filePath + "削除に成功しました",Toast.LENGTH_SHORT).show()
                 setListView()
             } else {
                 Toast.makeText(this,filePath + "削除に失敗しました",Toast.LENGTH_SHORT).show()
