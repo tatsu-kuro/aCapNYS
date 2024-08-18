@@ -174,9 +174,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             viewBinding.helpButton.setOnClickListener {
 
                 Log.e("data",getData(lastURI))
-                val array=getStringArray(lastURI)
+                val arrayS=getStringArray(lastURI)
                // if (array != null) {
-                    Log.e("data_size", array?.size.toString())
+                    Log.e("data_size", arrayS?.size.toString())
                 //}
 
             /*
@@ -751,29 +751,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         // ダイアログの表示
         builder.show()
     }
-    /*
-    fun deleteVideoFile_DB(context: Context, filePath: String): Boolean {
-        val contentResolver: ContentResolver = context.contentResolver
-        val uri: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-        val selection = MediaStore.MediaColumns.DATA + "=?"
-        val selectionArgs = arrayOf(filePath)
-        return try {
-            val rowsDeleted = contentResolver.delete(uri, selection, selectionArgs)
-            if (rowsDeleted > 0) {
-                // メディアストアを更新
-                context.contentResolver.notifyChange(uri, null)
-                true
-            } else {
-                false
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-    }
-*/
+ 
     var onePath:String=""//fullPathに戻すために保存
     //@SuppressLint("Range")//"Range"に関連する警告を無視する
+    @SuppressLint("Range")
     private fun readContent() {
         val contentResolver = contentResolver
         var cursor: Cursor? = null
