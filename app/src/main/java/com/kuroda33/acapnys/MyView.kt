@@ -93,10 +93,16 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         nq2 = 0.0f
         nq3 = 0.0f //現在のquaternion
     }
-  //  fun clearCanvas(){
-    //    cq0 =  nq0
-      //  cq3 = -nq3
-   // }
+    fun resetHead(){
+        cq0 =  nq0
+        cq3 = -nq3
+    }
+    fun resetHead_back(){
+        cq0 =  nq0
+        //    cq1 = nq1
+        //    cq2 = nq2
+        cq3 = -nq3
+    }
     private fun MultQuat(
         q0: Float,
         q1: Float,

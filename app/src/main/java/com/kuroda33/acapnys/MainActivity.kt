@@ -1,60 +1,43 @@
 package com.kuroda33.acapnys
-//import androidx.camera.core.ImageCapture
-//import com.kuroda33.databinding.ActivityMainBinding
-//import androidx.camera.core.ImageCaptureException
-//import android.graphics.Color
-//import android.graphics.ColorSpace.Rgb
-//import android.net.Uri
-//import android.widget.MediaController
-//import androidx.camera.core.ImageAnalysis
-//import androidx.camera.core.ImageProxy
-//import androidx.camera.view.LifecycleCameraController
-//import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-//import java.net.URI
-//import java.nio.ByteBuffer
-//import android.graphics.Color
-//import android.util.DisplayMetrics
-//import android.view.WindowInsetsController
 
-//import android.R
-//import kotlinx.coroutines.flow.internal.NoOpContinuation.context
-//import android.content.Context
 import android.Manifest
+//import android.R
 import android.annotation.SuppressLint
-//import android.app.RecoverableSecurityException
-//import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Rect
-//import android.net.Uri
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.net.Uri.*
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.preference.PreferenceManager
 import android.provider.MediaStore
-//import android.provider.Settings
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
-import android.widget.AdapterView.OnItemLongClickListener
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ListView
 import android.widget.SeekBar
+import android.widget.TextView
 import android.widget.Toast
-//import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
-//import androidx.camera.core.ImageCapture
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.MediaStoreOutputOptions
@@ -64,40 +47,28 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
-//import androidx.camera.view.video.OutputFileOptions
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-//import androidx.core.content.PackageManagerCompat.LOG_TAG
 import androidx.core.content.PermissionChecker
-//import androidx.lifecycle.LifecycleOwner
 import com.kuroda33.acapnys.databinding.ActivityMainBinding
-//import kotlinx.coroutines.DefaultExecutor.thread
-import kotlinx.coroutines.delay
 import java.io.File
-//import java.io.IOException
-//import java.nio.file.Files
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-//import kotlin.coroutines.jvm.internal.CompletedContinuation.context
+import kotlin.time.times
 
-//import kotlin.coroutines.jvm.internal.CompletedContinuation.context
-
-//import kotlin.coroutines.jvm.internal.CompletedContinuation.context
-
-//import kotlin.coroutines.jvm.internal.CompletedContinuation.context
-
-//import kotlin.coroutines.jvm.internal.CompletedContinuation.context
-
-
-//typealias LumaListener = (luma: Double) -> Unit
-
-class MainActivity : AppCompatActivity() {//}, SensorEventListener{
+class MainActivity : AppCompatActivity() , SensorEventListener {
+    private val _helper = DatabaseHelper(this@MainActivity)
     private var videoURI: String ="no video"
- //  private lateinit var sensorManager: SensorManager
-//    private var quaternionSensor: Sensor? = null
-
+    private var lastURI: String = ""
+    private lateinit var sensorManager: SensorManager
+    private var quaternionSensor: Sensor? = null
+    val gyroArrayList = ArrayList<String>()
+   // arrayList.add(1)
+   // arrayList.add(2)
+    // 必要に応じて要素を追加
+   // val intArray = arrayList.toIntArray()
     private lateinit var viewBinding: ActivityMainBinding
 
     private var videoCapture: VideoCapture<Recorder>? = null
@@ -117,7 +88,67 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
         val cameraController = camera!!.cameraControl
         cameraController.setLinearZoom(zoom100 / 100f)
     }
+   // arrayString = intArray.joinToString(","))
+    //cq0 = nq0; cq3 = -nq3;
+    fun saveData(name:String,data:String){
+        val db = _helper.writableDatabase
+        val values = ContentValues().apply {
+            put("name", name)
+            put("data", data)
+        }
+        db.insert("headgyrodata", null, values)
+        db.close()
+    }
+    fun getStringArray(name: String): Array<String> {
+        val db = _helper.readableDatabase
+        val cursor: Cursor = db.query(
+            "headgyrodata",
+            arrayOf("_id","name","data"),
+            "name = ?",
+            arrayOf(name),
+            null,
+            null,
+            null
+        )
+        var stringArray:Array<String> = arrayOf("apple", "banana", "cherry")
+        if (cursor.moveToFirst()) {
+            val arrayString = cursor.getString(cursor.getColumnIndexOrThrow("data"))
+            stringArray = arrayString.split(",").toTypedArray()
+        }
 
+        cursor.close()
+        db.close()
+        return stringArray
+    }
+    fun getData(name:String):String{
+        val db = _helper.readableDatabase
+        val cursor: Cursor = db.query(
+            "headgyrodata", // テーブル名
+            arrayOf("_id", "name", "data"), // 取得するカラム
+            "name = ?", // WHERE句
+            arrayOf(name), // WHERE句の引数
+            null, // GROUP BY句
+            null, // HAVING句
+            null // ORDER BY句
+        )
+        var itemData:String=""
+        with(cursor) {
+            if(moveToFirst()){
+                itemData = getString(getColumnIndexOrThrow("data"))
+            }
+        }
+        cursor.close()
+        db.close()
+        return itemData
+    }
+    fun deleteData(name:String){
+        val db = _helper.writableDatabase
+        val selection = "name = ?"
+        val selectionArgs = arrayOf(name)
+
+        db.delete("headgyrodata", selection, selectionArgs)
+        db.close()
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,7 +157,7 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
      //   setContentView(R.layout.activity_main)
         videoURI="no video"
         getPara()
-    //    viewBinding.myView.setCamera(cameraNum)
+        viewBinding.myView.setCamera(cameraNum)
 
    //     val listView = findViewById<ListView>(R.id.listview)
       //  while(!allPermissionsGranted()) Thread.sleep(100)
@@ -141,9 +172,17 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
                 captureVideo()
             }
             viewBinding.helpButton.setOnClickListener {
+
+                Log.e("data",getData(lastURI))
+                val array=getStringArray(lastURI)
+               // if (array != null) {
+                    Log.e("data_size", array?.size.toString())
+                //}
+
+            /*
                 val intent =
                     Intent(/* packageContext = */ application,/* cls = */ How2Activity::class.java)
-                startActivity(/* intent = */ intent)
+                startActivity(/* intent = */ intent)*/
             }
             viewBinding.gyroButton.setOnClickListener {
                 //         val intent = Intent(/* packageContext = */ application,/* cls = */ GridButtons::class.java)
@@ -152,15 +191,7 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
                     Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
                 startActivity(/* intent = */ intent)
             }
-          /*  viewBinding.playButton.setOnClickListener {
-                val intent =
-                    Intent(/* packageContext = */ application,/* cls = */ PlayActivity::class.java)
-                if (videoURI != "no video") {
-                    Toast.makeText(baseContext, videoURI, Toast.LENGTH_SHORT).show()
-                    intent.putExtra("videouri", videoURI)
-                    startActivity(/* intent = */ intent)
-                }
-            }*/
+
             viewBinding.cameraButton.setOnClickListener {
                 changeCamera()
             }
@@ -189,13 +220,13 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
                 }
             )
 
-     /*       sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+            sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
             sensorManager.registerListener(
                 this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
                 SensorManager.SENSOR_DELAY_FASTEST
-            )*/
-           // viewBinding.myView.set_rpk_ppk()
+            )
+            viewBinding.myView.set_rpk_ppk()
             setPreviewSize(cameraNum)
             setButtons(true)
             viewBinding.videoCaptureButton.bringToFront()
@@ -204,47 +235,16 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
         //    viewBinding.myView.alpha=0f
         }else{
             setButtons(false)
-          //  viewBinding.myView.alpha=0f
+            viewBinding.myView.alpha=0.5f
             viewBinding.permission.visibility=View.INVISIBLE//とりあえず削除せず隠しておく。
-           /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                val Environment =
-                    Intent().setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                        .setData(parse("package:$packageName"))
 
-                if (Environment.resolveActivity(packageManager) != null) {
-                    startActivity(Environment)
-                }
-                  if (allPermissionsGranted()) {
-            }*/
             ActivityCompat.requestPermissions(
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
 
-
-            //   requestPermissionLauncher.launch(
-              //     Manifest.permission.READ_EXTERNAL_STORAGE
-             // )
-             //   ActivityCompat.requestPermissions(
-              //      this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
-
         }
-        //     setListView()*/
-    }
- /*   private fun playVideo(){
-        val path = intent.getStringExtra("path")
-        videoView = findViewById<View>(R.id.videoView)
-        videoView.setVideoPath(path)
 
-        videoView.setOnPreparedListener(OnPreparedListener { mediaPlayer ->
-            if (mediaPlayer.videoWidth > mediaPlayer.videoHeight) {
-                // 横表示にする
-                this@Mp4Activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
-            } else {
-                // 縦表示にする
-                this@Mp4Activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-            }
-            videoView.start()
-        })
-    }*/
+    }
+
     private fun setNavigationBar(flag:Boolean) {
         if (!flag) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -313,7 +313,7 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
             viewBinding.zoomTextRight.visibility=View.VISIBLE
             viewBinding.zoomTextLeft.visibility=View.VISIBLE
             viewBinding.gyroButton.visibility=View.VISIBLE
-         //   viewBinding.myView.alpha=1f
+            viewBinding.myView.alpha=1f
             viewBinding.viewFinder.alpha=1f
             viewBinding.videoCaptureButton.alpha=0.1f
             viewBinding.permission.visibility=View.INVISIBLE
@@ -335,13 +335,13 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
             viewBinding.permission.visibility=View.INVISIBLE
             viewBinding.videoListView.visibility=View.INVISIBLE
             if(cameraNum==0){
-            //    viewBinding.myView.alpha=0f
+                viewBinding.myView.alpha=0f
                 viewBinding.viewFinder.alpha=0f
                 val windowAttributes = window.attributes
                 windowAttributes.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
                 window.attributes = windowAttributes
             }else{
-              //  viewBinding.myView.alpha=1f
+                viewBinding.myView.alpha=1f
                 viewBinding.viewFinder.alpha=1f
             }
         }
@@ -362,44 +362,7 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
         }
         return file
     }
-    // Implements VideoCapture use case, including start and stop capturing.
-   // @RequiresApi(Build.VERSION_CODES.O)
-    /*fun startVideoCapture(context: Context) {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-        cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
-            val preview = Preview.Builder().build()
-            val recorder = Recorder.Builder().build()
-            val videoCapture = VideoCapture.withOutput(recorder)
 
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-            cameraProvider.bindToLifecycle(context as LifecycleOwner, cameraSelector, preview, videoCapture)
-
-            val videoFile = createVideoFile(context)
-            val outputOptions = ImageCapture.OutputFileOptions.Builder(videoFile).build()
-
-            videoCapture.output.prepareRecording(context, outputOptions)
-                .start(ContextCompat.getMainExecutor(context)) { recordEvent ->
-                    when (recordEvent) {
-                        is VideoRecordEvent.Start -> {
-                            // 録画開始時の処理
-                        }
-                        is VideoRecordEvent.Finalize -> {
-                            // 録画終了時の処理
-                        }
-                    }
-                }
-        }, ContextCompat.getMainExecutor(context))
-    }*/
-    /*
-        // 新しい録画セッションの設定
-        val outputOptions = setupRecordingSession()
-        recording = videoCapture.output.prepareRecording(this, outputOptions).start(ContextCompat.getMainExecutor(this)) { recordEvent ->
-            handleVideoCaptureEvent(recordEvent)
-        }
-    }
-    */
     private fun setupRecordingSession(): MediaStoreOutputOptions {
         val name = SimpleDateFormat("yyyy-MMdd-HHmm-ss", Locale.US).format(System.currentTimeMillis())
         val contentValues = ContentValues().apply {
@@ -438,7 +401,7 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
                 put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/aCapNYS")
            // }
         }
-
+        gyroArrayList.clear()
         val mediaStoreOutputOptions = MediaStoreOutputOptions
             .Builder(contentResolver, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
             .setContentValues(contentValues)
@@ -472,6 +435,11 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
                             Log.d(TAG, msg)
                             // viewBinding.playButton.visibility=View.VISIBLE
                             setListView()
+                          //  Log.e("newest",videoPathList[0])
+                            lastURI = videoPathList[0].substring(videoPathList[0].indexOf(")") + 1)
+                            Log.e("newest",lastURI)
+                            //var gyroArray = gyroArrayList.toIntArray()
+                            saveData(lastURI, gyroArrayList.joinToString(","))
                         } else {
                             recording?.close()
                             recording = null
@@ -486,135 +454,7 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
                 }
             }
     }
-/*
-    private fun captureVideo() {
-        val videoCapture = this.videoCapture ?: return
 
-        viewBinding.videoCaptureButton.isEnabled = false
-
-        val curRecording = recording
-        if (curRecording != null) {
-            // ナビゲーションバー表示
-            setNavigationBar(true)
-            curRecording.stop()
-            recording = null
-            setButtons(true)
-            return
-        }
-        setButtons(false)
-        setNavigationBar(false)
-        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-            .format(System.currentTimeMillis())
-        // create and start a new recording session
-/*        Log.e("getMyDirectry",getAppSpecificAlbumStorageDir(this,"CapNYS").toString())
-//        /storage/emulated/0/Android/data/com.kuroda33.acapnys/files/Movies/CapNYS
-        val contentValues1 = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
-        }
-
-        val outputOptions = OutputFileOptions.Builder(
-            context.contentResolver,
-            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-            contentValues1
-        ).build()
-
-*/
-        val videoFile = createVideoFile(this)
-        val outputOptions = ImageCapture.OutputFileOptions.androidx.compose.foundation.layout.Box {
-            builder(videoFile)
-        }.build()// builder(videoFile).build()// .Builder(videoFile).build()
-
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/aCapNYS")
-//                  put(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, "Movies/aCapNYS")
-            }
-        }
-        Log.e("nan***********",outputOptions.toString())
-        val mediaStoreOutputOptions = MediaStoreOutputOptions
-            .Builder(contentResolver,MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
-            .setContentValues(contentValues)
-            .build()
-        Log.e("nan***********",mediaStoreOutputOptions.toString())
-        val videoFile = createVideoFile(context)
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(videoFile).build()
-
-        videoCapture.output.prepareRecording(context, outputOptions)
-            .start(ContextCompat.getMainExecutor(context)) { recordEvent ->
-                when (recordEvent) {
-                    is VideoRecordEvent.Start -> {
-                        // 録画開始時の処理
-                    }
-                    is VideoRecordEvent.Finalize -> {
-                        // 録画終了時の処理
-                    }
-                }
-            }
-    }, ContextCompat.getMainExecutor(context))
-
-
-
-    val contentValues = ContentValues().apply {
-        put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-        put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-            put(MediaStore.Video.Media.RELATIVE_PATH,"Android/data/com.kuroda33.acapnys/files/Movies/CapNYS")// "Movies/aCapNYS")
-//                  put(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, "Movies/aCapNYS")
-        }
-    }
-    Log.e("nan***********",contentValues.toString())
-    val mediaStoreOutputOptions = MediaStoreOutputOptions
-        .Builder(contentResolver,MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
-        .setContentValues(contentValues)
-        .build()
-
-        recording = videoCapture.output
-            .prepareRecording(this, mediaStoreOutputOptions)
-            .apply {
-                if (PermissionChecker.checkSelfPermission(this@MainActivity,
-                        Manifest.permission.RECORD_AUDIO) ==
-                    PermissionChecker.PERMISSION_GRANTED)
-                {
-                    withAudioEnabled()
-                }
-            }
-            .start(ContextCompat.getMainExecutor(this)) { recordEvent ->
-                when(recordEvent) {
-                    is VideoRecordEvent.Start -> {
-                        viewBinding.videoCaptureButton.apply {
-                            text = "stop_capture"
-                          //  text = getString(R.string.stop_capture)
-                            isEnabled = true
-                        }
-                    }
-                    is VideoRecordEvent.Finalize -> {
-                        if (!recordEvent.hasError()) {
-                            videoURI=recordEvent.outputResults.outputUri.toString()
-                            savePara()
-                            val msg = "Video capture succeeded: " +
-                                    "${recordEvent.outputResults.outputUri}"
-                        //    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                            Log.d(TAG, msg)
-                           // viewBinding.playButton.visibility=View.VISIBLE
-                            setListView()
-                        } else {
-                            recording?.close()
-                            recording = null
-                            Log.e(TAG, "Video capture ends with error: " +
-                                    "${recordEvent.error}")
-                        }
-                        viewBinding.videoCaptureButton.apply {
-                            text = "start_capture"//getString(R.string.start_capture)
-                            isEnabled = true
-                        }
-                    }
-                }
-            }
-    }
-*/
     private fun startCamera() {
         getPara()
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -635,17 +475,6 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
                 .build()
             videoCapture = VideoCapture.withOutput(recorder)
 
-
-            //  imageCapture = ImageCapture.Builder().build()
-            /*
-                        val imageAnalyzer = ImageAnalysis.Builder()
-                            .build()
-                            .also {
-                                it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
-                                    Log.d(TAG, "Average luminosity: $luma")
-                                })
-                            }
-            */
             // Select back camera as a default
             var cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
             if(cameraNum==1) {
@@ -667,48 +496,7 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
 
         }, ContextCompat.getMainExecutor(this))
     }
-    /*
-    private fun takePhoto() {
-        // Get a stable reference of the modifiable image capture use case
-  //      val imageCapture = imageCapture ?: return
 
-        // Create time stamped name and MediaStore entry.
-        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-            .format(System.currentTimeMillis())
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
-            }
-        }
-
-        // Create output options object which contains file + metadata
-        val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(contentResolver,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues)
-            .build()
-
-        // Set up image capture listener, which is triggered after photo has
-        // been taken
-        imageCapture.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onError(exc: ImageCaptureException) {
-                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
-                }
-
-                override fun
-                        onImageSaved(output: ImageCapture.OutputFileResults){
-                    val msg = "Photo capture succeeded: ${output.savedUri}"
-                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                    Log.d(TAG, msg)
-                }
-            }
-        )
-    }*/
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
             baseContext, it) == PackageManager.PERMISSION_GRANTED
@@ -716,10 +504,11 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
 
     override fun onDestroy() {
         super.onDestroy()
-        //  if (sensorManager != null) {
-     //   sensorManager.unregisterListener(this)
-        //}
+          if (sensorManager != null) {
+        sensorManager.unregisterListener(this)
+        }
         cameraExecutor.shutdown()
+        _helper.close()
     }
 
     companion object {
@@ -728,6 +517,7 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
         private const val REQUEST_CODE_PERMISSIONS = 5
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
+               // Manifest.permission.MANAGE_EXTERNAL_STORAGE,
               //  Manifest.permission.READ_MEDIA_VIDEO,
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -779,7 +569,7 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
         editor.putInt("zoom100",zoom100)
         editor.putString("videoURI",videoURI)
         editor.apply()
-     //   viewBinding.myView.setCamera(cameraNum)
+        viewBinding.myView.setCamera(cameraNum)
     }
     private fun getPara(){
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -800,23 +590,37 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
         }
         savePara()
         startCamera()
-  //      sensorReset()
+        sensorReset()
         setPreviewSize(cameraNum)
     }
 
     private var tempTime:Long = 0
-  /*  override fun onSensorChanged(event: SensorEvent) {
+    override fun onSensorChanged(event: SensorEvent) {
         val nq0 = event.values[3]
         val nq1 = event.values[0]
         val nq2 = event.values[1]
         val nq3 = event.values[2]
+        val int0=(128F*(nq0+1.0F)).toInt()//0~256
+        val int1=(128F*(nq1+1.0F)).toInt()
+        val int2=(128F*(nq2+1.0F)).toInt()
+        val int3=(128F*(nq3+1.0F)).toInt()
+        val str03=String.format("%03d%03d%03d%03d",int0,int1,int2,int3)
         val currentTime =System.currentTimeMillis()
         if(currentTime>tempTime+30) {
+            if(recording != null){
+                gyroArrayList.add(str03)
+            }
+            Log.e("counter",(currentTime-tempTime).toString())
             tempTime=currentTime
             viewBinding.myView.setQuats(nq0, nq1, nq2, nq3)
-            //   val str: String = "x=" + nq0 + "\n" + "y=" + nq1 + "\n" + "z=" + nq2 + "\n" + "w=" + nq3
-            //    Log.e("tetetete",str)
         }
+
+    }
+    private fun resetHead(){
+      //
+        viewBinding.myView.resetHead()
+//        viewBinding.myView.initData()
+
     }
     private fun sensorReset(){
         sensorManager.unregisterListener(this)
@@ -827,12 +631,13 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
             SensorManager.SENSOR_DELAY_FASTEST
         )
         viewBinding.myView.initData()
-    }*/
+    }
     override fun onTouchEvent(event: MotionEvent?): Boolean {
 
         if (event != null) {
             when(event.action){
-     //           MotionEvent.ACTION_DOWN -> sensorReset()
+           //     MotionEvent.ACTION_DOWN ->  sensorReset()
+                MotionEvent.ACTION_DOWN ->  resetHead()// sensorReset()
             }
         }
 
@@ -841,8 +646,8 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
         return super.onTouchEvent(event)
     }
     //センサの精度が変更されたときに呼ばれる
-   // override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
-   // }
+    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
+    }
 
     override fun onResume() {
         super.onResume()
@@ -853,12 +658,12 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
-        /*     sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+             sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
              sensorManager.registerListener(
                  this,
                  sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
                  SensorManager.SENSOR_DELAY_FASTEST
-             )*/
+             )
         //リスナーとセンサーオブジェクトを渡す
         //第一引数はインターフェースを継承したクラス、今回はthis
         //第二引数は取得したセンサーオブジェクト
@@ -870,7 +675,7 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
     override fun onPause() {
         super.onPause()
         //リスナーを解除しないとバックグラウンドにいるとき常にコールバックされ続ける
-    //    sensorManager.unregisterListener(this)
+        sensorManager.unregisterListener(this)
     }
     val videoPathList = mutableListOf(" ")
     private fun setListView(){
@@ -904,12 +709,12 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
 
         }
         lv.onItemLongClickListener =
-            OnItemLongClickListener { parent, view, i, id ->
-                var str=videoPathList[i].substring(videoPathList[i].indexOf(")")+1)
-                var fullPath=onePath.substring(0,onePath.indexOf("CapNYS")+7) + str + ".mp4"
+            AdapterView.OnItemLongClickListener { parent, view, i, id ->
+                var str = videoPathList[i].substring(videoPathList[i].indexOf(")") + 1)
+                var fullPath = onePath.substring(0, onePath.indexOf("CapNYS") + 7) + str + ".mp4"
 //                val msg = i.toString() + "番目のアイテムが長押しされました"
-  //              Toast.makeText(applicationContext, msg, Toast.LENGTH_LONG).show()
-                showAlertDialog(videoPathList[i],fullPath)
+                //              Toast.makeText(applicationContext, msg, Toast.LENGTH_LONG).show()
+                showAlertDialog(videoPathList[i], fullPath)
                 true
             }
     }
@@ -1008,7 +813,21 @@ class MainActivity : AppCompatActivity() {//}, SensorEventListener{
             }
         }
     }
+    //arrayString = intArray.joinToString(","))
+    //intArray = arrayString.split(",").map { it.toInt() }.toIntArray()
+
+    fun saveIntArray(intArray: IntArray) {
+        val db = _helper.writableDatabase
+
+        val contentValues = ContentValues().apply {
+            put("data", intArray.joinToString(","))
+        }
+
+        db.insert("headgyrodata", null, contentValues)
+        db.close()
+    }
 }
+
 
 
 
