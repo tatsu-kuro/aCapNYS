@@ -38,9 +38,22 @@ class PlayActivity : AppCompatActivity() {
         mediaController.setAnchorView(videoView)
         videoView.setMediaController(mediaController)
         videoView.setVideoURI(uri)
-      //  myView.setCamera(0)
+    //    myView.setCamera(0)
+        val camstr = arrayData[1]
+        val cam = camstr.substring(0, 3).toInt()
+        Log.e("camera_num",cam.toString())
+        myView.setCamera(cam)
         myView.set_rpk_ppk()
         videoView.start()
+        val str03 = arrayData[0]
+        val str0 = str03.substring(0, 3)
+        val str1 = str03.substring(3, 6)
+        val str2 = str03.substring(6, 9)
+        val str3 = str03.substring(9, 12)
+        myView.cq0 = (str0.toFloat() - 128F) / 128F
+        myView.cq1 = (str1.toFloat() - 128F) / 128F
+        myView.cq2 = (str2.toFloat() - 128F) / 128F
+        myView.cq3 = (str3.toFloat() - 128F) / 128F
 
 
         val updateTimeRunnable = object : Runnable {
@@ -56,7 +69,8 @@ class PlayActivity : AppCompatActivity() {
                 if(videoDuration>0) {
                     current = arrayCount * videoCurrent / videoDuration
                 }
-                if (arrayCount>1 && current < arrayCount) {
+                if (arrayCount>1 && current < arrayCount){// && current>1) {//0: set cq0-3
+                    if(current<2)current=2
                     val str03 = arrayData[current]
                     val str0 = str03.substring(0, 3)
                     val str1 = str03.substring(3, 6)

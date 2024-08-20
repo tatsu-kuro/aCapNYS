@@ -97,6 +97,14 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         cq0 =  nq0
         cq3 = -nq3
     }
+    fun restoreCqs(
+        c0:Float,c1:Float,c2:Float,c3:Float
+    ){
+        cq0=c0
+        cq1=c1
+        cq2=c2
+        cq3=c3
+    }
     fun resetHead_back(){
         cq0 =  nq0
         //    cq1 = nq1

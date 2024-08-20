@@ -404,6 +404,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             // }
         }
         gyroArrayList.clear()
+  //      gyroArrayAdd(viewBinding.myView.cq0,viewBinding.myView.cq1,viewBinding.myView.cq2,viewBinding.myView.cq3)
         val mediaStoreOutputOptions = MediaStoreOutputOptions
             .Builder(contentResolver, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
             .setContentValues(contentValues)
@@ -421,7 +422,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             .start(ContextCompat.getMainExecutor(this)) { recordEvent ->
                 when(recordEvent) {
                     is VideoRecordEvent.Start -> {
-                        resetHeadCount=5
+
+                        resetHead()
                         viewBinding.videoCaptureButton.apply {
                             text = "stop_capture"
                             //  text = getString(R.string.stop_capture)
@@ -614,28 +616,65 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             //    Log.e("counter",(currentTime-tempTime).toString())
             tempTime=currentTime
             if(resetHeadCount>0){
-                viewBinding.myView.resetHead()
+              //  if(resetHeadCount==5){
+                  //  viewBinding.myView.set_rpk_ppk()
+                   // viewBinding.myView.resetHead()
+                  //  sensorReset()
+            //    }else{// if(resetHeadCount>20){
+               // else if(resetHeadCount==19)sensorReset()
+           //     else{// if(resetHeadCount>1&&resetHeadCount<5){
+                    viewBinding.myView.resetHead()
+                    if(gyroArrayList.size>1) {
+                        gyroArraySet(0,
+                            viewBinding.myView.cq0,
+                            viewBinding.myView.cq1,
+                            viewBinding.myView.cq2,
+                            viewBinding.myView.cq3
+                        )
+                        val str=String.format("%03d%03d%03d%03d",cameraNum,cameraNum,cameraNum,cameraNum)
+                        gyroArrayList.set(1,str)
+
+                        Log.e("arrayCount", gyroArrayList.size.toString())
+                    }
+               // }
                 resetHeadCount -= 1
             }
             if(recordingFlag){
-                val int0=(128F*(nq0+1.0F)).toInt()//0~256
-                val int1=(128F*(nq1+1.0F)).toInt()
-                val int2=(128F*(nq2+1.0F)).toInt()
-                val int3=(128F*(nq3+1.0F)).toInt()
-                val str03=String.format("%03d%03d%03d%03d",int0,int1,int2,int3)
-                gyroArrayList.add(str03)
+                gyroArrayAdd(nq0,nq1,nq2,nq3)
+//                val int0=(128F*(nq0+1.0F)).toInt()//0~256
+ //               val int1=(128F*(nq1+1.0F)).toInt()
+  //              val int2=(128F*(nq2+1.0F)).toInt()
+   //             val int3=(128F*(nq3+1.0F)).toInt()
+    //            val str03=String.format("%03d%03d%03d%03d",int0,int1,int2,int3)
+    //            gyroArrayList.add(str03)
             }
             viewBinding.myView.setQuats(nq0, nq1, nq2, nq3)
         }
     }
+    fun gyroArrayAdd(n0:Float,n1:Float,n2:Float,n3:Float){
+        val int0=(128F*(n0+1.0F)).toInt()//0~256
+        val int1=(128F*(n1+1.0F)).toInt()
+        val int2=(128F*(n2+1.0F)).toInt()
+        val int3=(128F*(n3+1.0F)).toInt()
+        val str03=String.format("%03d%03d%03d%03d",int0,int1,int2,int3)
+        gyroArrayList.add(str03)
+    }
+    fun gyroArraySet(cnt:Int,n0:Float,n1:Float,n2:Float,n3:Float){
+        val int0=(128F*(n0+1.0F)).toInt()//0~256
+        val int1=(128F*(n1+1.0F)).toInt()
+        val int2=(128F*(n2+1.0F)).toInt()
+        val int3=(128F*(n3+1.0F)).toInt()
+        val str03=String.format("%03d%03d%03d%03d",int0,int1,int2,int3)
+        gyroArrayList.set(cnt,str03)
+    }
     private fun resetHead(){
-        //
-        //       viewBinding.myView.resetHead()
-//        viewBinding.myView.initData()
         resetHeadCount=5
     }
     private fun sensorReset(){
-        sensorManager.unregisterListener(this)
+        if (sensorManager != null) {
+            sensorManager.unregisterListener(this)
+        }
+    //    sensorManager.unregisterListener(this)
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         sensorManager.registerListener(
             this,
@@ -648,7 +687,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
 
         if (event != null) {
             when(event.action){
-                //MotionEvent.ACTION_DOWN ->  sensorReset()
                 MotionEvent.ACTION_DOWN ->  resetHead()// sensorReset()
             }
         }
