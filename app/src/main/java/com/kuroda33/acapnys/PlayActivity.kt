@@ -28,34 +28,37 @@ class PlayActivity : AppCompatActivity() {
         var csvData = intent.getStringExtra("gyrodata")
         //var stringArray:Array<String> = stringData!!.split(",").toTypedArray()
         val arrayData = csvData.toString().split(",").toTypedArray()
-        val arrayCount=arrayData.size
+        val arrayCount = arrayData.size
 
         uri = Uri.parse(stringUri)
         videoView = findViewById(R.id.videoView)
-        myView=findViewById(R.id.myView)
- //       timeTextView = findViewById(R.id.timeTextView)
+        myView = findViewById(R.id.myView)
+        //       timeTextView = findViewById(R.id.timeTextView)
         val mediaController = MediaController(this)
         mediaController.setAnchorView(videoView)
         videoView.setMediaController(mediaController)
         videoView.setVideoURI(uri)
-    //    myView.setCamera(0)
-        val camstr = arrayData[1]
-        val cam = camstr.substring(0, 3).toInt()
-        Log.e("camera_num",cam.toString())
-        myView.setCamera(cam)
+        //    myView.setCamera(0)
+        if (arrayData.size > 2) {
+            val camstr = arrayData[1]
+            val camNum = camstr.substring(0, 3).toInt()
+            Log.e("camera_num", camNum.toString())
+            myView.setCamera(camNum)//0:front 1:back
+
+            val str03 = arrayData[0]
+            val str0 = str03.substring(0, 3)
+            val str1 = str03.substring(3, 6)
+            val str2 = str03.substring(6, 9)
+            val str3 = str03.substring(9, 12)
+            myView.cq0 = (str0.toFloat() - 128F) / 128F
+            myView.cq1 = (str1.toFloat() - 128F) / 128F
+            myView.cq2 = (str2.toFloat() - 128F) / 128F
+            myView.cq3 = (str3.toFloat() - 128F) / 128F
+        } else {
+            myView.setCamera(0)//0:front
+        }
         myView.set_rpk_ppk()
         videoView.start()
-        val str03 = arrayData[0]
-        val str0 = str03.substring(0, 3)
-        val str1 = str03.substring(3, 6)
-        val str2 = str03.substring(6, 9)
-        val str3 = str03.substring(9, 12)
-        myView.cq0 = (str0.toFloat() - 128F) / 128F
-        myView.cq1 = (str1.toFloat() - 128F) / 128F
-        myView.cq2 = (str2.toFloat() - 128F) / 128F
-        myView.cq3 = (str3.toFloat() - 128F) / 128F
-
-
         val updateTimeRunnable = object : Runnable {
             override fun run() {
                 val videoCurrent=videoView.currentPosition
