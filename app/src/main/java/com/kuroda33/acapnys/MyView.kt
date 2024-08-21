@@ -162,7 +162,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
     //float[] ppk1 = new float[600];
     var ppk12 = Array(600) { FloatArray(3) }
 
-    var facePoints2 = arrayOf(
+    var facePoints = arrayOf(
         intArrayOf(0, 0, 0),
         intArrayOf(15, 0, 0),
         intArrayOf(30, 0, 0),
@@ -320,9 +320,9 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         // convert draw data to radian
         run {
             var i = 0
-            while (facePoints2[i][0] != 1000) {
-                rpk12[i][0] = facePoints2[i][0].toFloat() * pi180
-                rpk12[i][1] = facePoints2[i][1].toFloat() * pi180
+            while (facePoints[i][0] != 1000) {
+                rpk12[i][0] = facePoints[i][0].toFloat() * pi180
+                rpk12[i][1] = facePoints[i][1].toFloat() * pi180
                 i++
             }
         }
@@ -330,7 +330,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         // move (1,0,0) to each draw point
         run {
             var i = 0
-            while (facePoints2[i][0] != 1000) {
+            while (facePoints[i][0] != 1000) {
                 ppk12[i][0] = 0f
                 ppk12[i][1] = 1.0f * r
                 ppk12[i][2] = 0f
@@ -340,7 +340,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
 
         // rotate all draw point based on draw data
         var i = 0
-        while (facePoints2[i][0] != 1000) {
+        while (facePoints[i][0] != 1000) {
 
             //rotateX
             dy = ppk12[i][1] * Math.cos(rpk12[i][0].toDouble()).toFloat() - ppk12[i][2] * Math.sin(
@@ -417,7 +417,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         val defaultRadius = 40
         //     let size = CGSize(width:w, height:h)
         var i = 0
-        while (facePoints2.get(i).get(0) != 1000) {
+        while (facePoints.get(i).get(0) != 1000) {
             if (camera_num == 1) {
                 RotateQu(
                     i,
@@ -447,7 +447,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         var endpointF = true //終点でtrueとする
         if (camera_num == 0) { //iPhoneが >90||<-90 垂直以上に傾いた時
             var i = 0
-            while (facePoints2.get(i).get(0) != 1000) {
+            while (facePoints.get(i).get(0) != 1000) {
                 if (endpointF == true) { //始点に移動する
                     endpointF = if (ppk.get(i).get(1) < uraPoint) {
                         true
@@ -471,7 +471,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
                                 faceY0 + ppk.get(i).get(2) * faceR / defaultRadius
                             )
                         }
-                        if (facePoints2.get(i).get(2) == 1) {
+                        if (facePoints.get(i).get(2) == 1) {
                             endpointF = true
                         }
                   //  }
@@ -480,7 +480,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
             }
         } else { //iPhoneが-90~+90の時
             var i = 0
-            while (facePoints2.get(i).get(0) != 1000) {
+            while (facePoints.get(i).get(0) != 1000) {
                 if (endpointF == true) { //始点に移動する
                     endpointF = if (ppk.get(i).get(1) < uraPoint) {
                         true
@@ -503,7 +503,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
                             faceY0 - ppk.get(i).get(2) * faceR / defaultRadius
                         )
                     }
-                    if (facePoints2.get(i).get(2) == 1) {
+                    if (facePoints.get(i).get(2) == 1) {
                         endpointF = true
                     }
                 }
