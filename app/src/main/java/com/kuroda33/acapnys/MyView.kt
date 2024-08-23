@@ -32,23 +32,35 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
     fun setCamera(cameran:Int){
         camera_num=cameran
     }
+    private val paintFill: Paint = Paint()
+    private val paintStroke: Paint = Paint()
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas!!)
         if (initFlag) {
             mPaint.style = Paint.Style.STROKE
-            mPaint.strokeWidth = 5f
+            mPaint.strokeWidth = 3f
             mPaint.isAntiAlias = false
             mPaint.color = Color.BLACK
             //           mPaint2.setStyle(Paint.Style.STROKE);
-            mPaint2.strokeWidth = 5f
+            mPaint2.strokeWidth = 3f
             mPaint2.isAntiAlias = false
-            mPaint2.color = Color.LTGRAY
+            mPaint2.color = Color.WHITE// LTGRAY
             initFlag = false
+            paintFill.color = Color.WHITE
+            paintFill.style = Paint.Style.FILL
+
+            // 枠を黒く描くペイント
+            paintStroke.color = Color.BLACK
+            paintStroke.style = Paint.Style.STROKE
+            paintStroke.strokeWidth = 3f
         }
+        // 内部を白く塗りつぶすペイント
+
         mPath.reset()
-        canvas.drawARGB(255, 255, 255, 255)
-      //  canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        canvas.drawCircle( (canvas.width / 2).toFloat(),(canvas.height / 2).toFloat(),(2*canvas.height / 5).toFloat(), mPaint2 )
+        if(camera_num==0)canvas.drawARGB(255, 255, 255, 255)
+        else  canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        canvas.drawCircle( (canvas.width / 2).toFloat(),(canvas.height / 2).toFloat(),(2*canvas.height / 5).toFloat(), paintFill)//mPaint2 )
+        canvas.drawCircle( (canvas.width / 2).toFloat(),(canvas.height / 2).toFloat(),(2*canvas.height / 5).toFloat(), paintStroke)//mPaint2 )
         drawHead(canvas.width, canvas.height, 2*canvas.height / 5, mnq0, mnq1, mnq2, mnq3)
         canvas.drawPath(mPath, mPaint)
     }
@@ -451,7 +463,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
             var i = 0
             while (facePoints.get(i).get(0) != 1000) {
                 if (endpointF == true) { //始点に移動する
-                    endpointF = if (ppk.get(i).get(1) < uraPoint) {
+                    endpointF = if (ppk.get(i).get(1) < uraPoint-5) {
                         true
                     } else {
                         false
@@ -462,7 +474,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
                     )
                 } else {
                 //    if (ppk.get(i).get(1) >= uraPoint) {
-                        if (ppk.get(i).get(1) > uraPoint) {
+                        if (ppk.get(i).get(1) >= uraPoint-5) {
                             mPath!!.lineTo(
                                 faceX0 + ppk.get(i).get(0) * faceR / defaultRadius,
                                 faceY0 + ppk.get(i).get(2) * faceR / defaultRadius
@@ -484,7 +496,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
             var i = 0
             while (facePoints.get(i).get(0) != 1000) {
                 if (endpointF == true) { //始点に移動する
-                    endpointF = if (ppk.get(i).get(1) < uraPoint) {
+                    endpointF = if (ppk.get(i).get(1) < uraPoint-5) {
                         true
                     } else {
                         false
@@ -494,7 +506,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
                         faceY0 - ppk.get(i).get(2) * faceR / defaultRadius
                     )
                 } else {
-                    if (ppk.get(i).get(1) > uraPoint) {
+                    if (ppk.get(i).get(1) > uraPoint-5) {
                         mPath!!.lineTo(
                             faceX0 - ppk.get(i).get(0) * faceR / defaultRadius,
                             faceY0 - ppk.get(i).get(2) * faceR / defaultRadius
