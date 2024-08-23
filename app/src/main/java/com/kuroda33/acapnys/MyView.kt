@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.PorterDuff
 import android.preference.PreferenceManager
 import android.util.AttributeSet
 import android.util.Log
@@ -35,19 +36,20 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         super.onDraw(canvas!!)
         if (initFlag) {
             mPaint.style = Paint.Style.STROKE
-            mPaint.strokeWidth = 6f
+            mPaint.strokeWidth = 5f
             mPaint.isAntiAlias = false
             mPaint.color = Color.BLACK
             //           mPaint2.setStyle(Paint.Style.STROKE);
-            mPaint2.strokeWidth = 6f
+            mPaint2.strokeWidth = 5f
             mPaint2.isAntiAlias = false
             mPaint2.color = Color.LTGRAY
             initFlag = false
         }
         mPath.reset()
-        canvas.drawARGB(255, 255, 255, 255);
-        canvas.drawCircle( (canvas.width / 2).toFloat(),(canvas.height / 2).toFloat(),(canvas.height / 3).toFloat(), mPaint2 )
-        drawHead(canvas.width, canvas.height, canvas.height / 3, mnq0, mnq1, mnq2, mnq3)
+        canvas.drawARGB(255, 255, 255, 255)
+      //  canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        canvas.drawCircle( (canvas.width / 2).toFloat(),(canvas.height / 2).toFloat(),(2*canvas.height / 5).toFloat(), mPaint2 )
+        drawHead(canvas.width, canvas.height, 2*canvas.height / 5, mnq0, mnq1, mnq2, mnq3)
         canvas.drawPath(mPath, mPaint)
     }
 

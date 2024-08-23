@@ -29,7 +29,7 @@ class PlayActivity : AppCompatActivity() {
         //var stringArray:Array<String> = stringData!!.split(",").toTypedArray()
         val arrayData = csvData.toString().split(",").toTypedArray()
         val arrayCount = arrayData.size
-
+        Log.e("arrayData.count",arrayCount.toString())
         uri = Uri.parse(stringUri)
         videoView = findViewById(R.id.videoView)
         myView = findViewById(R.id.myView)
@@ -63,9 +63,9 @@ class PlayActivity : AppCompatActivity() {
             override fun run() {
                 val videoCurrent=videoView.currentPosition
                 val videoDuration=videoView.duration
-                Log.e("Current",videoCurrent.toString())
-                Log.e("Duration",videoDuration.toString())
-                Log.e("arrayCount",arrayCount.toString())
+            //    Log.e("Current",videoCurrent.toString())
+            //    Log.e("Duration",videoDuration.toString())
+            //    Log.e("arrayCount",arrayCount.toString())
 
                 handler.postDelayed(this, 33)
                 var current:Int=0

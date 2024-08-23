@@ -63,6 +63,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     private var videoURI: String ="no video"
     private var lastURI: String = ""
     private lateinit var sensorManager: SensorManager
+    private var gravitySensor: Sensor? = null
+    private var rotationVectorSensor: Sensor? = null
+
     private var quaternionSensor: Sensor? = null
     val gyroArrayList = ArrayList<String>()
     var recordingFlag:Boolean=false
@@ -220,13 +223,19 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                     override fun onStopTrackingTouch(seekBar: SeekBar?) {}
                 }
             )
+            sensorManager=getSystemService(SENSOR_SERVICE) as SensorManager
+            gravitySensor=sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
+            rotationVectorSensor=sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
 
-            sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+
+
+
+     /*       sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
             sensorManager.registerListener(
                 this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
                 SensorManager.SENSOR_DELAY_FASTEST
-            )
+            )*/
             viewBinding.myView.set_rpk_ppk()
             setPreviewSize(cameraNum)
             setButtons(true)
@@ -605,50 +614,71 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     private var tempTime:Long = 0
     var resetHeadCount:Int=0
     override fun onSensorChanged(event: SensorEvent) {
-        val nq0 = event.values[3]
-        val nq1 = event.values[0]
-        val nq2 = event.values[1]
-        val nq3 = event.values[2]
-
-        val currentTime =System.currentTimeMillis()
-        if(currentTime>tempTime+30) {
-
-            //    Log.e("counter",(currentTime-tempTime).toString())
-            tempTime=currentTime
-            if(resetHeadCount>0){
-              //  if(resetHeadCount==5){
-                  //  viewBinding.myView.set_rpk_ppk()
-                   // viewBinding.myView.resetHead()
-                  //  sensorReset()
-            //    }else{// if(resetHeadCount>20){
-               // else if(resetHeadCount==19)sensorReset()
-           //     else{// if(resetHeadCount>1&&resetHeadCount<5){
-                    viewBinding.myView.resetHead()
-                    if(gyroArrayList.size>1) {
-                        gyroArraySet(0,
-                            viewBinding.myView.cq0,
-                            viewBinding.myView.cq1,
-                            viewBinding.myView.cq2,
-                            viewBinding.myView.cq3
-                        )
-                        val str=String.format("%03d%03d%03d%03d",cameraNum,cameraNum,cameraNum,cameraNum)
-                        gyroArrayList.set(1,str)
-
-                        Log.e("arrayCount", gyroArrayList.size.toString())
+        event?.let{
+            when(it.sensor.type){
+                Sensor.TYPE_GRAVITY ->{
+                    if(viewBinding.myView.degreeAtResetHead==-1){
+                        val gravityZ=event.values[2]
+                        if (gravityZ > 0){
+                            if(viewBinding.myView.camera_num != 0)viewBinding.myView.degreeAtResetHead = 1
+                            else viewBinding.myView.degreeAtResetHead = 0
+                        }else{
+                            if(viewBinding.myView.camera_num != 0)viewBinding.myView.degreeAtResetHead = 0
+                            else viewBinding.myView.degreeAtResetHead = 1
+                        }
+                        // Log.e("gravity", String.format("%03f",gravityZ))//event[2])
                     }
-               // }
-                resetHeadCount -= 1
-            }
-            if(recordingFlag){
-                gyroArrayAdd(nq0,nq1,nq2,nq3)
+                }
+                Sensor.TYPE_GAME_ROTATION_VECTOR ->{
+                    val nq0 = event.values[3]
+                    val nq1 = event.values[0]
+                    val nq2 = event.values[1]
+                    val nq3 = event.values[2]
+
+                    val currentTime =System.currentTimeMillis()
+                    if(currentTime>tempTime+30) {
+
+                        //    Log.e("counter",(currentTime-tempTime).toString())
+                        tempTime=currentTime
+                        if(resetHeadCount>0){
+                            //  if(resetHeadCount==5){
+                            //  viewBinding.myView.set_rpk_ppk()
+                            // viewBinding.myView.resetHead()
+                            //  sensorReset()
+                            //    }else{// if(resetHeadCount>20){
+                            // else if(resetHeadCount==19)sensorReset()
+                            //     else{// if(resetHeadCount>1&&resetHeadCount<5){
+                            viewBinding.myView.resetHead()
+                            if(gyroArrayList.size>1) {
+                                gyroArraySet(0,
+                                    viewBinding.myView.cq0,
+                                    viewBinding.myView.cq1,
+                                    viewBinding.myView.cq2,
+                                    viewBinding.myView.cq3
+                                )
+                                val str=String.format("%03d%03d%03d%03d",cameraNum,cameraNum,cameraNum,cameraNum)
+                                gyroArrayList.set(1,str)
+
+                                Log.e("arrayCount", gyroArrayList.size.toString())
+                            }
+                            // }
+                            resetHeadCount -= 1
+                        }
+                        if(recordingFlag){
+                            gyroArrayAdd(nq0,nq1,nq2,nq3)
 //                val int0=(128F*(nq0+1.0F)).toInt()//0~256
- //               val int1=(128F*(nq1+1.0F)).toInt()
-  //              val int2=(128F*(nq2+1.0F)).toInt()
-   //             val int3=(128F*(nq3+1.0F)).toInt()
-    //            val str03=String.format("%03d%03d%03d%03d",int0,int1,int2,int3)
-    //            gyroArrayList.add(str03)
+                            //               val int1=(128F*(nq1+1.0F)).toInt()
+                            //              val int2=(128F*(nq2+1.0F)).toInt()
+                            //             val int3=(128F*(nq3+1.0F)).toInt()
+                            //            val str03=String.format("%03d%03d%03d%03d",int0,int1,int2,int3)
+                            //            gyroArrayList.add(str03)
+                        }
+                        viewBinding.myView.setQuats(nq0, nq1, nq2, nq3)
+                }
             }
-            viewBinding.myView.setQuats(nq0, nq1, nq2, nq3)
+        }
+
+
         }
     }
     fun gyroArrayAdd(n0:Float,n1:Float,n2:Float,n3:Float){
@@ -675,12 +705,21 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             sensorManager.unregisterListener(this)
         }
     //    sensorManager.unregisterListener(this)
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+ /*       sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         sensorManager.registerListener(
             this,
             sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
             SensorManager.SENSOR_DELAY_FASTEST
-        )
+        )*/
+        gravitySensor?.also{
+                gravity ->
+            sensorManager.registerListener(this, gravity,SensorManager.SENSOR_DELAY_FASTEST)
+        }
+        rotationVectorSensor?.also{
+                rotation ->
+            sensorManager.registerListener(this,rotation,SensorManager.SENSOR_DELAY_FASTEST)
+        }
+
         viewBinding.myView.initData()
     }
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -708,12 +747,21 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+/*        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         sensorManager.registerListener(
             this,
             sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
             SensorManager.SENSOR_DELAY_FASTEST
-        )
+        )*/
+        gravitySensor?.also{
+                gravity ->
+            sensorManager.registerListener(this, gravity,SensorManager.SENSOR_DELAY_FASTEST)
+        }
+        rotationVectorSensor?.also{
+                rotation ->
+            sensorManager.registerListener(this,rotation,SensorManager.SENSOR_DELAY_FASTEST)
+        }
+
         //リスナーとセンサーオブジェクトを渡す
         //第一引数はインターフェースを継承したクラス、今回はthis
         //第二引数は取得したセンサーオブジェクト
