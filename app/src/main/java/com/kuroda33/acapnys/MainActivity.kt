@@ -37,6 +37,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
+import androidx.camera.core.CameraInfo
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -50,6 +51,7 @@ import androidx.camera.video.VideoRecordEvent
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
+import com.google.common.util.concurrent.ListenableFuture
 import com.kuroda33.acapnys.databinding.ActivityMainBinding
 import java.io.File
 import java.text.SimpleDateFormat
@@ -65,7 +67,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private var gravitySensor: Sensor? = null
     private var rotationVectorSensor: Sensor? = null
-
+    private lateinit var cameraProviderFuture:ListenableFuture<ProcessCameraProvider>
+    private lateinit var cameraProvider: ProcessCameraProvider
+    private lateinit var cameraInfos: List<CameraInfo>
+    private var currentCameraIndex = 0
     private var quaternionSensor: Sensor? = null
     val gyroArrayList = ArrayList<String>()
     var recordingFlag:Boolean=false
@@ -154,6 +159,24 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         db.delete("headgyrodata", selection, selectionArgs)
         db.close()
     }
+    /*private fun bindCameraUseCases(cameraInfo: CameraInfo) {
+        val cameraSelector = CameraSelector.Builder()
+            .addCameraFilter { listOf(cameraInfo) }
+            .build()
+
+        val preview = Preview.Builder().build().also {
+            it.setSurfaceProvider(findViewById<PreviewView>(R.id.viewFinder).surfaceProvider)
+        }
+
+        try {
+            cameraProvider.unbindAll()
+            cameraProvider.bindToLifecycle(
+                this, cameraSelector, preview
+            )
+        } catch (exc: Exception) {
+            Log.e(TAG, "Use case binding failed", exc)
+        }
+    }*/
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -197,7 +220,14 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                     Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
                 startActivity(/* intent = */ intent)
             }
-
+            cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+            cameraProviderFuture.addListener(Runnable {
+                cameraProvider = cameraProviderFuture.get()
+                cameraInfos = cameraProvider.availableCameraInfos
+                val cameraCount = cameraInfos.size
+                Log.e("CameraXApp", "Number of cameras: $cameraCount")
+                //   bindCameraUseCases(cameraInfos[currentCameraIndex])
+            }, ContextCompat.getMainExecutor(this))
             viewBinding.cameraButton.setOnClickListener {
                 changeCamera()
             }
@@ -228,10 +258,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             sensorManager=getSystemService(SENSOR_SERVICE) as SensorManager
             gravitySensor=sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
             rotationVectorSensor=sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
-
-
-
-
      /*       sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
             sensorManager.registerListener(
                 this,
@@ -602,6 +628,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     //  private var videoCapture: VideoCapture?= null
     private fun changeCamera(){
         getPara()
+        currentCameraIndex = (currentCameraIndex + 1) % cameraInfos.size
+//        bindCameraUseCases(cameraInfos[currentCameraIndex])
+
+        Log.e("camera_number:",currentCameraIndex.toString())
         cameraNum = if (cameraNum == 1) {
             0//front
         }else{
