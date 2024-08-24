@@ -21,6 +21,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
     private var drawY:Float= 0F
     private var mTimer: Timer? = null
     //２）onDraw(描画の準備)f
+    var playMode:Boolean=false
     private var mIsDrawing = false
     private var mPaint: Paint = Paint() //画?
     private var mPaint2: Paint = Paint()
@@ -57,7 +58,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         // 内部を白く塗りつぶすペイント
 
         mPath.reset()
-        if(camera_num==0)canvas.drawARGB(255, 255, 255, 255)
+        if(camera_num==0 && playMode==false)canvas.drawARGB(255, 255, 255, 255)
         else  canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
         canvas.drawCircle( (canvas.width / 2).toFloat(),(canvas.height / 2).toFloat(),(2*canvas.height / 5).toFloat(), paintFill)//mPaint2 )
         canvas.drawCircle( (canvas.width / 2).toFloat(),(canvas.height / 2).toFloat(),(2*canvas.height / 5).toFloat(), paintStroke)//mPaint2 )

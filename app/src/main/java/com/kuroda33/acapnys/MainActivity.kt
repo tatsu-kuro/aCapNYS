@@ -88,6 +88,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             return
         }
         getPara()
+        viewBinding.myView.playMode=false
         //       setPreviewSize(cameraNum)
         val cameraController = camera!!.cameraControl
         cameraController.setLinearZoom(zoom100 / 100f)
@@ -161,6 +162,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         //   setContentView(R.layout.activity_main)
         videoURI="no video"
         getPara()
+        viewBinding.myView.playMode=false
         viewBinding.myView.setCamera(cameraNum)
 
         //     val listView = findViewById<ListView>(R.id.listview)

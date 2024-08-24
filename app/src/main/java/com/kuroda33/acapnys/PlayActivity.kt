@@ -33,6 +33,7 @@ class PlayActivity : AppCompatActivity() {
         uri = Uri.parse(stringUri)
         videoView = findViewById(R.id.videoView)
         myView = findViewById(R.id.myView)
+        myView.playMode=true
         //       timeTextView = findViewById(R.id.timeTextView)
         val mediaController = MediaController(this)
         mediaController.setAnchorView(videoView)
@@ -55,7 +56,8 @@ class PlayActivity : AppCompatActivity() {
             myView.cq2 = (str2.toFloat() - 128F) / 128F
             myView.cq3 = (str3.toFloat() - 128F) / 128F
         } else {
-            myView.setCamera(0)//0:front
+            myView.alpha=0f
+//            myView.setCamera(0)//0:front
         }
         myView.set_rpk_ppk()
         videoView.start()
@@ -96,5 +98,6 @@ class PlayActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacksAndMessages(null)
+        myView.playMode=false
     }
 }
