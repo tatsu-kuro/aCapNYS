@@ -398,8 +398,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             viewBinding.permission.visibility=View.INVISIBLE
             viewBinding.videoListView.visibility=View.INVISIBLE
             if(cameraNum==0){
-                viewBinding.myView.alpha=0.99f
-                viewBinding.viewFinder.alpha=0.99f
+                viewBinding.myView.alpha=0f
+                viewBinding.viewFinder.alpha=0f
                 val windowAttributes = window.attributes
                 windowAttributes.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
                 window.attributes = windowAttributes
