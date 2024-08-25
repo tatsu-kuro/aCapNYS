@@ -42,9 +42,14 @@ class PlayActivity : AppCompatActivity() {
         //    myView.setCamera(0)
         if (arrayData.size > 2) {
             val camstr = arrayData[1]
-            val camNum = camstr.substring(0, 3).toInt()
-            Log.e("camera_num", camNum.toString())
-            myView.setCamera(camNum)//0:front 1:back
+            myView.camera_num = camstr.substring(0, 3).toInt()
+            myView.gravityZ=camstr.substring(3,6).toInt()
+            //if(gravityz<0){
+            //    if(camNum==0)camNum=1
+            //    else camNum=0
+           // }
+            Log.e("camera_num", String.format("%3d,%d3",myView.camera_num,myView.gravityZ))
+            myView.setCamera(myView.camera_num)//0:front 1:back
 
             val str03 = arrayData[0]
             val str0 = str03.substring(0, 3)
@@ -85,7 +90,12 @@ class PlayActivity : AppCompatActivity() {
                     val f1 = (str1.toFloat() - 128F) / 128F
                     val f2 = (str2.toFloat() - 128F) / 128F
                     val f3 = (str3.toFloat() - 128F) / 128F
-                    myView.setQuats(f0, f1, f2, f3)
+                    myView.setQuats(f0, f1, f2, f3)//これはないとだめだが、数値は何でもかまわん、以下の4個が大事、わけわからんが出来た
+                    myView.mnq0=f0
+                    myView.mnq1=f1
+                    myView.mnq2=f2
+                    myView.mnq3=f3
+
                 }
             }
         }

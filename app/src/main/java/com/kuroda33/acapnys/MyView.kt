@@ -387,7 +387,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
     }
     //モーションセンサーをリセットするときに-1とする。リセット時に-1なら,角度から０か１をセット
     var degreeAtResetHead = 0 //0:-90<&&<90 1:<-90||>90 -1:flag for get degree
-
+    var gravityZ:Int=0
 
     private fun RotateQu(
         i: Int,

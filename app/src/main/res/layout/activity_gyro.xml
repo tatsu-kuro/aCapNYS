@@ -145,6 +145,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_weight="1"
+        android:visibility="invisible"
         android:orientation="horizontal">
 
         <EditText
@@ -153,6 +154,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_weight="1"
+            android:visibility="invisible"
             android:background="@android:drawable/editbox_background_normal"
             android:text="Pitch"
             android:paddingLeft="0dp"
@@ -266,10 +268,12 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_weight="1"
+        android:visibility="invisible"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/rollTitle"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -386,10 +390,12 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_weight="1"
+        android:visibility="invisible"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/yawTitle"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -506,10 +512,12 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_weight="1"
+        android:visibility="invisible"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/sound"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -519,6 +527,7 @@
             android:focusableInTouchMode="false"/>
         <Spinner
             android:id="@+id/soundSpinner"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -526,6 +535,7 @@
             android:spinnerMode="dropdown" />
         <EditText
             android:id="@+id/vibration"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -535,6 +545,7 @@
             android:focusableInTouchMode="false"/>
         <Spinner
             android:id="@+id/vibrationSpinner"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

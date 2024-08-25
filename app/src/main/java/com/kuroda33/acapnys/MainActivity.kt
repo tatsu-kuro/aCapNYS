@@ -187,7 +187,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         getPara()
         viewBinding.myView.playMode=false
         viewBinding.myView.setCamera(cameraNum)
-
+        viewBinding.myView.gravityZ=0
         //     val listView = findViewById<ListView>(R.id.listview)
         //  while(!allPermissionsGranted()) Thread.sleep(100)
         if (true||allPermissionsGranted()) {
@@ -216,6 +216,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             viewBinding.gyroButton.setOnClickListener {
                 //         val intent = Intent(/* packageContext = */ application,/* cls = */ GridButtons::class.java)
                 //         startActivity(/* intent = */ intent)
+              //  if (sensorManager != null) {
+              //      sensorManager.unregisterListener(this)
+              //  }
                 val intent =
                     Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
                 startActivity(/* intent = */ intent)
@@ -227,7 +230,29 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                 val cameraCount = cameraInfos.size
                 Log.e("CameraXApp", "Number of cameras: $cameraCount")
                 //   bindCameraUseCases(cameraInfos[currentCameraIndex])
+
+
+
+                val backCameraCount = cameraProvider.availableCameraInfos.count { cameraInfo ->
+                    val cameraSelector = CameraSelector.Builder()
+                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                        .build()
+                    cameraSelector.filter(listOf(cameraInfo)).isNotEmpty()
+                }
+                Log.e("CameraXApp", "Number of back cameras: $backCameraCount")
             }, ContextCompat.getMainExecutor(this))
+            /*
+             cameraProviderFuture.addListener(Runnable {
+                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+                val backCameraCount = cameraProvider.availableCameraInfos.count { cameraInfo ->
+                    val cameraSelector = CameraSelector.Builder()
+                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                        .build()
+                    cameraSelector.filter(listOf(cameraInfo)).isNotEmpty()
+                }
+                Log.e("CameraXApp", "Number of back cameras: $backCameraCount")
+            }, ContextCompat.getMainExecutor(this))
+             */
             viewBinding.cameraButton.setOnClickListener {
                 changeCamera()
             }
@@ -373,8 +398,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             viewBinding.permission.visibility=View.INVISIBLE
             viewBinding.videoListView.visibility=View.INVISIBLE
             if(cameraNum==0){
-                viewBinding.myView.alpha=0f
-                viewBinding.viewFinder.alpha=0f
+                viewBinding.myView.alpha=0.99f
+                viewBinding.viewFinder.alpha=0.99f
                 val windowAttributes = window.attributes
                 windowAttributes.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
                 window.attributes = windowAttributes
@@ -430,6 +455,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         }
         setButtons(false)
         setNavigationBar(false)
+        viewBinding.myView.degreeAtResetHead=0//0にすることでgravityZ と degreeAtReseHead(1 or -1)をgetできる
         // create and start a new recording session
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
@@ -649,17 +675,19 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         event?.let{
             when(it.sensor.type){
                 Sensor.TYPE_GRAVITY ->{
-                    if(viewBinding.myView.degreeAtResetHead==-1){
-                        val gravityZ=event.values[2]
-                        if (gravityZ > 0){
+                    if(viewBinding.myView.degreeAtResetHead==0){//gravityをチェック
+                        val gravityT=event.values[2]
+                        if(gravityT>0)viewBinding.myView.gravityZ=1
+                        else viewBinding.myView.gravityZ=-1
+                        if (viewBinding.myView.gravityZ ==1 ){
                             if(viewBinding.myView.camera_num != 0)viewBinding.myView.degreeAtResetHead = 1
-                            else viewBinding.myView.degreeAtResetHead = 0
+                            else viewBinding.myView.degreeAtResetHead = -1
                         }else{
-                            if(viewBinding.myView.camera_num != 0)viewBinding.myView.degreeAtResetHead = 0
+                            if(viewBinding.myView.camera_num != 0)viewBinding.myView.degreeAtResetHead = -1
                             else viewBinding.myView.degreeAtResetHead = 1
                         }
-                        // Log.e("gravity", String.format("%03f",gravityZ))//event[2])
                     }
+
                 }
                 Sensor.TYPE_GAME_ROTATION_VECTOR ->{
                     val nq0 = event.values[3]
@@ -673,13 +701,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                         //    Log.e("counter",(currentTime-tempTime).toString())
                         tempTime=currentTime
                         if(resetHeadCount>0){
-                            //  if(resetHeadCount==5){
-                            //  viewBinding.myView.set_rpk_ppk()
-                            // viewBinding.myView.resetHead()
-                            //  sensorReset()
-                            //    }else{// if(resetHeadCount>20){
-                            // else if(resetHeadCount==19)sensorReset()
-                            //     else{// if(resetHeadCount>1&&resetHeadCount<5){
                             viewBinding.myView.resetHead()
                             if(gyroArrayList.size>1) {
                                 gyroArraySet(0,
@@ -688,22 +709,19 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                                     viewBinding.myView.cq2,
                                     viewBinding.myView.cq3
                                 )
-                                val str=String.format("%03d%03d%03d%03d",cameraNum,cameraNum,cameraNum,cameraNum)
-                                gyroArrayList.set(1,str)
-
-                                Log.e("arrayCount", gyroArrayList.size.toString())
+                               // val str=String.format("%03d%03d%03d%03d",cameraNum,viewBinding.myView.gravityZ,cameraNum,cameraNum)
+                               // gyroArrayList.set(1,str)
+                               // Log.e("arrayCount", String.format("%03d%3d%03d",cameraNum,-1,1))//viewBinding.myView.gravityZ))
+                               // Log.e("arrayCount", gyroArrayList.size.toString())
                             }
-                            // }
                             resetHeadCount -= 1
                         }
                         if(recordingFlag){
-                            gyroArrayAdd(nq0,nq1,nq2,nq3)
-//                val int0=(128F*(nq0+1.0F)).toInt()//0~256
-                            //               val int1=(128F*(nq1+1.0F)).toInt()
-                            //              val int2=(128F*(nq2+1.0F)).toInt()
-                            //             val int3=(128F*(nq3+1.0F)).toInt()
-                            //            val str03=String.format("%03d%03d%03d%03d",int0,int1,int2,int3)
-                            //            gyroArrayList.add(str03)
+                            gyroArrayAdd(viewBinding.myView.mnq0,viewBinding.myView.mnq1,viewBinding.myView.mnq2,viewBinding.myView.mnq3)
+                            if(gyroArrayList.size==10){
+                                val str=String.format("%03d%03d%03d%03d",cameraNum,viewBinding.myView.gravityZ,cameraNum,cameraNum)
+                                gyroArrayList.set(1,str)
+                            }
                         }
                         viewBinding.myView.setQuats(nq0, nq1, nq2, nq3)
                 }
@@ -730,7 +748,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         gyroArrayList.set(cnt,str03)
     }
     private fun resetHead(){
-        resetHeadCount=5
+        if(viewBinding.myView.gravityZ==1) {
+            resetHeadCount = 5
+        }
     }
     private fun sensorReset(){
         if (sensorManager != null) {
