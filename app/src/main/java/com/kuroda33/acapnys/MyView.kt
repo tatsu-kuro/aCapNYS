@@ -1,28 +1,25 @@
 package com.kuroda33.acapnys
 
 import android.content.Context
-import android.content.SharedPreferences
+
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PorterDuff
-import android.preference.PreferenceManager
+
 import android.util.AttributeSet
-import android.util.Log
-import android.view.MotionEvent
+
 import android.view.View
-import java.util.Timer
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
+
 
 class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
-    private var path : Path = Path()//線を引く、図形を描く、グラフィック描画
-    private var paint : Paint = Paint()//色とか太さ
-    private var drawX:Float= 0F
-    private var drawY:Float= 0F
-    private var mTimer: Timer? = null
-    //２）onDraw(描画の準備)f
+
     var playMode:Boolean=false
-    private var mIsDrawing = false
+
     private var mPaint: Paint = Paint() //画?
     private var mPaint2: Paint = Paint()
 
@@ -36,7 +33,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
     private val paintFill: Paint = Paint()
     private val paintStroke: Paint = Paint()
     override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas!!)
+        super.onDraw(canvas)
         if (initFlag) {
             mPaint.style = Paint.Style.STROKE
             mPaint.strokeWidth = 3f
@@ -58,34 +55,34 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         // 内部を白く塗りつぶすペイント
 
         mPath.reset()
-        if(camera_num==0 && playMode==false)canvas.drawARGB(255, 255, 255, 255)
+        if(camera_num==0 && !playMode)canvas.drawARGB(255, 255, 255, 255)
         else  canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        canvas.drawCircle( (canvas.width / 2).toFloat(),(canvas.height / 2).toFloat(),(2*canvas.height / 5).toFloat(), paintFill)//mPaint2 )
-        canvas.drawCircle( (canvas.width / 2).toFloat(),(canvas.height / 2).toFloat(),(2*canvas.height / 5).toFloat(), paintStroke)//mPaint2 )
-        drawHead(canvas.width, canvas.height, 2*canvas.height / 5, mnq0, mnq1, mnq2, mnq3)
+        canvas.drawCircle( (width / 2).toFloat(),(height / 2).toFloat(),(2*height / 5).toFloat(), paintFill)//mPaint2 )
+        canvas.drawCircle( (width / 2).toFloat(),(height / 2).toFloat(),(2*height / 5).toFloat(), paintStroke)//mPaint2 )
+        drawHead(width, height, 2*height / 5, mnq0, mnq1, mnq2, mnq3)
         canvas.drawPath(mPath, mPaint)
     }
 
     //３）実際の描画（押した時、動かした時）
-   /* override fun onTouchEvent(event: MotionEvent?): Boolean {
-        //タッチポジション（x座標、y座標）
-        //drawX = event!!.x
-        //drawY = event.y
-        if (event != null) {
-            when(event!!.action){
-                MotionEvent.ACTION_DOWN -> clearCanvas()
-                //   MotionEvent.ACTION_MOVE -> path.lineTo(drawX,drawY)
-                MotionEvent.ACTION_UP -> clearCanvas()
-            }
-        }
-        //再描画を実行させる呪文
-        //invalidate()
-        return true
-    }*/
+    /* override fun onTouchEvent(event: MotionEvent?): Boolean {
+         //タッチポジション（x座標、y座標）
+         //drawX = event!!.x
+         //drawY = event.y
+         if (event != null) {
+             when(event!!.action){
+                 MotionEvent.ACTION_DOWN -> clearCanvas()
+                 //   MotionEvent.ACTION_MOVE -> path.lineTo(drawX,drawY)
+                 MotionEvent.ACTION_UP -> clearCanvas()
+             }
+         }
+         //再描画を実行させる呪文
+         //invalidate()
+         return true
+     }*/
     var mnq0 = 0f
-    var mnq1:kotlin.Float = 0f
-    var mnq2:kotlin.Float = 0f
-    var mnq3:kotlin.Float = 0f
+    var mnq1 = 0f
+    var mnq2 = 0f
+    var mnq3 = 0f
     var a0 = 0f
     var a1 = 0f
     var a2 = 0f
@@ -112,20 +109,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         cq0 =  nq0
         cq3 = -nq3
     }
-    fun restoreCqs(
-        c0:Float,c1:Float,c2:Float,c3:Float
-    ){
-        cq0=c0
-        cq1=c1
-        cq2=c2
-        cq3=c3
-    }
-    fun resetHead_back(){
-        cq0 =  nq0
-        //    cq1 = nq1
-        //    cq2 = nq2
-        cq3 = -nq3
-    }
+
     private fun MultQuat(
         q0: Float,
         q1: Float,
@@ -156,7 +140,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         // QuatXchan(a0,a1, a2, a3);//set mnq0~mnq3
         val norm: Float
         val mag: Float
-        mag = Math.sqrt((a0 * a0 + a1 * a1 + a2 * a2 + a3 * a3).toDouble()).toFloat()
+        mag = sqrt((a0 * a0 + a1 * a1 + a2 * a2 + a3 * a3).toDouble()).toFloat()
         if (mag > 1.192092896e-07f) {
             norm = 1 / mag
             a0 *= norm
@@ -325,14 +309,14 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         intArrayOf(1000, 1000, 1000)
     ) //mouse 9
 
-    var pi180 = Math.PI.toFloat() / 180.0f
+
 
     fun set_rpk_ppk() {
         val r = 40f //hankei
         var dx: Float
         var dy: Float
         var dz: Float
-        // convert draw data to radian
+        val pi180 = Math.PI.toFloat() / 180.0f    // convert draw data to radian
         run {
             var i = 0
             while (facePoints[i][0] != 1000) {
@@ -358,27 +342,27 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         while (facePoints[i][0] != 1000) {
 
             //rotateX
-            dy = ppk12[i][1] * Math.cos(rpk12[i][0].toDouble()).toFloat() - ppk12[i][2] * Math.sin(
+            dy = ppk12[i][1] * cos(rpk12[i][0].toDouble()).toFloat() - ppk12[i][2] * sin(
                 rpk12[i][0].toDouble()
             ).toFloat()
-            dz = ppk12[i][1] * Math.sin(rpk12[i][0].toDouble()).toFloat() + ppk12[i][2] * Math.cos(
+            dz = ppk12[i][1] * sin(rpk12[i][0].toDouble()).toFloat() + ppk12[i][2] * cos(
                 rpk12[i][0].toDouble()
             ).toFloat()
             ppk12[i][1] = dy
             ppk12[i][2] = dz
             //rotateZ
-            dx = ppk12[i][0] * Math.cos(rpk12[i][1].toDouble()).toFloat() - ppk12[i][1] * Math.sin(
+            dx = ppk12[i][0] * cos(rpk12[i][1].toDouble()).toFloat() - ppk12[i][1] * sin(
                 rpk12[i][1].toDouble()
             ).toFloat()
-            dy = ppk12[i][0] * Math.sin(rpk12[i][1].toDouble()).toFloat() + ppk12[i][1] * Math.cos(
+            dy = ppk12[i][0] * sin(rpk12[i][1].toDouble()).toFloat() + ppk12[i][1] * cos(
                 rpk12[i][1].toDouble()
             ).toFloat()
             ppk12[i][0] = dx
             ppk12[i][1] = dy
             //rotateY
-            dx = ppk12[i][0] * Math.cos(1.5707963).toFloat() - ppk12[i][2] * Math.sin(1.5707963)
+            dx = ppk12[i][0] * cos(1.5707963).toFloat() - ppk12[i][2] * sin(1.5707963)
                 .toFloat()
-            dz = ppk12[i][0] * Math.sin(1.5707963).toFloat() + ppk12[i][2] * Math.cos(1.5707963)
+            dz = ppk12[i][0] * sin(1.5707963).toFloat() + ppk12[i][2] * cos(1.5707963)
                 .toFloat()
             ppk12[i][0] = dx
             ppk12[i][2] = dz
@@ -463,33 +447,29 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         if (camera_num == 0) { //iPhoneが >90||<-90 垂直以上に傾いた時
             var i = 0
             while (facePoints.get(i).get(0) != 1000) {
-                if (endpointF == true) { //始点に移動する
-                    endpointF = if (ppk.get(i).get(1) < uraPoint-5) {
-                        true
-                    } else {
-                        false
-                    }
-                    mPath!!.moveTo(
+                if (endpointF) { //始点に移動する
+                    endpointF = ppk.get(i).get(1) < uraPoint-5
+                    mPath.moveTo(
                         faceX0 + ppk.get(i).get(0) * faceR / defaultRadius,
                         faceY0 + ppk.get(i).get(2) * faceR / defaultRadius
                     )
                 } else {
-                //    if (ppk.get(i).get(1) >= uraPoint) {
-                        if (ppk.get(i).get(1) >= uraPoint-5) {
-                            mPath!!.lineTo(
-                                faceX0 + ppk.get(i).get(0) * faceR / defaultRadius,
-                                faceY0 + ppk.get(i).get(2) * faceR / defaultRadius
-                            )
-                        } else {
-                            mPath!!.moveTo(
-                                faceX0 + ppk.get(i).get(0) * faceR / defaultRadius,
-                                faceY0 + ppk.get(i).get(2) * faceR / defaultRadius
-                            )
-                        }
-                        if (facePoints.get(i).get(2) == 1) {
-                            endpointF = true
-                        }
-                  //  }
+                    //    if (ppk.get(i).get(1) >= uraPoint) {
+                    if (ppk.get(i).get(1) >= uraPoint-5) {
+                        mPath.lineTo(
+                            faceX0 + ppk.get(i).get(0) * faceR / defaultRadius,
+                            faceY0 + ppk.get(i).get(2) * faceR / defaultRadius
+                        )
+                    } else {
+                        mPath.moveTo(
+                            faceX0 + ppk.get(i).get(0) * faceR / defaultRadius,
+                            faceY0 + ppk.get(i).get(2) * faceR / defaultRadius
+                        )
+                    }
+                    if (facePoints.get(i).get(2) == 1) {
+                        endpointF = true
+                    }
+                    //  }
                 }
                 i++
             }
@@ -497,23 +477,24 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
             var i = 0
             while (facePoints.get(i).get(0) != 1000) {
                 if (endpointF == true) { //始点に移動する
-                    endpointF = if (ppk.get(i).get(1) < uraPoint-5) {
+                    endpointF = ppk.get(i).get(1) < uraPoint-5
+                    /*endpointF = if (ppk.get(i).get(1) < uraPoint-5) {
                         true
                     } else {
                         false
-                    }
-                    mPath!!.moveTo(
+                    }*/
+                    mPath.moveTo(
                         faceX0 - ppk.get(i).get(0) * faceR / defaultRadius,
                         faceY0 - ppk.get(i).get(2) * faceR / defaultRadius
                     )
                 } else {
                     if (ppk.get(i).get(1) > uraPoint-5) {
-                        mPath!!.lineTo(
+                        mPath.lineTo(
                             faceX0 - ppk.get(i).get(0) * faceR / defaultRadius,
                             faceY0 - ppk.get(i).get(2) * faceR / defaultRadius
                         )
                     } else {
-                        mPath!!.moveTo(
+                        mPath.moveTo(
                             faceX0 - ppk.get(i).get(0) * faceR / defaultRadius,
                             faceY0 - ppk.get(i).get(2) * faceR / defaultRadius
                         )

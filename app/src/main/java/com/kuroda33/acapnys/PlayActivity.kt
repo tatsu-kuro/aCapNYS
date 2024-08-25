@@ -1,31 +1,31 @@
 package com.kuroda33.acapnys
 
-import android.media.MediaPlayer
+
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.MediaController
-import android.widget.TextView
+
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 
 class PlayActivity : AppCompatActivity() {
 
-    public lateinit var videoURI: Uri
+
 
     private lateinit var videoView: VideoView
-    private lateinit var myView:com.kuroda33.acapnys.MyView
-  //  private lateinit var timeTextView: TextView
+    private lateinit var myView:MyView
+    //  private lateinit var timeTextView: TextView
     private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_play)
         val uri: Uri
-        var stringUri = intent.getStringExtra("videouri")
-        var csvData = intent.getStringExtra("gyrodata")
+        val stringUri = intent.getStringExtra("videouri")
+        val csvData = intent.getStringExtra("gyrodata")
         //var stringArray:Array<String> = stringData!!.split(",").toTypedArray()
         val arrayData = csvData.toString().split(",").toTypedArray()
         val arrayCount = arrayData.size
@@ -47,7 +47,7 @@ class PlayActivity : AppCompatActivity() {
             //if(gravityz<0){
             //    if(camNum==0)camNum=1
             //    else camNum=0
-           // }
+            // }
             Log.e("camera_num", String.format("%3d,%d3",myView.camera_num,myView.gravityZ))
             myView.setCamera(myView.camera_num)//0:front 1:back
 
@@ -70,12 +70,12 @@ class PlayActivity : AppCompatActivity() {
             override fun run() {
                 val videoCurrent=videoView.currentPosition
                 val videoDuration=videoView.duration
-            //    Log.e("Current",videoCurrent.toString())
-            //    Log.e("Duration",videoDuration.toString())
-            //    Log.e("arrayCount",arrayCount.toString())
+                //    Log.e("Current",videoCurrent.toString())
+                //    Log.e("Duration",videoDuration.toString())
+                //    Log.e("arrayCount",arrayCount.toString())
 
                 handler.postDelayed(this, 33)
-                var current:Int=0
+                var current=0
                 if(videoDuration>0) {
                     current = arrayCount * videoCurrent / videoDuration
                 }

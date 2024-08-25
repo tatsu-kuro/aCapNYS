@@ -17,7 +17,7 @@ import android.net.Uri.*
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.preference.PreferenceManager
+
 import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
@@ -26,13 +26,12 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
+
 import android.widget.ListView
 import android.widget.SeekBar
-import android.widget.TextView
+
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
+
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -58,7 +57,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.time.times
+
 
 class MainActivity : AppCompatActivity() , SensorEventListener {
     private val _helper = DatabaseHelper(this@MainActivity)
@@ -71,7 +70,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     private lateinit var cameraProvider: ProcessCameraProvider
     private lateinit var cameraInfos: List<CameraInfo>
     private var currentCameraIndex = 0
-    private var quaternionSensor: Sensor? = null
+
     val gyroArrayList = ArrayList<String>()
     var recordingFlag:Boolean=false
     // arrayList.add(1)
@@ -109,27 +108,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         db.insert("headgyrodata", null, values)
         db.close()
     }
-    fun getStringArray(name: String): Array<String> {
-        val db = _helper.readableDatabase
-        val cursor: Cursor = db.query(
-            "headgyrodata",
-            arrayOf("_id","name","data"),
-            "name = ?",
-            arrayOf(name),
-            null,
-            null,
-            null
-        )
-        var stringArray:Array<String> = arrayOf("apple", "banana", "cherry")
-        if (cursor.moveToFirst()) {
-            val arrayString = cursor.getString(cursor.getColumnIndexOrThrow("data"))
-            stringArray = arrayString.split(",").toTypedArray()
-        }
 
-        cursor.close()
-        db.close()
-        return stringArray
-    }
     fun getData(name:String):String{
         val db = _helper.readableDatabase
         val cursor: Cursor = db.query(
@@ -141,7 +120,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             null, // HAVING句
             null // ORDER BY句
         )
-        var itemData:String=""
+        var itemData=""
         with(cursor) {
             if(moveToFirst()){
                 itemData = getString(getColumnIndexOrThrow("data"))
@@ -151,32 +130,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         db.close()
         return itemData
     }
-    fun deleteData(name:String){
-        val db = _helper.writableDatabase
-        val selection = "name = ?"
-        val selectionArgs = arrayOf(name)
 
-        db.delete("headgyrodata", selection, selectionArgs)
-        db.close()
-    }
-    /*private fun bindCameraUseCases(cameraInfo: CameraInfo) {
-        val cameraSelector = CameraSelector.Builder()
-            .addCameraFilter { listOf(cameraInfo) }
-            .build()
-
-        val preview = Preview.Builder().build().also {
-            it.setSurfaceProvider(findViewById<PreviewView>(R.id.viewFinder).surfaceProvider)
-        }
-
-        try {
-            cameraProvider.unbindAll()
-            cameraProvider.bindToLifecycle(
-                this, cameraSelector, preview
-            )
-        } catch (exc: Exception) {
-            Log.e(TAG, "Use case binding failed", exc)
-        }
-    }*/
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -190,7 +144,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         viewBinding.myView.gravityZ=0
         //     val listView = findViewById<ListView>(R.id.listview)
         //  while(!allPermissionsGranted()) Thread.sleep(100)
-        if (true||allPermissionsGranted()) {
+        if (true||allPermissionsGranted()) {//記憶に残すために、こんなことにしているのか？もう忘れているなんでだろう
             startCamera()
             setListView()
 
@@ -216,9 +170,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             viewBinding.gyroButton.setOnClickListener {
                 //         val intent = Intent(/* packageContext = */ application,/* cls = */ GridButtons::class.java)
                 //         startActivity(/* intent = */ intent)
-              //  if (sensorManager != null) {
-              //      sensorManager.unregisterListener(this)
-              //  }
+                //  if (sensorManager != null) {
+                //      sensorManager.unregisterListener(this)
+                //  }
                 val intent =
                     Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
                 startActivity(/* intent = */ intent)
@@ -283,12 +237,12 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             sensorManager=getSystemService(SENSOR_SERVICE) as SensorManager
             gravitySensor=sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
             rotationVectorSensor=sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
-     /*       sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-            sensorManager.registerListener(
-                this,
-                sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
-                SensorManager.SENSOR_DELAY_FASTEST
-            )*/
+            /*       sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+                   sensorManager.registerListener(
+                       this,
+                       sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
+                       SensorManager.SENSOR_DELAY_FASTEST
+                   )*/
             viewBinding.myView.set_rpk_ppk()
             setPreviewSize(cameraNum)
             setButtons(true)
@@ -409,35 +363,18 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             }
         }
     }
-    fun createVideoFile(context: Context): File {
-        val sdf = SimpleDateFormat("yyyy_MMdd_HHmm_ss", Locale.getDefault())
-        val fileName = "${sdf.format(System.currentTimeMillis())}.mp4"
-        val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES)
-        return File(storageDir, fileName)
-    }
-    fun getAppSpecificAlbumStorageDir(context: Context, albumName: String): File? {
+
+    fun getAppSpecificAlbumStorageDir(context: Context, albumName: String): File {
         // Get the videos directory that's inside the app-specific directory on
         // external storage.
         val file = File(context.getExternalFilesDir(
             Environment.DIRECTORY_MOVIES), albumName)
-        if (file.mkdirs() == false) {
+        if (!file.mkdirs()) {
             Log.e("get MY Directory" ,"Directory not created")
         }
         return file
     }
 
-    private fun setupRecordingSession(): MediaStoreOutputOptions {
-        val name = SimpleDateFormat("yyyy-MMdd-HHmm-ss", Locale.US).format(System.currentTimeMillis())
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
-            put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/CapNYS")
-        }
-
-        return MediaStoreOutputOptions.Builder(contentResolver, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
-            .setContentValues(contentValues)
-            .build()
-    }
     private fun captureVideo() {
         val videoCapture = this.videoCapture ?: return
 
@@ -467,7 +404,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             // }
         }
         gyroArrayList.clear()
-  //      gyroArrayAdd(viewBinding.myView.cq0,viewBinding.myView.cq1,viewBinding.myView.cq2,viewBinding.myView.cq3)
+        //      gyroArrayAdd(viewBinding.myView.cq0,viewBinding.myView.cq1,viewBinding.myView.cq2,viewBinding.myView.cq3)
         val mediaStoreOutputOptions = MediaStoreOutputOptions
             .Builder(contentResolver, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
             .setContentValues(contentValues)
@@ -575,9 +512,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (sensorManager != null) {
-            sensorManager.unregisterListener(this)
-        }
+        // if (sensorManager != null) {
+        sensorManager.unregisterListener(this)
+        //}
         cameraExecutor.shutdown()
         _helper.close()
     }
@@ -599,20 +536,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                 }
             }.toTypedArray()
     }
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            readContent()
-        } else {
-            // それでも拒否された時の対応
-            val toast = Toast.makeText(
-                this,
-                "これ以上なにもできません", Toast.LENGTH_SHORT
-            )
-            toast.show()
-        }
-    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
         IntArray) {
@@ -632,22 +556,20 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     }
     private var cameraNum:Int=0
     var zoom100:Int=0
-
-    private fun savePara(){
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+    private fun savePara() {
+        val sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putInt("cameraNum",cameraNum)
-        editor.putInt("zoom100",zoom100)
-        editor.putString("videoURI",videoURI)
+        editor.putInt("cameraNum", cameraNum)
+        editor.putInt("zoom100", zoom100)
+        editor.putString("videoURI", videoURI)
         editor.apply()
         viewBinding.myView.setCamera(cameraNum)
     }
-    private fun getPara(){
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        // val editor = sharedPreferences.edit()
-        cameraNum = sharedPreferences.getInt("cameraNum",1)
-        zoom100=sharedPreferences.getInt("zoom100",10)
-        videoURI= sharedPreferences.getString("videoURI","no video").toString()
+    private fun getPara() {
+        val sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
+        cameraNum = sharedPreferences.getInt("cameraNum", 1)
+        zoom100 = sharedPreferences.getInt("zoom100", 10)
+        videoURI = sharedPreferences.getString("videoURI", "no video").toString()
     }
     private var camera: Camera?= null
     // private var imageCapture: ImageCapture?= null
@@ -672,7 +594,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     private var tempTime:Long = 0
     var resetHeadCount:Int=0
     override fun onSensorChanged(event: SensorEvent) {
-        event?.let{
+        event.let{
             when(it.sensor.type){
                 Sensor.TYPE_GRAVITY ->{
                     if(viewBinding.myView.degreeAtResetHead==0){//gravityをチェック
@@ -709,10 +631,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                                     viewBinding.myView.cq2,
                                     viewBinding.myView.cq3
                                 )
-                               // val str=String.format("%03d%03d%03d%03d",cameraNum,viewBinding.myView.gravityZ,cameraNum,cameraNum)
-                               // gyroArrayList.set(1,str)
-                               // Log.e("arrayCount", String.format("%03d%3d%03d",cameraNum,-1,1))//viewBinding.myView.gravityZ))
-                               // Log.e("arrayCount", gyroArrayList.size.toString())
+                                // val str=String.format("%03d%03d%03d%03d",cameraNum,viewBinding.myView.gravityZ,cameraNum,cameraNum)
+                                // gyroArrayList.set(1,str)
+                                // Log.e("arrayCount", String.format("%03d%3d%03d",cameraNum,-1,1))//viewBinding.myView.gravityZ))
+                                // Log.e("arrayCount", gyroArrayList.size.toString())
                             }
                             resetHeadCount -= 1
                         }
@@ -724,9 +646,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                             }
                         }
                         viewBinding.myView.setQuats(nq0, nq1, nq2, nq3)
+                    }
                 }
             }
-        }
 
 
         }
@@ -753,16 +675,16 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         }
     }
     private fun sensorReset(){
-        if (sensorManager != null) {
-            sensorManager.unregisterListener(this)
-        }
-    //    sensorManager.unregisterListener(this)
- /*       sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        sensorManager.registerListener(
-            this,
-            sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
-            SensorManager.SENSOR_DELAY_FASTEST
-        )*/
+        // if (sensorManager != null) {
+        sensorManager.unregisterListener(this)
+        // }
+        //    sensorManager.unregisterListener(this)
+        /*       sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+               sensorManager.registerListener(
+                   this,
+                   sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
+                   SensorManager.SENSOR_DELAY_FASTEST
+               )*/
         gravitySensor?.also{
                 gravity ->
             sensorManager.registerListener(this, gravity,SensorManager.SENSOR_DELAY_FASTEST)
@@ -799,12 +721,12 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                 this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
             )
         }
-/*        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        sensorManager.registerListener(
-            this,
-            sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
-            SensorManager.SENSOR_DELAY_FASTEST
-        )*/
+        /*        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+                sensorManager.registerListener(
+                    this,
+                    sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
+                    SensorManager.SENSOR_DELAY_FASTEST
+                )*/
         gravitySensor?.also{
                 gravity ->
             sensorManager.registerListener(this, gravity,SensorManager.SENSOR_DELAY_FASTEST)
@@ -908,7 +830,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     private fun readContent() {
         val contentResolver = contentResolver
         var cursor: Cursor? = null
-        var cnt:Int=0
+        var cnt=0
         // 例外を受け取る
         try {
             cursor = contentResolver.query(
@@ -923,7 +845,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                                 MediaStore.Video.Media.DATA
                             )
                         )
-                        if (onePath.contains("aCapNYS") == true) {
+                        if (onePath.contains("aCapNYS")) {
                             val str1 = "aCapNYS"
                             val n = onePath.indexOf(str1)
                             val str2: String = onePath.substring(n + 8, n + 25)
@@ -945,18 +867,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         }
     }
     //arrayString = intArray.joinToString(","))
-    //intArray = arrayString.split(",").map { it.toInt() }.toIntArray()
 
-    fun saveIntArray(intArray: IntArray) {
-        val db = _helper.writableDatabase
-
-        val contentValues = ContentValues().apply {
-            put("data", intArray.joinToString(","))
-        }
-
-        db.insert("headgyrodata", null, contentValues)
-        db.close()
-    }
 }
 
 
