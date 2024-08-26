@@ -869,7 +869,3 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     //arrayString = intArray.joinToString(","))
 
 }
-
-
-
-
