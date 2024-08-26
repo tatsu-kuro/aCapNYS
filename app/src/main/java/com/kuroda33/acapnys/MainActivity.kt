@@ -31,13 +31,12 @@ import android.widget.ListView
 import android.widget.SeekBar
 
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.Camera
-import androidx.camera.core.CameraInfo
+
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -51,14 +50,12 @@ import androidx.camera.video.VideoRecordEvent
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
-import com.google.common.util.concurrent.ListenableFuture
 import com.kuroda33.acapnys.databinding.ActivityMainBinding
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
 
 class MainActivity : AppCompatActivity() , SensorEventListener {
     private val _helper = DatabaseHelper(this@MainActivity)
@@ -67,24 +64,17 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private var gravitySensor: Sensor? = null
     private var rotationVectorSensor: Sensor? = null
-    private lateinit var cameraProviderFuture:ListenableFuture<ProcessCameraProvider>
-    private lateinit var cameraProvider: ProcessCameraProvider
-  //  private lateinit var cameraInfos: List<CameraInfo>
-  //  private var currentCameraIndex = 0
 
     val gyroArrayList = ArrayList<String>()
     var recordingFlag:Boolean=false
-    // arrayList.add(1)
-    // arrayList.add(2)
-    // 必要に応じて要素を追加
-    // val intArray = arrayList.toIntArray()
+
     private lateinit var viewBinding: ActivityMainBinding
 
     private var videoCapture: VideoCapture<Recorder>? = null
     private var recording: Recording? = null
 
     private lateinit var cameraExecutor: ExecutorService
-    //    private lateinit var cameraController: LifecycleCameraController
+
     private var focusChangedInitFlag:Boolean=true
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
@@ -98,8 +88,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         val cameraController = camera!!.cameraControl
         cameraController.setLinearZoom(zoom100 / 100f)
     }
-    // arrayString = intArray.joinToString(","))
-    //cq0 = nq0; cq3 = -nq3;
+   
     fun saveData(name:String,data:String){
         val db = _helper.writableDatabase
         val values = ContentValues().apply {
@@ -145,17 +134,17 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         viewBinding.myView.gravityZ=0
         //     val listView = findViewById<ListView>(R.id.listview)
         //  while(!allPermissionsGranted()) Thread.sleep(100)
-        if (true||allPermissionsGranted()) {//記憶に残すために、こんなことにしているのか？もう忘れているなんでだろう
-            startCamera()
-            setListView()
+        //if (true||allPermissionsGranted()) {//記憶に残すために、こんなことにしているのか？もう忘れているなんでだろう
+        startCamera()
+        setListView()
 
-            viewBinding.zoomSeekBar.progress = zoom100
-            // Set up the listeners for take photo and video capture buttons
-            //  viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
-            viewBinding.videoCaptureButton.setOnClickListener {
-                captureVideo()
-            }
-            viewBinding.helpButton.setOnClickListener {
+        viewBinding.zoomSeekBar.progress = zoom100
+        // Set up the listeners for take photo and video capture buttons
+        //  viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
+        viewBinding.videoCaptureButton.setOnClickListener {
+            captureVideo()
+        }
+        viewBinding.helpButton.setOnClickListener {
 /*
                 Log.e("data",getData(lastURI))
                 val arrayS=getStringArray(lastURI)
@@ -164,103 +153,93 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                 //}
 
                 */
-                val intent =
-                    Intent(/* packageContext = */ application,/* cls = */ How2Activity::class.java)
-                startActivity(/* intent = */ intent)
-            }
-            viewBinding.gyroButton.setOnClickListener {
-                //         val intent = Intent(/* packageContext = */ application,/* cls = */ GridButtons::class.java)
-                //         startActivity(/* intent = */ intent)
-                //  if (sensorManager != null) {
-                //      sensorManager.unregisterListener(this)
-                //  }
-                val intent =
-                    Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
-                startActivity(/* intent = */ intent)
-            }
-         /*   cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-            cameraProviderFuture.addListener(Runnable {
-                cameraProvider = cameraProviderFuture.get()
-                cameraInfos = cameraProvider.availableCameraInfos
-                val cameraCount = cameraInfos.size
-                Log.e("CameraXApp", "Number of cameras: $cameraCount")
-                //   bindCameraUseCases(cameraInfos[currentCameraIndex])
-
-
-
-                val backCameraCount = cameraProvider.availableCameraInfos.count { cameraInfo ->
-                    val cameraSelector = CameraSelector.Builder()
-                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                        .build()
-                    cameraSelector.filter(listOf(cameraInfo)).isNotEmpty()
-                }
-                Log.e("CameraXApp", "Number of back cameras: $backCameraCount")
-            }, ContextCompat.getMainExecutor(this))*/
-            /*
-             cameraProviderFuture.addListener(Runnable {
-                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-                val backCameraCount = cameraProvider.availableCameraInfos.count { cameraInfo ->
-                    val cameraSelector = CameraSelector.Builder()
-                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                        .build()
-                    cameraSelector.filter(listOf(cameraInfo)).isNotEmpty()
-                }
-                Log.e("CameraXApp", "Number of back cameras: $backCameraCount")
-            }, ContextCompat.getMainExecutor(this))
-             */
-            viewBinding.cameraButton.setOnClickListener {
-                changeCamera()
-            }
-            cameraExecutor = Executors.newSingleThreadExecutor()
-            viewBinding.zoomSeekBar.setOnSeekBarChangeListener(
-                object : SeekBar.OnSeekBarChangeListener {
-                    @SuppressLint("RestrictedApi")
-                    override fun onProgressChanged(
-                        seekBar: SeekBar?,
-                        progress: Int,
-                        fromUser: Boolean
-                    ) {
-                        if (fromUser) {
-                            zoom100 = progress
-                            savePara()
-                            val cameraController = camera!!.cameraControl
-                            cameraController.setLinearZoom(zoom100 / 100f)
-//                        startCamera()//   Log.d("kdkdkdkdkdk","$progress")
-                        }
-                    }
-
-                    override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                    }
-
-                    override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-                }
-            )
-            sensorManager=getSystemService(SENSOR_SERVICE) as SensorManager
-            gravitySensor=sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
-            rotationVectorSensor=sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
-            /*       sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-                   sensorManager.registerListener(
-                       this,
-                       sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
-                       SensorManager.SENSOR_DELAY_FASTEST
-                   )*/
-            viewBinding.myView.set_rpk_ppk()
-            setPreviewSize(cameraNum)
-            setButtons(true)
-            viewBinding.videoCaptureButton.bringToFront()
-            //val permissionText = findViewById<TextView>(R.id.permission)
-            //permissionText.translationX(1000f)
-            //    viewBinding.myView.alpha=0f
-        }else{
-            setButtons(false)
-            viewBinding.myView.alpha=0.5f
-            viewBinding.permission.visibility=View.INVISIBLE//とりあえず削除せず隠しておく。
-
-            ActivityCompat.requestPermissions(
-                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
-
+            val intent =
+                Intent(/* packageContext = */ application,/* cls = */ How2Activity::class.java)
+            startActivity(/* intent = */ intent)
         }
+        viewBinding.gyroButton.setOnClickListener {
+            //         val intent = Intent(/* packageContext = */ application,/* cls = */ GridButtons::class.java)
+            //         startActivity(/* intent = */ intent)
+            //  if (sensorManager != null) {
+            //      sensorManager.unregisterListener(this)
+            //  }
+            val intent =
+                Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
+            startActivity(/* intent = */ intent)
+        }
+        /*   cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+           cameraProviderFuture.addListener(Runnable {
+               cameraProvider = cameraProviderFuture.get()
+               cameraInfos = cameraProvider.availableCameraInfos
+               val cameraCount = cameraInfos.size
+               Log.e("CameraXApp", "Number of cameras: $cameraCount")
+               //   bindCameraUseCases(cameraInfos[currentCameraIndex])
 
+
+
+               val backCameraCount = cameraProvider.availableCameraInfos.count { cameraInfo ->
+                   val cameraSelector = CameraSelector.Builder()
+                       .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                       .build()
+                   cameraSelector.filter(listOf(cameraInfo)).isNotEmpty()
+               }
+               Log.e("CameraXApp", "Number of back cameras: $backCameraCount")
+           }, ContextCompat.getMainExecutor(this))*/
+        /*
+         cameraProviderFuture.addListener(Runnable {
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            val backCameraCount = cameraProvider.availableCameraInfos.count { cameraInfo ->
+                val cameraSelector = CameraSelector.Builder()
+                    .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                    .build()
+                cameraSelector.filter(listOf(cameraInfo)).isNotEmpty()
+            }
+            Log.e("CameraXApp", "Number of back cameras: $backCameraCount")
+        }, ContextCompat.getMainExecutor(this))
+         */
+        viewBinding.cameraButton.setOnClickListener {
+            changeCamera()
+        }
+        cameraExecutor = Executors.newSingleThreadExecutor()
+        viewBinding.zoomSeekBar.setOnSeekBarChangeListener(
+            object : SeekBar.OnSeekBarChangeListener {
+                @SuppressLint("RestrictedApi")
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+                    if (fromUser) {
+                        zoom100 = progress
+                        savePara()
+                        val cameraController = camera!!.cameraControl
+                        cameraController.setLinearZoom(zoom100 / 100f)
+//                        startCamera()//   Log.d("kdkdkdkdkdk","$progress")
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            }
+        )
+        sensorManager=getSystemService(SENSOR_SERVICE) as SensorManager
+        gravitySensor=sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
+        rotationVectorSensor=sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
+        /*       sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+               sensorManager.registerListener(
+                   this,
+                   sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
+                   SensorManager.SENSOR_DELAY_FASTEST
+               )*/
+        viewBinding.myView.set_rpk_ppk()
+        setPreviewSize(cameraNum)
+        setButtons(true)
+        viewBinding.videoCaptureButton.bringToFront()
+        //val permissionText = findViewById<TextView>(R.id.permission)
+        //permissionText.translationX(1000f)
+        //    viewBinding.myView.alpha=0f
     }
 
     private fun setNavigationBar(flag:Boolean) {
@@ -395,21 +374,21 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         setNavigationBar(false)
         viewBinding.myView.degreeAtResetHead=0//0にすることでgravityZ と degreeAtReseHead(1 or -1)をgetできる
         // create and start a new recording session
-        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-            .format(System.currentTimeMillis())
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
-            // if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-            put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/aCapNYS")
-            // }
-        }
+        /*    val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+                .format(System.currentTimeMillis())
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+                put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
+                // if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/aCapNYS")
+                // }
+            }*/
         gyroArrayList.clear()
         //      gyroArrayAdd(viewBinding.myView.cq0,viewBinding.myView.cq1,viewBinding.myView.cq2,viewBinding.myView.cq3)
-   /*     val mediaStoreOutputOptions = MediaStoreOutputOptions
-            .Builder(contentResolver, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
-            .setContentValues(contentValues)
-            .build()*/
+        /*     val mediaStoreOutputOptions = MediaStoreOutputOptions
+                 .Builder(contentResolver, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
+                 .setContentValues(contentValues)
+                 .build()*/
 
         val outputDirectory=getOutputDirectory()
         val fileName = SimpleDateFormat("yyyy-MMdd-HHmm-ss", Locale.US)
@@ -421,14 +400,14 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
 
         recording = videoCapture.output
             .prepareRecording(this, outputOptions)
-          /*  .apply {
-                if (PermissionChecker.checkSelfPermission(this@MainActivity,
-                        Manifest.permission.RECORD_AUDIO) ==
-                    PermissionChecker.PERMISSION_GRANTED)
-                {
-                    withAudioEnabled()
-                }
-            }*/
+            /*  .apply {
+                  if (PermissionChecker.checkSelfPermission(this@MainActivity,
+                          Manifest.permission.RECORD_AUDIO) ==
+                      PermissionChecker.PERMISSION_GRANTED)
+                  {
+                      withAudioEnabled()
+                  }
+              }*/
             .start(ContextCompat.getMainExecutor(this)) { recordEvent ->
                 when(recordEvent) {
                     is VideoRecordEvent.Start -> {
@@ -538,66 +517,21 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
 
     companion object {
         private const val TAG = "aCapNYS"
-        private const val FILENAME_FORMAT = "yyyy-MMdd-HHmm-ss"
         private const val REQUEST_CODE_PERMISSIONS = 5
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
                 // Manifest.permission.MANAGE_EXTERNAL_STORAGE,
                 //  Manifest.permission.READ_MEDIA_VIDEO,
                 Manifest.permission.RECORD_AUDIO,
-            //    Manifest.permission.READ_EXTERNAL_STORAGE,
+                //    Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.CAMERA
             ).apply {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-               //     add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                }
+                //  if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                //     add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                // }
             }.toTypedArray()
     }
-    private fun requestPermissions() {
-        val requestPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            if (permissions[Manifest.permission.CAMERA] == true &&
-                permissions[Manifest.permission.RECORD_AUDIO] == true) {
-                // Permissions granted
-                startCamera()
-                setListView()
-            } else {
-                // Permissions not granted
-                Toast.makeText(this,
-                    "Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT).show()
-                finish()
-            }
-        }
 
-        // Check if permissions are already granted
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            // Request permissions
-            requestPermissionLauncher.launch(arrayOf(
-                Manifest.permission.CAMERA,
-                Manifest.permission.RECORD_AUDIO
-            ))
-        }
-    }
-    /*override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults:
-        IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                //     finish()
-                startCamera()
-                setListView()
-            } else {
-                Toast.makeText(this,
-                    "Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT).show()
-                finish()
-            }
-        }
-    }*/
     private var cameraNum:Int=0
     var zoom100:Int=0
     private fun savePara() {
@@ -620,10 +554,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     //  private var videoCapture: VideoCapture?= null
     private fun changeCamera(){
         getPara()
-  //      currentCameraIndex = (currentCameraIndex + 1) % cameraInfos.size
+        //      currentCameraIndex = (currentCameraIndex + 1) % cameraInfos.size
 //        bindCameraUseCases(cameraInfos[currentCameraIndex])
 
- //       Log.e("camera_number:",currentCameraIndex.toString())
+        //       Log.e("camera_number:",currentCameraIndex.toString())
         cameraNum = if (cameraNum == 1) {
             0//front
         }else{
