@@ -69,8 +69,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     private var rotationVectorSensor: Sensor? = null
     private lateinit var cameraProviderFuture:ListenableFuture<ProcessCameraProvider>
     private lateinit var cameraProvider: ProcessCameraProvider
-    private lateinit var cameraInfos: List<CameraInfo>
-    private var currentCameraIndex = 0
+  //  private lateinit var cameraInfos: List<CameraInfo>
+  //  private var currentCameraIndex = 0
 
     val gyroArrayList = ArrayList<String>()
     var recordingFlag:Boolean=false
@@ -620,10 +620,10 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     //  private var videoCapture: VideoCapture?= null
     private fun changeCamera(){
         getPara()
-        currentCameraIndex = (currentCameraIndex + 1) % cameraInfos.size
+  //      currentCameraIndex = (currentCameraIndex + 1) % cameraInfos.size
 //        bindCameraUseCases(cameraInfos[currentCameraIndex])
 
-        Log.e("camera_number:",currentCameraIndex.toString())
+ //       Log.e("camera_number:",currentCameraIndex.toString())
         cameraNum = if (cameraNum == 1) {
             0//front
         }else{
