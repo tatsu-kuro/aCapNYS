@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         val cameraController = camera!!.cameraControl
         cameraController.setLinearZoom(zoom100 / 100f)
     }
-   
+
     fun saveData(name:String,data:String){
         val db = _helper.writableDatabase
         val values = ContentValues().apply {
