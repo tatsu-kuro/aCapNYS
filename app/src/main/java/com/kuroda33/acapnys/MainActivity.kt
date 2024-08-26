@@ -17,7 +17,7 @@ import android.net.Uri.*
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-
+import androidx.camera.video.FileOutputOptions
 import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
@@ -31,6 +31,7 @@ import android.widget.ListView
 import android.widget.SeekBar
 
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
@@ -40,7 +41,7 @@ import androidx.camera.core.CameraInfo
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.video.MediaStoreOutputOptions
+
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
 import androidx.camera.video.Recorder
@@ -49,7 +50,7 @@ import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.PermissionChecker
+
 import com.google.common.util.concurrent.ListenableFuture
 import com.kuroda33.acapnys.databinding.ActivityMainBinding
 import java.io.File
@@ -177,7 +178,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                     Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
                 startActivity(/* intent = */ intent)
             }
-            cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+         /*   cameraProviderFuture = ProcessCameraProvider.getInstance(this)
             cameraProviderFuture.addListener(Runnable {
                 cameraProvider = cameraProviderFuture.get()
                 cameraInfos = cameraProvider.availableCameraInfos
@@ -194,7 +195,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                     cameraSelector.filter(listOf(cameraInfo)).isNotEmpty()
                 }
                 Log.e("CameraXApp", "Number of back cameras: $backCameraCount")
-            }, ContextCompat.getMainExecutor(this))
+            }, ContextCompat.getMainExecutor(this))*/
             /*
              cameraProviderFuture.addListener(Runnable {
                 val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
@@ -405,20 +406,29 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         }
         gyroArrayList.clear()
         //      gyroArrayAdd(viewBinding.myView.cq0,viewBinding.myView.cq1,viewBinding.myView.cq2,viewBinding.myView.cq3)
-        val mediaStoreOutputOptions = MediaStoreOutputOptions
+   /*     val mediaStoreOutputOptions = MediaStoreOutputOptions
             .Builder(contentResolver, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
             .setContentValues(contentValues)
-            .build()
+            .build()*/
+
+        val outputDirectory=getOutputDirectory()
+        val fileName = SimpleDateFormat("yyyy-MMdd-HHmm-ss", Locale.US)
+            .format(System.currentTimeMillis()) + ".mp4"
+        val file = File(outputDirectory, fileName)
+
+        val outputOptions = FileOutputOptions.Builder(file).build()
+
+
         recording = videoCapture.output
-            .prepareRecording(this, mediaStoreOutputOptions)
-            .apply {
+            .prepareRecording(this, outputOptions)
+          /*  .apply {
                 if (PermissionChecker.checkSelfPermission(this@MainActivity,
                         Manifest.permission.RECORD_AUDIO) ==
                     PermissionChecker.PERMISSION_GRANTED)
                 {
                     withAudioEnabled()
                 }
-            }
+            }*/
             .start(ContextCompat.getMainExecutor(this)) { recordEvent ->
                 when(recordEvent) {
                     is VideoRecordEvent.Start -> {
@@ -461,6 +471,11 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                     }
                 }
             }
+    }private fun getOutputDirectory(): File {
+        val mediaDir = externalMediaDirs.firstOrNull()?.let {
+            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
+        }
+        return if (mediaDir != null && mediaDir.exists()) mediaDir else filesDir
     }
 
     private fun startCamera() {
@@ -482,7 +497,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                 .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
                 .build()
             videoCapture = VideoCapture.withOutput(recorder)
-
+//            cameraInfos = cameraProvider.availableCameraInfos
+//            val cameraCount = cameraInfos.size
+//            Log.e("CameraXApp", "Number of cameras: $cameraCount")
             // Select back camera as a default
             var cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
             if(cameraNum==1) {
@@ -528,16 +545,43 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                 // Manifest.permission.MANAGE_EXTERNAL_STORAGE,
                 //  Manifest.permission.READ_MEDIA_VIDEO,
                 Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
+            //    Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.CAMERA
             ).apply {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                    add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+               //     add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 }
             }.toTypedArray()
     }
+    private fun requestPermissions() {
+        val requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            if (permissions[Manifest.permission.CAMERA] == true &&
+                permissions[Manifest.permission.RECORD_AUDIO] == true) {
+                // Permissions granted
+                startCamera()
+                setListView()
+            } else {
+                // Permissions not granted
+                Toast.makeText(this,
+                    "Permissions not granted by the user.",
+                    Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
 
-    override fun onRequestPermissionsResult(
+        // Check if permissions are already granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            // Request permissions
+            requestPermissionLauncher.launch(arrayOf(
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO
+            ))
+        }
+    }
+    /*override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
         IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -553,7 +597,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                 finish()
             }
         }
-    }
+    }*/
     private var cameraNum:Int=0
     var zoom100:Int=0
     private fun savePara() {
