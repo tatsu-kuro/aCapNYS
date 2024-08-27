@@ -20,7 +20,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
     var playMode:Boolean=false
 
     private var mPaint: Paint = Paint() //画?
-    private var mPaint2: Paint = Paint()
+   // private var mPaint2: Paint = Paint()
 
     //路径
     private var mPath: Path = Path()
@@ -39,9 +39,9 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
             mPaint.isAntiAlias = false
             mPaint.color = Color.BLACK
             //           mPaint2.setStyle(Paint.Style.STROKE);
-            mPaint2.strokeWidth = 3f
-            mPaint2.isAntiAlias = false
-            mPaint2.color = Color.WHITE// LTGRAY
+            //mPaint2.strokeWidth = 3f
+            //mPaint2.isAntiAlias = false
+            //mPaint2.color = Color.WHITE// LTGRAY
             initFlag = false
             paintFill.color = Color.WHITE
             paintFill.style = Paint.Style.FILL
@@ -56,8 +56,8 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         mPath.reset()
         if(cameraNum==0 && !playMode)canvas.drawARGB(255, 255, 255, 255)
         else  canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        canvas.drawCircle( (width / 2).toFloat(),(height / 2).toFloat(),(2*height / 5).toFloat(), paintFill)//mPaint2 )
-        canvas.drawCircle( (width / 2).toFloat(),(height / 2).toFloat(),(2*height / 5).toFloat(), paintStroke)//mPaint2 )
+        canvas.drawCircle( (width / 2).toFloat(),(height / 2).toFloat(),(2*height / 5).toFloat(), paintFill)
+        canvas.drawCircle( (width / 2).toFloat(),(height / 2).toFloat(),(2*height / 5).toFloat(), paintStroke)
         drawHead(width, height, 2*height / 5, mnq0, mnq1, mnq2, mnq3)
         canvas.drawPath(mPath, mPaint)
     }
