@@ -42,14 +42,14 @@ class PlayActivity : AppCompatActivity() {
         //    myView.setCamera(0)
         if (arrayData.size > 2) {
             val camstr = arrayData[1]
-            myView.camera_num = camstr.substring(0, 3).toInt()
+            myView.cameraNum = camstr.substring(0, 3).toInt()
             myView.gravityZ=camstr.substring(3,6).toInt()
             //if(gravityz<0){
             //    if(camNum==0)camNum=1
             //    else camNum=0
             // }
-            Log.e("camera_num", String.format("%3d,%d3",myView.camera_num,myView.gravityZ))
-            myView.setCamera(myView.camera_num)//0:front 1:back
+            Log.e("camera_num", String.format("%3d,%d3",myView.cameraNum,myView.gravityZ))
+            myView.setCamera(myView.cameraNum)//0:front 1:back
 
             val str03 = arrayData[0]
             val str0 = str03.substring(0, 3)
@@ -64,7 +64,7 @@ class PlayActivity : AppCompatActivity() {
             myView.alpha=0f
 //            myView.setCamera(0)//0:front
         }
-        myView.set_rpk_ppk()
+        myView.setRpkPpk()
         videoView.start()
         val updateTimeRunnable = object : Runnable {
             override fun run() {

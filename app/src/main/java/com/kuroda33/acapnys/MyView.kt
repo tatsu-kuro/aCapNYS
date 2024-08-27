@@ -15,7 +15,6 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-
 class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
 
     var playMode:Boolean=false
@@ -26,9 +25,9 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
     //路径
     private var mPath: Path = Path()
     var initFlag: Boolean = true
-    var camera_num: Int = 0
+    var cameraNum: Int = 0
     fun setCamera(cameran:Int){
-        camera_num=cameran
+        cameraNum=cameran
     }
     private val paintFill: Paint = Paint()
     private val paintStroke: Paint = Paint()
@@ -55,7 +54,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         // 内部を白く塗りつぶすペイント
 
         mPath.reset()
-        if(camera_num==0 && !playMode)canvas.drawARGB(255, 255, 255, 255)
+        if(cameraNum==0 && !playMode)canvas.drawARGB(255, 255, 255, 255)
         else  canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
         canvas.drawCircle( (width / 2).toFloat(),(height / 2).toFloat(),(2*height / 5).toFloat(), paintFill)//mPaint2 )
         canvas.drawCircle( (width / 2).toFloat(),(height / 2).toFloat(),(2*height / 5).toFloat(), paintStroke)//mPaint2 )
@@ -63,22 +62,6 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         canvas.drawPath(mPath, mPaint)
     }
 
-    //３）実際の描画（押した時、動かした時）
-    /* override fun onTouchEvent(event: MotionEvent?): Boolean {
-         //タッチポジション（x座標、y座標）
-         //drawX = event!!.x
-         //drawY = event.y
-         if (event != null) {
-             when(event!!.action){
-                 MotionEvent.ACTION_DOWN -> clearCanvas()
-                 //   MotionEvent.ACTION_MOVE -> path.lineTo(drawX,drawY)
-                 MotionEvent.ACTION_UP -> clearCanvas()
-             }
-         }
-         //再描画を実行させる呪文
-         //invalidate()
-         return true
-     }*/
     var mnq0 = 0f
     var mnq1 = 0f
     var mnq2 = 0f
@@ -105,12 +88,13 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         nq2 = 0.0f
         nq3 = 0.0f //現在のquaternion
     }
-    fun resetHead(){
-        cq0 =  nq0
-        cq3 = -nq3
+    fun resetHead() {
+        if (gravityZ == 1) {//screen up
+            cq0 = nq0
+            cq3 = -nq3
+        }
     }
-
-    private fun MultQuat(
+    private fun multQuat(
         q0: Float,
         q1: Float,
         q2: Float,
@@ -136,7 +120,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         nq1 = tempnq1
         nq2 = tempnq2
         nq3 = tempnq3
-        MultQuat(cq0, cq1, cq2, cq3, nq0, nq1, nq2, nq3) //set a0~a3
+        multQuat(cq0, cq1, cq2, cq3, nq0, nq1, nq2, nq3) //set a0~a3
         // QuatXchan(a0,a1, a2, a3);//set mnq0~mnq3
         val norm: Float
         val mag: Float
@@ -309,9 +293,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         intArrayOf(1000, 1000, 1000)
     ) //mouse 9
 
-
-
-    fun set_rpk_ppk() {
+    fun setRpkPpk() {
         val r = 40f //hankei
         var dx: Float
         var dy: Float
@@ -326,7 +308,6 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
             }
         }
 
-        // move (1,0,0) to each draw point
         run {
             var i = 0
             while (facePoints[i][0] != 1000) {
@@ -369,8 +350,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
             i++
         }
     }
-    //モーションセンサーをリセットするときに-1とする。リセット時に-1なら,角度から０か１をセット
-    var degreeAtResetHead = 0 //0:-90<&&<90 1:<-90||>90 -1:flag for get degree
+
     var gravityZ:Int=0
 
     private fun RotateQu(
@@ -378,20 +358,25 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         x0: Float,
         y0: Float,
         z0: Float,
-        q0: Float,
-        q1: Float,
-        q2: Float,
-        q3: Float
+        q0o: Float,
+        q1o: Float,
+        q2o: Float,
+        q3o: Float
     ) {
-        /*  float norm, mag;
-        mag = (float)sqrt((q0 * q0) + (q1 * q1) + (q2 * q2) + (q3 * q3));
-        if (mag>1.192092896e-07F){
-            norm = 1 / mag;
-            q0 *= norm;
-            q1 *= norm;
-            q2 *= norm;
-            q3 *= norm;
-        }*/
+        var q0=q0o
+        var q1=q1o
+        var q2=q2o
+        var q3=q3o
+        val norm: Float
+        val mag: Float
+        mag = sqrt((q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3).toDouble()).toFloat()
+        if (mag > 1.192092896e-07f) {
+            norm = 1 / mag
+            q0 *= norm
+            q1 *= norm
+            q2 *= norm
+            q3 *= norm
+        }
         ppk[i][0] =
             x0 * (q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) + y0 * (2f * (q1 * q2 - q0 * q3)) + z0 * (2f * (q1 * q3 + q0 * q2))
         ppk[i][1] =
@@ -417,7 +402,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         //     let size = CGSize(width:w, height:h)
         var i = 0
         while (facePoints.get(i).get(0) != 1000) {
-            if (camera_num == 1) {
+            if (cameraNum == 1) {
                 RotateQu(
                     i,
                     ppk12.get(i).get(0),
@@ -444,7 +429,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         }
         val uraPoint = faceR / 50.0f //この値の意味がよくわからなかった
         var endpointF = true //終点でtrueとする
-        if (camera_num == 0) { //iPhoneが >90||<-90 垂直以上に傾いた時
+        if (cameraNum == 0) { //iPhoneが >90||<-90 垂直以上に傾いた時
             var i = 0
             while (facePoints.get(i).get(0) != 1000) {
                 if (endpointF) { //始点に移動する
@@ -454,7 +439,6 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
                         faceY0 + ppk.get(i).get(2) * faceR / defaultRadius
                     )
                 } else {
-                    //    if (ppk.get(i).get(1) >= uraPoint) {
                     if (ppk.get(i).get(1) >= uraPoint-5) {
                         mPath.lineTo(
                             faceX0 + ppk.get(i).get(0) * faceR / defaultRadius,
@@ -469,20 +453,14 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
                     if (facePoints.get(i).get(2) == 1) {
                         endpointF = true
                     }
-                    //  }
                 }
                 i++
             }
         } else { //iPhoneが-90~+90の時
             var i = 0
             while (facePoints.get(i).get(0) != 1000) {
-                if (endpointF == true) { //始点に移動する
+                if (endpointF) { //始点に移動する
                     endpointF = ppk.get(i).get(1) < uraPoint-5
-                    /*endpointF = if (ppk.get(i).get(1) < uraPoint-5) {
-                        true
-                    } else {
-                        false
-                    }*/
                     mPath.moveTo(
                         faceX0 - ppk.get(i).get(0) * faceR / defaultRadius,
                         faceY0 - ppk.get(i).get(2) * faceR / defaultRadius

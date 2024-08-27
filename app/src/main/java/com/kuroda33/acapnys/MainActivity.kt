@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         //if (true||allPermissionsGranted()) {//記憶に残すために、こんなことにしているのか？もう忘れているなんでだろう
         startCamera()
         setListView()
-
+        recordingFlag=false
         viewBinding.zoomSeekBar.progress = zoom100
         // Set up the listeners for take photo and video capture buttons
         //  viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
@@ -233,7 +233,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                    sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
                    SensorManager.SENSOR_DELAY_FASTEST
                )*/
-        viewBinding.myView.set_rpk_ppk()
+        viewBinding.myView.setRpkPpk()
         setPreviewSize(cameraNum)
         setButtons(true)
         viewBinding.videoCaptureButton.bringToFront()
@@ -359,7 +359,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         val videoCapture = this.videoCapture ?: return
 
         viewBinding.videoCaptureButton.isEnabled = false
-        recordingFlag = false
+
 
         val curRecording = recording
         if (curRecording != null) {
@@ -372,7 +372,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         }
         setButtons(false)
         setNavigationBar(false)
-        viewBinding.myView.degreeAtResetHead=0//0にすることでgravityZ と degreeAtReseHead(1 or -1)をgetできる
+  //      viewBinding.myView.degreeAtResetHead=0//0にすることでgravityZ と degreeAtReseHead(1 or -1)をgetできる
         // create and start a new recording session
         /*    val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
                 .format(System.currentTimeMillis())
@@ -421,10 +421,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                         recordingFlag=true
                     }
                     is VideoRecordEvent.Finalize -> {
+                        recordingFlag=false
                         if (!recordEvent.hasError()) {
-                            recordingFlag=false
                             videoURI=recordEvent.outputResults.outputUri.toString()
-
                             savePara()
                             val msg = "Video capture succeeded: " +
                                     "${recordEvent.outputResults.outputUri}"
@@ -575,19 +574,9 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         event.let{
             when(it.sensor.type){
                 Sensor.TYPE_GRAVITY ->{
-                    if(viewBinding.myView.degreeAtResetHead==0){//gravityをチェック
-                        val gravityT=event.values[2]
-                        if(gravityT>0)viewBinding.myView.gravityZ=1
-                        else viewBinding.myView.gravityZ=-1
-                        if (viewBinding.myView.gravityZ ==1 ){
-                            if(viewBinding.myView.camera_num != 0)viewBinding.myView.degreeAtResetHead = 1
-                            else viewBinding.myView.degreeAtResetHead = -1
-                        }else{
-                            if(viewBinding.myView.camera_num != 0)viewBinding.myView.degreeAtResetHead = -1
-                            else viewBinding.myView.degreeAtResetHead = 1
-                        }
-                    }
-
+                    val gravityT=event.values[2]
+                    if(gravityT>0)viewBinding.myView.gravityZ=1
+                    else viewBinding.myView.gravityZ=-1
                 }
                 Sensor.TYPE_GAME_ROTATION_VECTOR ->{
                     val nq0 = event.values[3]
@@ -597,28 +586,16 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
 
                     val currentTime =System.currentTimeMillis()
                     if(currentTime>tempTime+30) {
-
                         //    Log.e("counter",(currentTime-tempTime).toString())
                         tempTime=currentTime
                         if(resetHeadCount>0){
                             viewBinding.myView.resetHead()
-                            if(gyroArrayList.size>1) {
-                                gyroArraySet(0,
-                                    viewBinding.myView.cq0,
-                                    viewBinding.myView.cq1,
-                                    viewBinding.myView.cq2,
-                                    viewBinding.myView.cq3
-                                )
-                                // val str=String.format("%03d%03d%03d%03d",cameraNum,viewBinding.myView.gravityZ,cameraNum,cameraNum)
-                                // gyroArrayList.set(1,str)
-                                // Log.e("arrayCount", String.format("%03d%3d%03d",cameraNum,-1,1))//viewBinding.myView.gravityZ))
-                                // Log.e("arrayCount", gyroArrayList.size.toString())
-                            }
                             resetHeadCount -= 1
                         }
                         if(recordingFlag){
                             gyroArrayAdd(viewBinding.myView.mnq0,viewBinding.myView.mnq1,viewBinding.myView.mnq2,viewBinding.myView.mnq3)
-                            if(gyroArrayList.size==10){
+                            if(gyroArrayList.size==10){//1度だけcameraNum, gravityZ(画面の向き)を書き込む。
+                                gyroArraySet(0,viewBinding.myView.cq0,viewBinding.myView.cq1,viewBinding.myView.cq2,viewBinding.myView.cq3)
                                 val str=String.format("%03d%03d%03d%03d",cameraNum,viewBinding.myView.gravityZ,cameraNum,cameraNum)
                                 gyroArrayList.set(1,str)
                             }
@@ -627,8 +604,6 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                     }
                 }
             }
-
-
         }
     }
     fun gyroArrayAdd(n0:Float,n1:Float,n2:Float,n3:Float){
@@ -648,9 +623,11 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
         gyroArrayList.set(cnt,str03)
     }
     private fun resetHead(){
-        if(viewBinding.myView.gravityZ==1) {
+   //     if(viewBinding.myView.gravityZ==1) {//screen up
             resetHeadCount = 5
-        }
+   //     }else{
+   //         resetHeadCount=5
+   //     }
     }
     private fun sensorReset(){
         // if (sensorManager != null) {
