@@ -163,6 +163,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             //  if (sensorManager != null) {
             //      sensorManager.unregisterListener(this)
             //  }
+        //    val intent =
+        //        Intent(/* packageContext = */ application,/* cls = */ RehaActivity::class.java)
             val intent =
                 Intent(/* packageContext = */ application,/* cls = */ GyroActivity::class.java)
             startActivity(/* intent = */ intent)

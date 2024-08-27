@@ -10,7 +10,7 @@
         "\n\n2：眼振の録画\nまず、使用するカメラを選択し、ズームを設定しておきます。"
         "\n〇録画開始：画面の中央の録画スタートボタンをタップ\n〇録画終了：画面の中央部分をタップ\nで録画完了です。"
         "\n右リストの項目をタップするとそれを再生し、長押しすると削除出来ます。"
-<!--        "\n\n3：右上隅の [Gyro] ボタンをタップすると、スマホの pitch, roll, yaw の動きをチェックしてアラームを鳴らし、回数を表示します。前庭リハビリのための機能です。"
+        <!--        "\n\n3：右上隅の [Gyro] ボタンをタップすると、スマホの pitch, roll, yaw の動きをチェックしてアラームを鳴らし、回数を表示します。前庭リハビリのための機能です。"
 -->
         "\n\n3：[Gyro]画面で、Windows アプリ CapNYS が指定する IP-Address, Port を設定すると、ジャイロデータを WiFi でその CapNYS に送信できます。"
         "Windows用 CapNYS は https://kuroda33.com/jibika からダウンロード出来ます。\n"
@@ -28,7 +28,7 @@
         "End recording: Tap the center of the screen.\n"
         "These two operations complete the recording.\n"
         "Tap an item in the list on the right side of the screen to play it. Press and hold to delete the item."
-   <!--     "\n\n3: Tap the [Gyro] button in the upper right corner to check your phone's pitch, roll, and yaw movements, "
+        <!--     "\n\n3: Tap the [Gyro] button in the upper right corner to check your phone's pitch, roll, and yaw movements, "
         "sound an alarm, and display the number of times. This function is for vestibular rehabilitation."
     -->
         "\n\n3: On the [Gyro] screen, you can set the IP-Address and Port specified by the Windows app CapNYS to send gyro data to that CapNYS via WiFi."
