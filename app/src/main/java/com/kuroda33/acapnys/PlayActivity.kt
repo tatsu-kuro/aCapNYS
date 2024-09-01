@@ -1,11 +1,13 @@
 package com.kuroda33.acapnys
 
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.Button
 import android.widget.MediaController
 
 import android.widget.VideoView
@@ -26,6 +28,20 @@ class PlayActivity : AppCompatActivity() {
         val uri: Uri
         val stringUri = intent.getStringExtra("videouri")
         val csvData = intent.getStringExtra("gyrodata")
+
+        val sendButton: Button = findViewById(R.id.sendBtton)
+        sendButton.setOnClickListener {
+            val videoUri=Uri.parse(stringUri)
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.type = "video/*"
+            shareIntent.putExtra(Intent.EXTRA_STREAM, videoUri)//Uri.fromFile(videoUri))
+         //   shareIntent.putExtra(Intent.EXTRA_SUBJECT, "動画を共有します")
+            //      intentMode=1
+            //      requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            startActivity(Intent.createChooser(shareIntent, "share"))
+        }
+
+
         //var stringArray:Array<String> = stringData!!.split(",").toTypedArray()
         val arrayData = csvData.toString().split(",").toTypedArray()
         val arrayCount = arrayData.size

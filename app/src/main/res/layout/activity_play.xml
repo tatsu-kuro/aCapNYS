@@ -20,6 +20,16 @@
         android:layout_height="90dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/sendBtton"
+        android:layout_width="80dp"
+        android:layout_height="50dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="8dp"
+        android:text="Share"
+        android:background="@android:drawable/editbox_background_normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <!--<TextView
         android:id="@+id/timeTextView"
         android:layout_width="90dp"
