@@ -731,9 +731,14 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             var str=videoPathList[i].substring(videoPathList[i].indexOf(")")+1)
             var fullPath=onePath.substring(0,onePath.indexOf("CapNYS")+7) + str + ".mp4"
             //    Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
+         //   Log.e("onepath:",onePath)
             val strcsv=getData(str)
             val intent = Intent(application, PlayActivity::class.java)
+      //      var str2=videoPathList[i+1].substring(videoPathList[i].indexOf(")")+1)
+       //     var fullPath2=onePath.substring(0,onePath.indexOf("CapNYS")+7) + str + ".mp4"
             intent.putExtra("videouri",fullPath)
+            Log.e("onepath:",fullPath)
+         //   intent.putExtra("videouri2",fullPath2)
             intent.putExtra("gyrodata",strcsv)
             startActivity(/* intent = */ intent)
         }
@@ -802,14 +807,13 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                                 MediaStore.Video.Media.DATA
                             )
                         )
-                        if (onePath.contains("aCapNYS")) {
+// /storage/emulated/0/Android/media/com.kuroda33.acapnys/aCapNYS/2024-0908-1819-51.mp4
+                        if (onePath.contains("aCapNYS")&&onePath[onePath.indexOf("aCapNYS")+25]=='.') {
                             val str1 = "aCapNYS"
                             val n = onePath.indexOf(str1)
                             val str2: String = onePath.substring(n + 8, n + 25)
                             cnt += 1
                             videoPathList += "(" + cnt.toString() + ")" + str2
-//                        data +=onePath
-                            // data += str
                         }
                     } while (cursor.moveToNext())
                 }
@@ -823,6 +827,4 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
             }
         }
     }
-    //arrayString = intArray.joinToString(","))
-
-}
+ }

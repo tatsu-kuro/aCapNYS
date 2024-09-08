@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-
+    implementation("com.arthenica:ffmpeg-kit-full:4.5")
     implementation("androidx.gridlayout:gridlayout:1.0.0")
     val cameraxVersion = "1.4.0-beta02"
     implementation ("androidx.camera:camera-core:${cameraxVersion}")

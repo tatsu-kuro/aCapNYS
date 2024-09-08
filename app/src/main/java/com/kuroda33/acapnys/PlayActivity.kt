@@ -2,6 +2,10 @@ package com.kuroda33.acapnys
 
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -12,6 +16,9 @@ import android.widget.MediaController
 
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
+import com.arthenica.ffmpegkit.FFmpegKit
+import java.io.File
+import java.io.FileOutputStream
 
 class PlayActivity : AppCompatActivity() {
 
@@ -21,17 +28,113 @@ class PlayActivity : AppCompatActivity() {
     private lateinit var myView:MyView
     //  private lateinit var timeTextView: TextView
     private val handler = Handler(Looper.getMainLooper())
+    fun cropVideo(inputFilePath: String, outputFilePath: String) {
+        val cropCommand = "-i $inputFilePath -vf crop=in_w/4:in_h/4:0:0 -c:a copy $outputFilePath"
+        FFmpegKit.execute(cropCommand).apply {
+            if (returnCode.isSuccess) {
+                println("command exe Cropping successful!")
+            } else {
+                println("command exe Cropping failed with state ${state} and rc ${returnCode}.")
+            }
+        }
+    }
+    /*
+    fun resizeVideo(inputPath: String, outputPath: String) {
+        // 元の解像度が1920x1080の場合、1/4のサイズに設定
+        val command = "-i $inputPath -vf scale=iw/10:ih/10 $outputPath"
+        FFmpegKit.executeAsync(command) { session ->
+            val returnCode = session.returnCode
+            if (returnCode.isSuccess) {
+                println("Command execution resize completed successfully.")
+            } else {
+                println("Command execution resixe failed with returnCode=$returnCode.")
+            }
+        }
+    }*/
+    fun overlayVideos(inputPath1: String, inputPath2: String, outputPath: String) {
+        val command = "-i $inputPath1 -i $inputPath2 -filter_complex \"overlay=x=(W-w)/2:y=0\" -c:a copy $outputPath"
+        FFmpegKit.executeAsync(command) { session ->
+            val returnCode = session.returnCode
+            val output = session.output
+            val logs = session.allLogsAsString
+            if (returnCode.isSuccess) {
+                println("Overlay completed successfully.")
+            } else {
+                println("Overlay failed with returnCode=$returnCode.")
+                println("Output: $output")
+                println("Logs: $logs")
+            }
+        }
+    }
 
+    fun createImageFiles(directory: File, count: Int) {
+        val paint = Paint().apply {
+            color = Color.RED
+            textSize = 50f
+        }
+
+        for (i in 0 until count) {
+            val bitmap = Bitmap.createBitmap(1920, 1080, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            canvas.drawColor(Color.WHITE)
+            canvas.drawText("Frame $i", 100f, 100f, paint)
+
+            val file = File(directory, "frame_$i.png")
+            FileOutputStream(file).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+        }
+    }
+    fun deleteVideoFile(filePath: String) {
+         val file= File(filePath)
+        if (file.exists()){
+            // FFmpegコマンドを実行（例：動画の情報を取得）
+            val command = "-i $filePath -c copy -an output.mp4"
+            val session = FFmpegKit.execute(command)
+
+            if (session.returnCode.isSuccess) {
+                // FFmpegコマンドが成功した場合、ファイルを削除
+                val success = file.delete()
+                if (success) {
+                    println("deleteファイルが削除されました。")
+                } else {
+                    println("ファイルの削除に失敗しました。")
+                }
+            } else {
+                println("FFmpegコマンドの実行に失敗しました。")
+            }
+        } else {
+            println("ファイルが存在しません。")
+        }
+    }
+    fun createVideoFromImages(imageDirectory: File, outputPath: String) {
+        val command = "-framerate 30 -i ${imageDirectory.path}/frame_%d.png -c:v libx264 -pix_fmt yuv420p $outputPath"
+        FFmpegKit.executeAsync(command) { session ->
+            val returnCode = session.returnCode
+            if (returnCode.isSuccess) {
+                println("Command execution completed successfully.")
+            } else {
+                println("Command execution failed with returnCode=$returnCode.")
+            }
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_play)
         val uri: Uri
-        val stringUri = intent.getStringExtra("videouri")
+        //val path_temp = intent.getStringExtra("videouri")
+        val path1 = intent.getStringExtra("videouri")
+        val cropPath=path1!!.replace(".mp4","_crop.mp4")
+        val path = path1!!.replace(".mp4", "_overlay.mp4")
         val csvData = intent.getStringExtra("gyrodata")
+
+
+     //   cropVideo(path!!, cropPath!!)
+      //  overlayVideos(path,cropPath,overlayPath)
 
         val sendButton: Button = findViewById(R.id.sendBtton)
         sendButton.setOnClickListener {
-            val videoUri=Uri.parse(stringUri)
+            val videoUri=Uri.parse(path)
             val shareIntent = Intent(Intent.ACTION_SEND)
             shareIntent.type = "video/*"
             shareIntent.putExtra(Intent.EXTRA_STREAM, videoUri)//Uri.fromFile(videoUri))
@@ -46,7 +149,7 @@ class PlayActivity : AppCompatActivity() {
         val arrayData = csvData.toString().split(",").toTypedArray()
         val arrayCount = arrayData.size
         Log.e("arrayData.count",arrayCount.toString())
-        uri = Uri.parse(stringUri)
+        uri = Uri.parse(path)
         videoView = findViewById(R.id.videoView)
         myView = findViewById(R.id.myView)
         myView.playMode=true
@@ -111,7 +214,6 @@ class PlayActivity : AppCompatActivity() {
                     myView.mnq1=f1
                     myView.mnq2=f2
                     myView.mnq3=f3
-
                 }
             }
         }
