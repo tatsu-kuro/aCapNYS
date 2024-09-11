@@ -123,14 +123,13 @@ class PlayActivity : AppCompatActivity() {
         setContentView(R.layout.activity_play)
         val uri: Uri
         //val path_temp = intent.getStringExtra("videouri")
-        val path1 = intent.getStringExtra("videouri")
-        val cropPath=path1!!.replace(".mp4","_crop.mp4")
-        val path = path1!!.replace(".mp4", "_overlay.mp4")
-        val csvData = intent.getStringExtra("gyrodata")
-
-
-     //   cropVideo(path!!, cropPath!!)
-      //  overlayVideos(path,cropPath,overlayPath)
+        val path = intent.getStringExtra("videouri")
+         val csvData = intent.getStringExtra("gyrodata")
+       // val path_temp = intent.getStringExtra("videouri")
+        //   val Path = path_temp!!.replace(".mp4","_crop.mp4")//crop.mp4を見るとき
+        //   val path = path_temp!!.replace(".mp4", "_overlay.mp4")//overlay.mp4を見るとき
+        //   cropVideo(path!!, cropPath!!)//成功、使う可能性はないができた
+      //  overlayVideos(path,cropPath,overlayPath)//成功
 
         val sendButton: Button = findViewById(R.id.sendBtton)
         sendButton.setOnClickListener {
