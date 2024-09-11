@@ -166,23 +166,6 @@ class PlayActivity : AppCompatActivity() {
             Log.e("kkkkkkkkk", "File does not exist")
         }
 
-
-
-     /*   if (file.exists()) {
-            try {//
-                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-                imageView.setImageBitmap(bitmap)
-            //    imageView.setImageResource(R.drawable.plus)
-            } catch (e: Exception) {
-                Log.e("MainActivity", "Error setting image resource", e)
-            }
-          //  imageView.setImageResource(R.drawable.plus)
-            Log.e("kkkkkkkk:","exist")
-        }
-        Log.e("kkkkkkkk:","exist")*/
-        ///////////////////////////////////////
-
-
         val sendButton: Button = findViewById(R.id.sendBtton)
         sendButton.setOnClickListener {
          //   saveCanvasAsImage(this, 10)
@@ -279,6 +262,8 @@ class PlayActivity : AppCompatActivity() {
         }
 
     }
+    //下記ではアプリ固有のexternal storage 外部ストレージが得られる。
+    //filesDirではアプリ固有のinternal storage
     private fun getOutputDirectory(): File {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
             File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
