@@ -1,8 +1,10 @@
 package com.kuroda33.acapnys
 
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -12,6 +14,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.MediaController
 
 import android.widget.VideoView
@@ -19,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.arthenica.ffmpegkit.FFmpegKit
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 
 class PlayActivity : AppCompatActivity() {
 
@@ -118,6 +122,9 @@ class PlayActivity : AppCompatActivity() {
             }
         }
     }
+    fun show() {
+
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_play)
@@ -131,8 +138,57 @@ class PlayActivity : AppCompatActivity() {
         //   cropVideo(path!!, cropPath!!)//成功、使う可能性はないができた
       //  overlayVideos(path,cropPath,overlayPath)//成功
 
+        /////////////////////////
+        val dir=getOutputDirectory()
+        val directory = File(dir, "temp")
+        // temp フォルダが存在しない場合は作成
+        if (!directory.exists()) {
+            directory.mkdir()
+        }
+        //val directory = filesDir
+        val pngFile = String.format("%05d.png", 5)
+        val file = File(directory, pngFile)
+        Log.e("kkkkkkexist:", file.toString())
+        val imageView:ImageView=findViewById(R.id.imageView)
+        // 画像ファイルが存在する場合、ImageViewに表示
+        if (file.exists()) {
+            try {
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                if (bitmap != null) {
+                    imageView.setImageBitmap(bitmap)
+                } else {
+                    Log.e("kkkkkkkk", "Bitmap is null")
+                }
+            } catch (e: Exception) {
+                Log.e("kkkkkkkkk", "Error setting image resource", e)
+            }
+        } else {
+            Log.e("kkkkkkkkk", "File does not exist")
+        }
+
+
+
+     /*   if (file.exists()) {
+            try {//
+                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                imageView.setImageBitmap(bitmap)
+            //    imageView.setImageResource(R.drawable.plus)
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Error setting image resource", e)
+            }
+          //  imageView.setImageResource(R.drawable.plus)
+            Log.e("kkkkkkkk:","exist")
+        }
+        Log.e("kkkkkkkk:","exist")*/
+        ///////////////////////////////////////
+
+
         val sendButton: Button = findViewById(R.id.sendBtton)
         sendButton.setOnClickListener {
+         //   saveCanvasAsImage(this, 10)
+            for(r in 0..100) {
+                saveCanvasAsImage(this, r)
+            }
             val videoUri=Uri.parse(path)
             val shareIntent = Intent(Intent.ACTION_SEND)
             shareIntent.type = "video/*"
@@ -220,6 +276,51 @@ class PlayActivity : AppCompatActivity() {
         // 動画が再生されている間、経過時間を更新
         videoView.setOnPreparedListener {
             handler.post(updateTimeRunnable)
+        }
+
+    }
+    private fun getOutputDirectory(): File {
+        val mediaDir = externalMediaDirs.firstOrNull()?.let {
+            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
+        }
+        return if (mediaDir != null && mediaDir.exists()) mediaDir else filesDir
+    }
+    fun saveCanvasAsImage(context: Context, r:Int) {
+        // 画像のサイズを指定
+        val width = 500
+        val height = 500
+
+        // Bitmapを作成
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        // 描画するペイントを設定
+        val paint = Paint().apply {
+            color = Color.RED
+            style = Paint.Style.FILL
+        }
+           // 図形を描画（例として円を描画）
+        canvas.drawCircle(width / 2f, height / 2f, r.toFloat()*3F, paint)
+
+        val dir=getOutputDirectory()
+        val directory = File(dir, "temp")
+
+        // temp フォルダが存在しない場合は作成
+        if (!directory.exists()) {
+            directory.mkdir()
+        }
+
+        val pngFile = String.format("%05d.png", r)
+
+        val file = File(directory, pngFile)
+        Log.e("kkkkkk:",file.toString())
+        // 画像をファイルに保存
+        try {
+            FileOutputStream(file).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
     override fun onDestroy() {

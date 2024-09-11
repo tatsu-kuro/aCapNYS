@@ -451,7 +451,8 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
                     }
                 }
             }
-    }private fun getOutputDirectory(): File {
+    }
+    private fun getOutputDirectory(): File {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
             File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
         }
@@ -754,7 +755,7 @@ class MainActivity : AppCompatActivity() , SensorEventListener {
     }
 
     private fun showAlertDialog(str:String,filePath:String) {
-        Log.e("getMyDirectry",getAppSpecificAlbumStorageDir(this,"CapNYS").toString())
+    //    Log.e("getMyDirectry",getAppSpecificAlbumStorageDir(this,"CapNYS").toString())
         val builder = AlertDialog.Builder(this)
         //  builder.setTitle("確認")
         val mess=str +" / Delete OK?"
