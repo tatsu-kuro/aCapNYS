@@ -1,5 +1,6 @@
 package com.kuroda33.acapnys
 
+import com.kuroda33.acapnys.R
 
 import android.content.Context
 import android.content.ContentUris

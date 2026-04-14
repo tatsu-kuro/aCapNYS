@@ -15,20 +15,21 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
+class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
-    var playMode:Boolean=false
+    var playMode: Boolean = false
 
     private var mPaint: Paint = Paint() //画?
-   // private var mPaint2: Paint = Paint()
+    // private var mPaint2: Paint = Paint()
 
     //路径
     private var mPath: Path = Path()
     var initFlag: Boolean = true
-    var cameraNum: Int = 0
-    fun setCamera(cameran:Int){
-        cameraNum=cameran
+    var cameraNum: Int = 1
+    fun setCamera(cameran: Int) {
+        cameraNum = cameran
     }
+
     private val paintFill: Paint = Paint()
     private val paintStroke: Paint = Paint()
 
@@ -61,9 +62,19 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
 
         mPath.reset()
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        canvas.drawCircle( (width / 2).toFloat(),(height / 2).toFloat(),(2*height / 5).toFloat(), paintFill)
-        canvas.drawCircle( (width / 2).toFloat(),(height / 2).toFloat(),(2*height / 5).toFloat(), paintStroke)
-        drawHead(width, height, 2*height / 5, mnq0, mnq1, mnq2, mnq3)
+        canvas.drawCircle(
+            (width / 2).toFloat(),
+            (height / 2).toFloat(),
+            (2 * height / 5).toFloat(),
+            paintFill
+        )
+        canvas.drawCircle(
+            (width / 2).toFloat(),
+            (height / 2).toFloat(),
+            (2 * height / 5).toFloat(),
+            paintStroke
+        )
+        drawHead(width, height, 2 * height / 5, mnq0, mnq1, mnq2, mnq3)
         canvas.drawPath(mPath, mPaint)
     }
 
@@ -83,7 +94,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
     var nq1 = 0.0f
     var nq2 = 0.0f
     var nq3 = 0.0f //現在のquaternion
-    fun initData(){
+    fun initData() {
         cq0 = 0.99f
         cq1 = 0.0f
         cq2 = 0.0f
@@ -93,6 +104,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         nq2 = 0.0f
         nq3 = 0.0f //現在のquaternion
     }
+
     fun resetHead() {
         val gravityZ = 2f * (nq0 * nq0 + nq3 * nq3) - 1f
         var yaw = kotlin.math.atan2(
@@ -124,6 +136,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
     fun getCurrentQuat(): FloatArray {
         return floatArrayOf(nq0, nq1, nq2, nq3)
     }
+
     private fun multQuat(
         q0: Float,
         q1: Float,
@@ -381,7 +394,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         }
     }
 
-    var gravityZ:Int=0
+    var gravityZ: Int = 0
 
     private fun RotateQu(
         i: Int,
@@ -393,10 +406,10 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         q2o: Float,
         q3o: Float
     ) {
-        var q0=q0o
-        var q1=q1o
-        var q2=q2o
-        var q3=q3o
+        var q0 = q0o
+        var q1 = q1o
+        var q2 = q2o
+        var q3 = q3o
         val norm: Float
         val mag: Float
         mag = sqrt((q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3).toDouble()).toFloat()
@@ -416,6 +429,77 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
     }
 
     var ppk = Array(600) { FloatArray(3) }
+
+    /* fun drawHead(
+         w: Int,
+         h: Int,
+         faceR: Int,
+         qOld0: Float,
+         qOld1: Float,
+         qOld2: Float,
+         qOld3: Float
+     ) {
+         val centerX = w / 2f
+         val centerY = h / 2f
+
+         val defaultRadius = 40f
+         val scale = faceR / defaultRadius
+         val uraPoint = faceR / 50f - 5f
+
+         // =========================
+         // 回転処理
+         // =========================
+         for (i in 0 until facePoints.size) {
+             if (facePoints[i][0] == 1000) break
+
+             val x = ppk12[i][0]
+             val y = ppk12[i][1]
+             val z = ppk12[i][2]
+
+             RotateQu(i, -x, -y, z, qOld0, qOld1, qOld2, qOld3)
+         }
+
+         // =========================
+         // 描画処理
+         // =========================
+         mPath.reset()
+
+         var startNewSegment = true
+
+         val flip = 1f
+
+         for (i in 0 until facePoints.size) {
+             if (facePoints[i][0] == 1000) break
+
+             val px = ppk[i][0]
+             val py = ppk[i][1]
+             val pz = ppk[i][2]
+
+             val screenX = centerX + flip * px * scale
+             val screenY = centerY + flip * pz * scale
+
+             val visible = py >= uraPoint
+
+             if (startNewSegment) {
+                 if (visible) {
+                     mPath.moveTo(screenX, screenY)
+                     startNewSegment = false
+                 }
+             } else {
+                 if (visible) {
+                     mPath.lineTo(screenX, screenY)
+                 } else {
+                     mPath.moveTo(screenX, screenY)
+                     startNewSegment = true
+                 }
+             }
+
+             // セグメント終端
+             if (facePoints[i][2] == 1) {
+                 startNewSegment = true
+             }
+         }
+     }*/
     fun drawHead(
         w: Int,
         h: Int,
@@ -427,92 +511,54 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
     ) {
         val faceX0 = w / 2
         val faceY0 = h / 2 //center
-        //    float faceR = r;//hankei
         val defaultRadius = 40
-        //     let size = CGSize(width:w, height:h)
         var i = 0
-        while (facePoints.get(i).get(0) != 1000) {
-            if (cameraNum == 1) {
-                RotateQu(
-                    i,
-                    ppk12.get(i).get(0),
-                    ppk12.get(i).get(1),
-                    ppk12.get(i).get(2),
-                    qOld0,
-                    qOld1,
-                    qOld2,
-                    qOld3
-                )
-            } else {
-                RotateQu(
-                    i,
-                    -ppk12.get(i).get(0),
-                    -ppk12.get(i).get(1),
-                    ppk12.get(i).get(2),
-                    qOld0,
-                    qOld1,
-                    qOld2,
-                    qOld3
-                )
-            }
+        while (facePoints[i][0] != 1000) {
+            RotateQu(
+                i,
+                ppk12[i][0],
+                ppk12[i][1],
+                ppk12[i][2],
+                qOld0,
+                qOld1,
+                qOld2,
+                qOld3
+            )
             i++
         }
-        val uraPoint = faceR / 50.0f //この値の意味がよくわからなかった
-        var endpointF = true //終点でtrueとする
-        if (cameraNum == 0) { //iPhoneが >90||<-90 垂直以上に傾いた時
-            var i = 0
-            while (facePoints.get(i).get(0) != 1000) {
-                if (endpointF) { //始点に移動する
-                    endpointF = ppk.get(i).get(1) < uraPoint-5
-                    mPath.moveTo(
-                        faceX0 + ppk.get(i).get(0) * faceR / defaultRadius,
-                        faceY0 + ppk.get(i).get(2) * faceR / defaultRadius
+
+        val uraPoint = faceR / 50.0f
+        var endpointF = true
+
+        i = 0
+        while (facePoints[i][0] != 1000) {
+            val px = ppk[i][0]
+            val py = ppk[i][1]
+            val pz = ppk[i][2]
+
+            if (endpointF) {
+                endpointF = py < uraPoint - 5
+                mPath.moveTo(
+                    faceX0 - px * faceR / defaultRadius,
+                    faceY0 - pz * faceR / defaultRadius
+                )
+            } else {
+                if (py > uraPoint - 5) {
+                    mPath.lineTo(
+                        faceX0 - px * faceR / defaultRadius,
+                        faceY0 - pz * faceR / defaultRadius
                     )
                 } else {
-                    if (ppk.get(i).get(1) >= uraPoint-5) {
-                        mPath.lineTo(
-                            faceX0 + ppk.get(i).get(0) * faceR / defaultRadius,
-                            faceY0 + ppk.get(i).get(2) * faceR / defaultRadius
-                        )
-                    } else {
-                        mPath.moveTo(
-                            faceX0 + ppk.get(i).get(0) * faceR / defaultRadius,
-                            faceY0 + ppk.get(i).get(2) * faceR / defaultRadius
-                        )
-                    }
-                    if (facePoints.get(i).get(2) == 1) {
-                        endpointF = true
-                    }
-                }
-                i++
-            }
-        } else { //iPhoneが-90~+90の時
-            var i = 0
-            while (facePoints.get(i).get(0) != 1000) {
-                if (endpointF) { //始点に移動する
-                    endpointF = ppk.get(i).get(1) < uraPoint-5
                     mPath.moveTo(
-                        faceX0 - ppk.get(i).get(0) * faceR / defaultRadius,
-                        faceY0 - ppk.get(i).get(2) * faceR / defaultRadius
+                        faceX0 - px * faceR / defaultRadius,
+                        faceY0 - pz * faceR / defaultRadius
                     )
-                } else {
-                    if (ppk.get(i).get(1) > uraPoint-5) {
-                        mPath.lineTo(
-                            faceX0 - ppk.get(i).get(0) * faceR / defaultRadius,
-                            faceY0 - ppk.get(i).get(2) * faceR / defaultRadius
-                        )
-                    } else {
-                        mPath.moveTo(
-                            faceX0 - ppk.get(i).get(0) * faceR / defaultRadius,
-                            faceY0 - ppk.get(i).get(2) * faceR / defaultRadius
-                        )
-                    }
-                    if (facePoints.get(i).get(2) == 1) {
-                        endpointF = true
-                    }
                 }
-                i++
+                if (facePoints[i][2] == 1) {
+                    endpointF = true
+                }
             }
+            i++
         }
     }
 }

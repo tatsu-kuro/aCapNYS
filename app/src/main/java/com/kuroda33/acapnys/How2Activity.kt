@@ -1,5 +1,6 @@
 package com.kuroda33.acapnys
 
+import com.kuroda33.acapnys.R
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.content.Intent

@@ -1,5 +1,6 @@
 package com.kuroda33.acapnys
 
+import com.kuroda33.acapnys.R
 import android.Manifest
 import android.content.ContentValues
 import android.content.Intent
@@ -594,7 +595,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         startTime = SystemClock.elapsedRealtimeNanos()
         csvBuffer.clear()
         csvBuffer.append("time,q0,q1,q2,q3\n")
-        csvBuffer.append("0,${viewBinding.myView.mnq0},${viewBinding.myView.mnq1},${viewBinding.myView.mnq2},${viewBinding.myView.mnq3}\n")
+        val baseQuat = viewBinding.myView.getCurrentQuat()
+        csvBuffer.append("0,${baseQuat[0]},${baseQuat[1]},${baseQuat[2]},${baseQuat[3]}\n")
 
         hideControlsForRecording()
         resetHead()

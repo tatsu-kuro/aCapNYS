@@ -1,5 +1,6 @@
 package com.kuroda33.acapnys
 
+import com.kuroda33.acapnys.R
 import android.content.ContentUris
 import android.content.Intent
 import android.graphics.Color
