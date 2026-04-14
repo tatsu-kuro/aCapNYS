@@ -33,7 +33,7 @@
         app:layout_constraintStart_toStartOf="@id/viewFinder"
         app:layout_constraintTop_toTopOf="@id/viewFinder" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/lastThumbnail"
         android:layout_width="70dp"
         android:layout_height="0dp"

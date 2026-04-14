@@ -2,6 +2,7 @@ package com.kuroda33.acapnys
 
 
 import android.content.Context
+import android.content.ContentUris
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -13,25 +14,34 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.widget.Button
+import android.provider.MediaStore
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.MediaController
 
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
+import java.io.BufferedReader
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStreamReader
 
 class PlayActivity : AppCompatActivity() {
+
+    private data class DataPoint(val timeMs: Long, val q0: Float, val q1: Float, val q2: Float, val q3: Float)
+
+    private val syncOffsetMs = 800L
 
 
 
     private lateinit var videoView: VideoView
     private lateinit var myView:MyView
-    private val dbHelper by lazy { DatabaseHelper(this) }
     //  private lateinit var timeTextView: TextView
     private val handler = Handler(Looper.getMainLooper())
+    private val data = mutableListOf<DataPoint>()
+    private var currentIndex = 0
+    private var sourceUriString = ""
     fun createImageFiles(directory: File, count: Int) {
         val paint = Paint().apply {
             color = Color.RED
@@ -56,138 +66,58 @@ class PlayActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_play)
-        val uri: Uri
-        //val path_temp = intent.getStringExtra("videouri")
-        val path = intent.getStringExtra("videouri")
-         val csvData = intent.getStringExtra("gyrodata")
-       // val path_temp = intent.getStringExtra("videouri")
-        //   val Path = path_temp!!.replace(".mp4","_crop.mp4")//crop.mp4を見るとき
-        //   val path = path_temp!!.replace(".mp4", "_overlay.mp4")//overlay.mp4を見るとき
-        //   cropVideo(path!!, cropPath!!)//成功、使う可能性はないができた
-      //  overlayVideos(path,cropPath,overlayPath)//成功
-
-        /////////////////////////
-        val dir=getOutputDirectory()
-        val directory = File(dir, "temp")
-        // temp フォルダが存在しない場合は作成
-        if (!directory.exists()) {
-            directory.mkdir()
-        }
-        //val directory = filesDir
-        val pngFile = String.format("%05d.png", 5)
-        val file = File(directory, pngFile)
-        Log.e("kkkkkkexist:", file.toString())
-        val imageView:ImageView=findViewById(R.id.imageView)
-        // 画像ファイルが存在する場合、ImageViewに表示
-        if (file.exists()) {
-            try {
-                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
-                if (bitmap != null) {
-                    imageView.setImageBitmap(bitmap)
-                } else {
-                    Log.e("kkkkkkkk", "Bitmap is null")
-                }
-            } catch (e: Exception) {
-                Log.e("kkkkkkkkk", "Error setting image resource", e)
-            }
-        } else {
-            Log.e("kkkkkkkkk", "File does not exist")
+        val uriString = intent.getStringExtra("videouri") ?: return
+        sourceUriString = uriString
+        val uri = Uri.parse(uriString)
+        val displayName = getDisplayName(uriString, uri)
+        if (displayName != null) {
+            loadCSVByName(displayName)
         }
 
-        val sendButton: Button = findViewById(R.id.sendBtton)
-        sendButton.setOnClickListener {
-         //   saveCanvasAsImage(this, 10)
-            for(r in 0..100) {
-                saveCanvasAsImage(this, r)
-            }
-            val videoUri=Uri.parse(path)
-            val shareIntent = Intent(Intent.ACTION_SEND)
-            shareIntent.type = "video/*"
-            shareIntent.putExtra(Intent.EXTRA_STREAM, videoUri)//Uri.fromFile(videoUri))
-         //   shareIntent.putExtra(Intent.EXTRA_SUBJECT, "動画を共有します")
-            //      intentMode=1
-            //      requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            startActivity(Intent.createChooser(shareIntent, "share"))
-        }
-
-
-        //var stringArray:Array<String> = stringData!!.split(",").toTypedArray()
-        val resolvedPath = resolvePlaybackUri(path)
-        val resolvedCsvData = resolveGyroData(path, csvData)
-        val arrayData = resolvedCsvData.split(",").toTypedArray()
-        val arrayCount = arrayData.size
-        Log.e("arrayData.count",arrayCount.toString())
-        uri = resolvedPath
+        val backButton: ImageButton = findViewById(R.id.btnBack)
+        backButton.setOnClickListener { finish() }
         videoView = findViewById(R.id.videoView)
         myView = findViewById(R.id.myView)
-        myView.playMode=true
-        //       timeTextView = findViewById(R.id.timeTextView)
+        myView.playMode = true
         val mediaController = MediaController(this)
         mediaController.setAnchorView(videoView)
         videoView.setMediaController(mediaController)
         videoView.setVideoURI(uri)
-        //    myView.setCamera(0)
-        if (arrayData.size > 2) {
-            val camstr = arrayData[1]
-            myView.cameraNum = camstr.substring(0, 3).toInt()
-            myView.gravityZ=camstr.substring(3,6).toInt()
-            //if(gravityz<0){
-            //    if(camNum==0)camNum=1
-            //    else camNum=0
-            // }
-            Log.e("camera_num", String.format("%3d,%d3",myView.cameraNum,myView.gravityZ))
-            myView.setCamera(myView.cameraNum)//0:front 1:back
 
-            val str03 = arrayData[0]
-            val str0 = str03.substring(0, 3)
-            val str1 = str03.substring(3, 6)
-            val str2 = str03.substring(6, 9)
-            val str3 = str03.substring(9, 12)
-            myView.cq0 = (str0.toFloat() - 128F) / 128F
-            myView.cq1 = (str1.toFloat() - 128F) / 128F
-            myView.cq2 = (str2.toFloat() - 128F) / 128F
-            myView.cq3 = (str3.toFloat() - 128F) / 128F
-        } else {
-            myView.alpha=1f
-//            myView.setCamera(0)//0:front
+        myView.alpha = 1f
+        if (data.isNotEmpty()) {
+            val first = data.first()
+            myView.setQuats(first.q0, first.q1, first.q2, first.q3)
+            myView.mnq0 = first.q0
+            myView.mnq1 = first.q1
+            myView.mnq2 = first.q2
+            myView.mnq3 = first.q3
         }
         myView.setRpkPpk()
-        videoView.start()
         val updateTimeRunnable = object : Runnable {
             override fun run() {
                 val videoCurrent=videoView.currentPosition
                 val videoDuration=videoView.duration
-                //    Log.e("Current",videoCurrent.toString())
-                //    Log.e("Duration",videoDuration.toString())
-                //    Log.e("arrayCount",arrayCount.toString())
-
                 handler.postDelayed(this, 33)
-                var current=0
-                if(videoDuration>0) {
-                    current = arrayCount * videoCurrent / videoDuration
-                }
-                if (arrayCount>1 && current < arrayCount){// && current>1) {//0: set cq0-3
-                    if(current<2)current=2
-                    val str03 = arrayData[current]
-                    val str0 = str03.substring(0, 3)
-                    val str1 = str03.substring(3, 6)
-                    val str2 = str03.substring(6, 9)
-                    val str3 = str03.substring(9, 12)
-                    val f0 = (str0.toFloat() - 128F) / 128F
-                    val f1 = (str1.toFloat() - 128F) / 128F
-                    val f2 = (str2.toFloat() - 128F) / 128F
-                    val f3 = (str3.toFloat() - 128F) / 128F
-                    myView.setQuats(f0, f1, f2, f3)//これはないとだめだが、数値は何でもかまわん、以下の4個が大事、わけわからんが出来た
-                    myView.mnq0=f0
-                    myView.mnq1=f1
-                    myView.mnq2=f2
-                    myView.mnq3=f3
+                if (data.isNotEmpty() && videoDuration > 0) {
+                    val targetTime = videoCurrent + syncOffsetMs
+                    while (currentIndex < data.lastIndex && data[currentIndex + 1].timeMs <= targetTime) {
+                        currentIndex++
+                    }
+                    val sample = data[currentIndex.coerceIn(0, data.lastIndex)]
+                    myView.setQuats(sample.q0, sample.q1, sample.q2, sample.q3)
+                    myView.mnq0 = sample.q0
+                    myView.mnq1 = sample.q1
+                    myView.mnq2 = sample.q2
+                    myView.mnq3 = sample.q3
                 }
             }
         }
 
         // 動画が再生されている間、経過時間を更新
         videoView.setOnPreparedListener {
+            videoView.start()
+            currentIndex = 0
             handler.post(updateTimeRunnable)
         }
 
@@ -198,83 +128,52 @@ class PlayActivity : AppCompatActivity() {
 
     }
 
-    private fun resolvePlaybackUri(path: String?): Uri {
-        if (path.isNullOrBlank()) return Uri.EMPTY
-        return try {
-            if (path.startsWith("content://")) {
-                copyContentUriToCache(Uri.parse(path))?.let { Uri.fromFile(it) } ?: Uri.parse(path)
-            } else {
-                Uri.parse(path)
-            }
-        } catch (e: Exception) {
-            Log.e("PLAY", "resolvePlaybackUri error=${e.message}")
-            Uri.parse(path)
-        }
-    }
+    private fun loadCSVByName(displayName: String) {
+        data.clear()
+        val csvName = displayName.removeSuffix(".mp4") + ".csv"
+        val projection = arrayOf(MediaStore.Files.FileColumns._ID)
+        val selection =
+            "${MediaStore.Files.FileColumns.DISPLAY_NAME}=? AND ${MediaStore.Files.FileColumns.RELATIVE_PATH} LIKE ?"
+        val selectionArgs = arrayOf(csvName, "%Documents/aCapNYS%")
+        val baseUri = MediaStore.Files.getContentUri("external")
 
-    private fun copyContentUriToCache(uri: Uri): File? {
-        return try {
-            val name = queryDisplayName(uri) ?: "playback_${System.currentTimeMillis()}.mp4"
-            val outFile = File(cacheDir, name)
-            contentResolver.openInputStream(uri)?.use { input ->
-                FileOutputStream(outFile).use { output ->
-                    input.copyTo(output)
+        contentResolver.query(baseUri, projection, selection, selectionArgs, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val id = cursor.getLong(0)
+                val csvUri = ContentUris.withAppendedId(baseUri, id)
+                contentResolver.openInputStream(csvUri)?.use { input ->
+                    val reader = BufferedReader(InputStreamReader(input))
+                    reader.readLine()
+                    reader.forEachLine { line ->
+                        val sp = line.split(",")
+                        if (sp.size >= 5) {
+                            data.add(
+                                DataPoint(
+                                    sp[0].toLongOrNull() ?: 0L,
+                                    sp[1].toFloatOrNull() ?: 0f,
+                                    sp[2].toFloatOrNull() ?: 0f,
+                                    sp[3].toFloatOrNull() ?: 0f,
+                                    sp[4].toFloatOrNull() ?: 0f
+                                )
+                            )
+                        }
+                    }
                 }
-            } ?: return null
-            outFile
-        } catch (e: Exception) {
-            Log.e("PLAY", "copyContentUriToCache error=${e.message}")
-            null
+            }
         }
+        Log.e("CSV_DEBUG", "size=${data.size}")
     }
 
-    private fun queryDisplayName(uri: Uri): String? {
-        return try {
-            val projection = arrayOf(android.provider.MediaStore.MediaColumns.DISPLAY_NAME)
+    private fun getDisplayName(source: String, uri: Uri): String? {
+        return if (source.startsWith("content://")) {
+            val projection = arrayOf(MediaStore.MediaColumns.DISPLAY_NAME)
             contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
-                val idx = cursor.getColumnIndexOrThrow(android.provider.MediaStore.MediaColumns.DISPLAY_NAME)
+                val idx = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
                 if (cursor.moveToFirst()) cursor.getString(idx) else null
             }
-        } catch (_: Exception) {
-            null
+        } else {
+            File(source).name
         }
-    }
-
-    private fun resolveGyroData(path: String?, csvData: String?): String {
-        if (!csvData.isNullOrBlank() && csvData != "null") return csvData
-
-        val key = when {
-            path.isNullOrBlank() -> ""
-            path.startsWith("content://") -> queryDisplayName(Uri.parse(path))?.removeSuffix(".mp4").orEmpty()
-            path.startsWith("file://") -> File(Uri.parse(path).path ?: path).nameWithoutExtension
-            else -> File(path).nameWithoutExtension
-        }
-        if (key.isBlank()) return ""
-
-        val db = dbHelper.readableDatabase
-        val cursor = db.query(
-            "headgyrodata",
-            arrayOf("data"),
-            "name = ?",
-            arrayOf(key),
-            null,
-            null,
-            null
-        )
-        cursor.use {
-            if (it.moveToFirst()) {
-                return it.getString(0)
-            }
-        }
-        return ""
-    }
-    //下記ではアプリ固有のexternal storage 外部ストレージが得られる。
-    //filesDirではアプリ固有のinternal storage
-    private fun getOutputDirectory(): File {
-        val mediaDir = externalMediaDirs.firstOrNull()?.let {
-            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
-        }
-        return if (mediaDir != null && mediaDir.exists()) mediaDir else filesDir
     }
     fun saveCanvasAsImage(context: Context, r:Int) {
         // 画像のサイズを指定
@@ -293,7 +192,7 @@ class PlayActivity : AppCompatActivity() {
            // 図形を描画（例として円を描画）
         canvas.drawCircle(width / 2f, height / 2f, r.toFloat()*3F, paint)
 
-        val dir=getOutputDirectory()
+        val dir = filesDir
         val directory = File(dir, "temp")
 
         // temp フォルダが存在しない場合は作成

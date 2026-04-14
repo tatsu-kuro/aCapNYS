@@ -25,16 +25,19 @@
         android:layout_marginStart="0dp"
         app:layout_constraintStart_toStartOf="@id/videoView"
         app:layout_constraintTop_toTopOf="@id/videoView" />
-    <Button
-        android:id="@+id/sendBtton"
-        android:layout_width="80dp"
-        android:layout_height="50dp"
-        android:paddingEnd="8dp"
-        android:paddingTop="8dp"
-        android:text="Share"
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
         android:background="@android:drawable/editbox_background_normal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:backgroundTint="@color/design_default_color_primary"
+        android:contentDescription="back"
+        android:padding="10dp"
+        android:src="@drawable/ic_left_triangle"
+        android:tint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageView
         android:id="@+id/imageView"

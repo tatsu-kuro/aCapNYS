@@ -94,10 +94,35 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         nq3 = 0.0f //現在のquaternion
     }
     fun resetHead() {
-        if (gravityZ == 1) {//screen up
+        val gravityZ = 2f * (nq0 * nq0 + nq3 * nq3) - 1f
+        var yaw = kotlin.math.atan2(
+            2f * (nq0 * nq3 + nq1 * nq2),
+            1f - 2f * (nq2 * nq2 + nq3 * nq3)
+        )
+
+        if (gravityZ <= 0) {
+            yaw += Math.PI.toFloat()
+            val half = yaw / 2f
+            cq0 = kotlin.math.cos(half)
+            cq1 = 0f
+            cq2 = 0f
+            cq3 = -kotlin.math.sin(half)
+        } else {
             cq0 = nq0
             cq3 = -nq3
         }
+    }
+
+    fun setReferenceQuat(q0: Float, q1: Float, q2: Float, q3: Float) {
+        nq0 = q0
+        nq1 = q1
+        nq2 = q2
+        nq3 = q3
+        resetHead()
+    }
+
+    fun getCurrentQuat(): FloatArray {
+        return floatArrayOf(nq0, nq1, nq2, nq3)
     }
     private fun multQuat(
         q0: Float,

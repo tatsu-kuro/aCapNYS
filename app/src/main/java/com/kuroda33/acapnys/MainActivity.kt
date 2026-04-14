@@ -5,6 +5,8 @@ import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.app.AlertDialog
+import android.content.ContentUris
+import android.content.ContentResolver
 import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Rect
@@ -24,12 +26,17 @@ import android.hardware.camera2.params.OutputConfiguration
 import android.hardware.camera2.params.SessionConfiguration
 import android.media.MediaMetadataRetriever
 import android.media.MediaRecorder
+import android.media.ThumbnailUtils
+import android.os.ParcelFileDescriptor
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
+import android.os.SystemClock
+import android.os.Looper
 import android.util.Size
 import android.view.Surface
+import android.view.MotionEvent
 import android.view.TextureView
 import android.view.View
 import android.view.WindowManager
@@ -39,7 +46,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import android.provider.MediaStore
 import com.kuroda33.acapnys.databinding.ActivityMainBinding
+import java.io.FileOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -57,8 +66,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private data class CameraChoice(val logicalId: String, val physicalId: String?)
 
-    private val _helper = DatabaseHelper(this)
-
     private lateinit var viewBinding: ActivityMainBinding
     private lateinit var cameraManager: CameraManager
     private lateinit var sensorManager: SensorManager
@@ -71,7 +78,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var cameraSession: CameraCaptureSession? = null
     private var mediaRecorder: MediaRecorder? = null
     private var requestBuilder: CaptureRequest.Builder? = null
-    private var recordingFile: File? = null
+    private var recordingUri: android.net.Uri? = null
+    private var recordingPfd: ParcelFileDescriptor? = null
     private var backCameraChoices: List<CameraChoice> = emptyList()
     private var backCameraIndex = 0
 
@@ -83,16 +91,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var backgroundHandler: Handler? = null
     private val uiHandler = Handler(android.os.Looper.getMainLooper())
 
-    private var lastVideoPath: String = ""
+    private var lastVideoUriString: String = ""
+    private var currentName: String = ""
+    private var startTime: Long = 0L
+    private val csvBuffer = StringBuilder()
     private var recordingFlag = false
     private var isRecording = false
     private var cameraToastRunnable: Runnable? = null
-
-    val gyroArrayList = ArrayList<String>()
+    private var requestReset = false
 
     private val REQUIRED_PERMISSIONS = arrayOf(
-        Manifest.permission.CAMERA,
-        Manifest.permission.RECORD_AUDIO
+        Manifest.permission.CAMERA
     )
 
     private val REQUEST_CODE_PERMISSIONS = 10
@@ -241,7 +250,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             ?: map.getOutputSizes(SurfaceTexture::class.java)
             ?: return Size(1280, 960)
         val fourThree = choices.filter { it.width * 3 == it.height * 4 }
-        return fourThree.maxByOrNull { it.width * it.height }
+        val capped = fourThree.filter { it.width <= 1280 && it.height <= 960 }
+        return capped.maxByOrNull { it.width * it.height }
+            ?: fourThree.firstOrNull { it.width == 1280 && it.height == 960 }
+            ?: fourThree.minByOrNull { it.width * it.height }
             ?: choices.maxByOrNull { it.width * it.height }
             ?: Size(1280, 960)
     }
@@ -400,25 +412,27 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun cleanupRecordingFailure() {
         isRecording = false
         recordingFlag = false
-        recordingFile = null
+        recordingUri = null
+        closeRecordingOutput()
         releaseMediaRecorder()
         showControlsAfterStop()
         createPreviewSession()
     }
 
     private fun prepareMediaRecorder(): MediaRecorder? {
-        val file = recordingFile ?: return null
+        val uri = recordingUri ?: return null
         releaseMediaRecorder()
+        closeRecordingOutput()
+        recordingPfd = contentResolver.openFileDescriptor(uri, "w")
+        val pfd = recordingPfd ?: return null
         mediaRecorder = MediaRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
             setVideoSource(MediaRecorder.VideoSource.SURFACE)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            setOutputFile(file.absolutePath)
-            setVideoEncodingBitRate(8_000_000)
+            setOutputFile(pfd.fileDescriptor)
+            setVideoEncodingBitRate(4_000_000)
             setVideoFrameRate(30)
             setVideoSize(videoSize.width, videoSize.height)
             setVideoEncoder(MediaRecorder.VideoEncoder.H264)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
             setOrientationHint(0)
             prepare()
         }
@@ -574,8 +588,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             return
         }
 
-        val fileName = SimpleDateFormat("yyyy-MMdd-HHmm-ss", Locale.US).format(System.currentTimeMillis()) + ".mp4"
-        recordingFile = File(getOutputDirectory(), fileName)
+        currentName = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(System.currentTimeMillis())
+        recordingUri = createVideoOutputUri("$currentName.mp4")
+        if (recordingUri == null) return
+        startTime = SystemClock.elapsedRealtimeNanos()
+        csvBuffer.clear()
+        csvBuffer.append("time,q0,q1,q2,q3\n")
+        csvBuffer.append("0,${viewBinding.myView.mnq0},${viewBinding.myView.mnq1},${viewBinding.myView.mnq2},${viewBinding.myView.mnq3}\n")
 
         hideControlsForRecording()
         resetHead()
@@ -586,7 +605,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private fun stopRecordingNow() {
         if (!recordingFlag && !isRecording) return
 
-        val savedFile = recordingFile
+        val savedUri = recordingUri
         recordingFlag = false
         isRecording = false
 
@@ -599,10 +618,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         try {
             mediaRecorder?.stop()
         } catch (_: Exception) {
-            savedFile?.delete()
+            savedUri?.let { contentResolver.delete(it, null, null) }
         }
 
         releaseMediaRecorder()
+        closeRecordingOutput()
 
         try {
             cameraSession?.close()
@@ -610,97 +630,145 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
         cameraSession = null
         requestBuilder = null
-        recordingFile = null
+        recordingUri = null
 
         showControlsAfterStop()
         createPreviewSession()
 
-        if (savedFile != null && savedFile.exists()) {
-            handleRecordedFile(savedFile)
+        if (savedUri != null) {
+            handleRecordedMedia(savedUri)
         }
     }
 
-    private fun handleRecordedFile(file: File) {
-        lastVideoPath = file.absolutePath
-        saveData(file.absolutePath, gyroArrayList.joinToString(","))
+    private fun handleRecordedMedia(uri: android.net.Uri) {
+        lastVideoUriString = uri.toString()
+        saveCSV(currentName)
+        markVideoFinished(uri)
+        updateThumbnail(uri, 0)
+    }
 
-        try {
-            val retriever = MediaMetadataRetriever()
-            retriever.setDataSource(file.absolutePath)
-            val bmp = retriever.getFrameAtTime(1_000_000)
-            if (bmp != null) viewBinding.lastThumbnail.setImageBitmap(bmp)
-            retriever.release()
-        } catch (_: Exception) {
-        }
+    private fun updateThumbnail(uri: android.net.Uri, attempt: Int) {
+        uiHandler.postDelayed({
+            try {
+                val retriever = MediaMetadataRetriever()
+                val bmp = try {
+                    retriever.setDataSource(this, uri)
+                    retriever.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST)
+                } finally {
+                    retriever.release()
+                }
+
+                if (bmp != null) {
+                    viewBinding.lastThumbnail.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+                    viewBinding.lastThumbnail.setPadding(0, 0, 0, 0)
+                    viewBinding.lastThumbnail.setImageBitmap(bmp)
+                } else if (attempt < 3) {
+                    updateThumbnail(uri, attempt + 1)
+                }
+            } catch (_: Exception) {
+                if (attempt < 3) {
+                    updateThumbnail(uri, attempt + 1)
+                }
+            }
+        }, if (attempt == 0) 150L else 250L)
     }
 
     private fun resetHead() {
         viewBinding.myView.resetHead()
     }
 
-    private fun getOutputDirectory(): File {
-        val mediaDir = externalMediaDirs.firstOrNull()?.let {
-            File(it, "aCapNYS").apply { mkdirs() }
-        }
-        return mediaDir ?: filesDir
+    private fun requestHeadReset() {
+        requestReset = true
     }
 
-    fun saveData(name: String, data: String) {
-        val db = _helper.writableDatabase
+    private fun createVideoOutputUri(displayName: String): android.net.Uri? {
         val values = ContentValues().apply {
-            put("name", name)
-            put("data", data)
+            put(MediaStore.Video.Media.DISPLAY_NAME, displayName)
+            put(MediaStore.Video.Media.MIME_TYPE, "video/mp4")
+            put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/aCapNYS")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.Video.Media.IS_PENDING, 1)
+            }
         }
-        db.insert("headgyrodata", null, values)
-        db.close()
+
+        return contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values)
     }
 
-    private var tempTime: Long = 0
+    private fun saveCSV(baseName: String) {
+        try {
+            val values = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, "$baseName.csv")
+                put(MediaStore.MediaColumns.MIME_TYPE, "text/csv")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, "Documents/aCapNYS")
+            }
+
+            val uri = contentResolver.insert(MediaStore.Files.getContentUri("external"), values)
+                ?: return
+
+            contentResolver.openOutputStream(uri)?.use { os ->
+                os.write(csvBuffer.toString().toByteArray())
+            }
+        } catch (_: Exception) {
+        }
+    }
+
+    private fun markVideoFinished(uri: android.net.Uri) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            try {
+                val values = ContentValues().apply {
+                    put(MediaStore.Video.Media.IS_PENDING, 0)
+                }
+                contentResolver.update(uri, values, null, null)
+            } catch (_: Exception) {
+            }
+        }
+    }
+
+    private fun closeRecordingOutput() {
+        try {
+            recordingPfd?.close()
+        } catch (_: Exception) {
+        } finally {
+            recordingPfd = null
+        }
+    }
+
     var resetHeadCount: Int = 0
-
-    fun gyroArrayAdd(n0: Float, n1: Float, n2: Float, n3: Float) {
-        val int0 = (128F * (n0 + 1.0F)).toInt()
-        val int1 = (128F * (n1 + 1.0F)).toInt()
-        val int2 = (128F * (n2 + 1.0F)).toInt()
-        val int3 = (128F * (n3 + 1.0F)).toInt()
-        val str = String.format("%03d%03d%03d%03d", int0, int1, int2, int3)
-        gyroArrayList.add(str)
-    }
 
     override fun onSensorChanged(event: SensorEvent) {
         when (event.sensor.type) {
             Sensor.TYPE_GAME_ROTATION_VECTOR, Sensor.TYPE_ROTATION_VECTOR -> {
-                val nq0 = event.values[3]
-                val nq1 = event.values[0]
-                val nq2 = event.values[1]
-                val nq3 = event.values[2]
-
-                val currentTime = System.currentTimeMillis()
+                val q = FloatArray(4)
+                SensorManager.getQuaternionFromVector(q, event.values)
 
                 if (resetHeadCount > 0) {
                     viewBinding.myView.resetHead()
                     resetHeadCount--
                 }
 
-                if (currentTime > tempTime + 30) {
-                    tempTime = currentTime
+                if (requestReset) {
+                    viewBinding.myView.setReferenceQuat(q[0], q[1], q[2], q[3])
+                    requestReset = false
+                }
 
-                    if (recordingFlag) {
-                        gyroArrayAdd(
-                            viewBinding.myView.mnq0,
-                            viewBinding.myView.mnq1,
-                            viewBinding.myView.mnq2,
-                            viewBinding.myView.mnq3
-                        )
-                    }
+                viewBinding.myView.setQuats(q[0], q[1], q[2], q[3])
 
-                    viewBinding.myView.setQuats(nq0, nq1, nq2, nq3)
+                if (startTime != 0L && recordingFlag) {
+                    val t = (event.timestamp - startTime) / 1_000_000
+                    csvBuffer.append("$t,${q[0]},${q[1]},${q[2]},${q[3]}\n")
                 }
             }
         }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (ev.action == MotionEvent.ACTION_UP) {
+            requestHeadReset()
+        }
+        return super.dispatchTouchEvent(ev)
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -739,6 +807,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         startCamera()
 
         viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
+        viewBinding.lastThumbnail.setOnClickListener {
+            val uriString = lastVideoUriString
+            if (uriString.isBlank()) return@setOnClickListener
+            startActivity(Intent(this, PlayActivity::class.java).apply {
+                putExtra("videouri", uriString)
+            })
+        }
         viewBinding.listButton.setOnClickListener { startActivity(Intent(this, ListActivity::class.java)) }
         viewBinding.helpButton.setOnClickListener { startActivity(Intent(this, How2Activity::class.java)) }
         viewBinding.cameraButton.setOnClickListener {
@@ -820,6 +895,5 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        _helper.close()
     }
 }
