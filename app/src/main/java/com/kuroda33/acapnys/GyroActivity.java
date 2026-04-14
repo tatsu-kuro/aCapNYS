@@ -13,7 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowInsets;
+import android.widget.ImageButton;
 import android.widget.Button;
 import android.widget.EditText;
 import java.io.IOException;
@@ -35,18 +35,10 @@ public class GyroActivity extends AppCompatActivity implements SensorEventListen
     private EditText ipe1,ipe2,ipe3,ipe4;
 
     Button ipSetBtn;
-    Button exitBtn;
+    ImageButton exitBtn;
 
 
-    private void setNavigationBar(){//わからない
-        View decor = getWindow().getDecorView();
-        // API 30以上の場合
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            decor.getWindowInsetsController().hide(WindowInsets.Type.systemBars());
-        } else {
-            // API 29以下の場合
-            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
+    private void setNavigationBar(){// no-op: keep system bars visible
     }
 
     @Override

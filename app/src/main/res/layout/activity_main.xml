@@ -8,73 +8,87 @@
     tools:context=".MainActivity"
     android:background="@color/white">
 
-    <androidx.camera.view.PreviewView
+    <TextureView
         android:id="@+id/viewFinder"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
+        app:layout_constraintDimensionRatio="W,4:3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:layout_editor_absoluteX="365dp"
         tools:layout_editor_absoluteY="0dp">
 
 
-    </androidx.camera.view.PreviewView>
+    </TextureView>
     <com.kuroda33.acapnys.MyView
         android:id="@+id/myView"
         android:layout_width="90dp"
         android:layout_height="90dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    <ListView
-        android:id="@+id/videoListView"
-        android:layout_width="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/gyroButton"
-        app:layout_constraintBottom_toTopOf="@+id/helpButton"
-        android:layout_height="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintStart_toStartOf="@id/viewFinder"
+        app:layout_constraintTop_toTopOf="@id/viewFinder" />
 
-        android:entries="@array/video_files"
+    <ImageView
+        android:id="@+id/lastThumbnail"
+        android:layout_width="70dp"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
+        android:background="@android:drawable/editbox_background_normal"
+        android:clipToOutline="true"
+        android:outlineProvider="background"
+        android:scaleType="centerCrop"
+        app:layout_constraintDimensionRatio="4:3"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/video_capture_button"
-        android:layout_marginEnd="4dp"
-        android:longClickable="true"/>
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/listButton"
+        android:layout_width="70dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:drawable/editbox_background_normal"
+        android:backgroundTint="@color/design_default_color_primary"
+        android:src="@android:drawable/ic_menu_sort_by_size"
+        app:tint="@android:color/white"
+        android:contentDescription="list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lastThumbnail" />
+
     <SeekBar
         android:id="@+id/zoomSeekBar"
         style="@style/Base.Theme.ACapNYS"
         android:layout_width="0dp"
-        android:layout_height="42dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="12dp"
-        android:thumbTint="@color/design_default_color_primary"
         android:background="#ccc"
         android:clickable="true"
         android:progressTint="@color/design_default_color_primary"
+        android:thumbTint="@color/design_default_color_primary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/zoomTextRight"
-        app:layout_constraintStart_toEndOf="@+id/zoomTextLeft" />
+        app:layout_constraintStart_toEndOf="@+id/zoomTextLeft"
+        app:layout_constraintEnd_toStartOf="@+id/zoomTextRight" />
 
     <Button
         android:id="@+id/video_capture_button"
-        android:layout_width="240dp"
-        android:layout_height="240dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:alpha="0.1"
 
-        android:text="@string/start_capture"
+        android:text="start_record"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/permission"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="40dp"
-        android:layout_marginBottom="40dp"
-        android:background="#fff"
-        android:focusableInTouchMode="false"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:text="@string/permissionText"
-        android:textColor="#000"
-        android:textSize="16sp" />
     <EditText
         android:id="@+id/zoomTextRight"
         android:layout_width="80dp"
@@ -85,14 +99,29 @@
         android:paddingLeft="0dp"
         android:background="@android:drawable/editbox_background_normal"
         android:textColor="@color/black"
-        android:text="zoom"
+        android:text="Focus"
         android:textSize="20sp"
         android:textAlignment="center"
         android:focusableInTouchMode="false"
-
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <SeekBar
+        android:id="@+id/focusSeekBar"
+        style="@style/Base.Theme.ACapNYS"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="12dp"
+        android:background="#ccc"
+        android:clickable="true"
+        android:progressTint="@color/design_default_color_primary"
+        android:thumbTint="@color/design_default_color_primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/zoomTextRight"
+        app:layout_constraintEnd_toStartOf="@+id/cameraButton" />
 
     <EditText
         android:id="@+id/zoomTextLeft"
@@ -100,40 +129,27 @@
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
-        android:text="zoom"
-        android:textSize="15sp"
+        android:text="Zoom"
+        android:textSize="20sp"
         android:textAlignment="center"
         android:focusableInTouchMode="false"
         android:background="@android:drawable/editbox_background_normal"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
-    <Button
-        android:id="@+id/gyroButton"
-        android:layout_width="80dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:paddingLeft="0dp"
-        android:paddingRight="0dp"
-        android:background="@android:drawable/editbox_background_normal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-
-        android:text="Gyro" />
-
     <ImageButton
         android:id="@+id/helpButton"
-        android:layout_width="80dp"
+        android:layout_width="70dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
         android:background="@android:drawable/editbox_background_normal"
         android:backgroundTint="@color/design_default_color_primary"
         android:contentDescription="NULL"
         android:src="@drawable/help"
         app:tint="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/cameraButton" />
+        app:layout_constraintBottom_toTopOf="@id/cameraButton"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageButton
         android:id="@+id/cameraButton"
@@ -148,4 +164,20 @@
         android:contentDescription="NULL"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/cameraToastText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:background="#AA000000"
+        android:paddingLeft="8dp"
+        android:paddingTop="4dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="4dp"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/cameraButton"
+        app:layout_constraintEnd_toEndOf="@id/cameraButton" />
 </androidx.constraintlayout.widget.ConstraintLayout>

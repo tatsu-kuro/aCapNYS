@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="#ffffff"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
 
         <EditText
@@ -636,14 +640,20 @@
             android:layout_weight="1"
             android:text="Button"
             android:visibility="invisible" />
-        <Button
-            android:id="@+id/exitButton"
-            android:background="@android:drawable/editbox_background_normal"
-
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:layout_weight="0.1"
-            android:text="Exit" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+
+    <ImageButton
+        android:id="@+id/exitButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:background="@android:drawable/editbox_background_normal"
+        android:backgroundTint="@color/design_default_color_primary"
+        android:contentDescription="back"
+        android:padding="10dp"
+        android:src="@drawable/ic_left_triangle"
+        android:tint="#FFFFFF" />
+
+</FrameLayout>

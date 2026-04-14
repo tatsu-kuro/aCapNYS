@@ -31,6 +31,12 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
     }
     private val paintFill: Paint = Paint()
     private val paintStroke: Paint = Paint()
+
+    init {
+        setBackgroundColor(Color.TRANSPARENT)
+        setLayerType(LAYER_TYPE_SOFTWARE, null)
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (initFlag) {
@@ -54,8 +60,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs){
         // 内部を白く塗りつぶすペイント
 
         mPath.reset()
-        if(cameraNum==0 && !playMode)canvas.drawARGB(255, 255, 255, 255)
-        else  canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
         canvas.drawCircle( (width / 2).toFloat(),(height / 2).toFloat(),(2*height / 5).toFloat(), paintFill)
         canvas.drawCircle( (width / 2).toFloat(),(height / 2).toFloat(),(2*height / 5).toFloat(), paintStroke)
         drawHead(width, height, 2*height / 5, mnq0, mnq1, mnq2, mnq3)

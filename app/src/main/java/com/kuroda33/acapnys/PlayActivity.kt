@@ -19,7 +19,6 @@ import android.widget.MediaController
 
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
-import com.arthenica.ffmpegkit.FFmpegKit
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -30,47 +29,9 @@ class PlayActivity : AppCompatActivity() {
 
     private lateinit var videoView: VideoView
     private lateinit var myView:MyView
+    private val dbHelper by lazy { DatabaseHelper(this) }
     //  private lateinit var timeTextView: TextView
     private val handler = Handler(Looper.getMainLooper())
-    fun cropVideo(inputFilePath: String, outputFilePath: String) {
-        val cropCommand = "-i $inputFilePath -vf crop=in_w/4:in_h/4:0:0 -c:a copy $outputFilePath"
-        FFmpegKit.execute(cropCommand).apply {
-            if (returnCode.isSuccess) {
-                println("command exe Cropping successful!")
-            } else {
-                println("command exe Cropping failed with state ${state} and rc ${returnCode}.")
-            }
-        }
-    }
-    /*
-    fun resizeVideo(inputPath: String, outputPath: String) {
-        // 元の解像度が1920x1080の場合、1/4のサイズに設定
-        val command = "-i $inputPath -vf scale=iw/10:ih/10 $outputPath"
-        FFmpegKit.executeAsync(command) { session ->
-            val returnCode = session.returnCode
-            if (returnCode.isSuccess) {
-                println("Command execution resize completed successfully.")
-            } else {
-                println("Command execution resixe failed with returnCode=$returnCode.")
-            }
-        }
-    }*/
-    fun overlayVideos(inputPath1: String, inputPath2: String, outputPath: String) {
-        val command = "-i $inputPath1 -i $inputPath2 -filter_complex \"overlay=x=(W-w)/2:y=0\" -c:a copy $outputPath"
-        FFmpegKit.executeAsync(command) { session ->
-            val returnCode = session.returnCode
-            val output = session.output
-            val logs = session.allLogsAsString
-            if (returnCode.isSuccess) {
-                println("Overlay completed successfully.")
-            } else {
-                println("Overlay failed with returnCode=$returnCode.")
-                println("Output: $output")
-                println("Logs: $logs")
-            }
-        }
-    }
-
     fun createImageFiles(directory: File, count: Int) {
         val paint = Paint().apply {
             color = Color.RED
@@ -86,39 +47,6 @@ class PlayActivity : AppCompatActivity() {
             val file = File(directory, "frame_$i.png")
             FileOutputStream(file).use { out ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-            }
-        }
-    }
-    fun deleteVideoFile(filePath: String) {
-         val file= File(filePath)
-        if (file.exists()){
-            // FFmpegコマンドを実行（例：動画の情報を取得）
-            val command = "-i $filePath -c copy -an output.mp4"
-            val session = FFmpegKit.execute(command)
-
-            if (session.returnCode.isSuccess) {
-                // FFmpegコマンドが成功した場合、ファイルを削除
-                val success = file.delete()
-                if (success) {
-                    println("deleteファイルが削除されました。")
-                } else {
-                    println("ファイルの削除に失敗しました。")
-                }
-            } else {
-                println("FFmpegコマンドの実行に失敗しました。")
-            }
-        } else {
-            println("ファイルが存在しません。")
-        }
-    }
-    fun createVideoFromImages(imageDirectory: File, outputPath: String) {
-        val command = "-framerate 30 -i ${imageDirectory.path}/frame_%d.png -c:v libx264 -pix_fmt yuv420p $outputPath"
-        FFmpegKit.executeAsync(command) { session ->
-            val returnCode = session.returnCode
-            if (returnCode.isSuccess) {
-                println("Command execution completed successfully.")
-            } else {
-                println("Command execution failed with returnCode=$returnCode.")
             }
         }
     }
@@ -184,10 +112,12 @@ class PlayActivity : AppCompatActivity() {
 
 
         //var stringArray:Array<String> = stringData!!.split(",").toTypedArray()
-        val arrayData = csvData.toString().split(",").toTypedArray()
+        val resolvedPath = resolvePlaybackUri(path)
+        val resolvedCsvData = resolveGyroData(path, csvData)
+        val arrayData = resolvedCsvData.split(",").toTypedArray()
         val arrayCount = arrayData.size
         Log.e("arrayData.count",arrayCount.toString())
-        uri = Uri.parse(path)
+        uri = resolvedPath
         videoView = findViewById(R.id.videoView)
         myView = findViewById(R.id.myView)
         myView.playMode=true
@@ -218,7 +148,7 @@ class PlayActivity : AppCompatActivity() {
             myView.cq2 = (str2.toFloat() - 128F) / 128F
             myView.cq3 = (str3.toFloat() - 128F) / 128F
         } else {
-            myView.alpha=0f
+            myView.alpha=1f
 //            myView.setCamera(0)//0:front
         }
         myView.setRpkPpk()
@@ -261,6 +191,82 @@ class PlayActivity : AppCompatActivity() {
             handler.post(updateTimeRunnable)
         }
 
+        videoView.setOnErrorListener { _, what, extra ->
+            Log.e("PLAY", "video error what=$what extra=$extra uri=$uri")
+            false
+        }
+
+    }
+
+    private fun resolvePlaybackUri(path: String?): Uri {
+        if (path.isNullOrBlank()) return Uri.EMPTY
+        return try {
+            if (path.startsWith("content://")) {
+                copyContentUriToCache(Uri.parse(path))?.let { Uri.fromFile(it) } ?: Uri.parse(path)
+            } else {
+                Uri.parse(path)
+            }
+        } catch (e: Exception) {
+            Log.e("PLAY", "resolvePlaybackUri error=${e.message}")
+            Uri.parse(path)
+        }
+    }
+
+    private fun copyContentUriToCache(uri: Uri): File? {
+        return try {
+            val name = queryDisplayName(uri) ?: "playback_${System.currentTimeMillis()}.mp4"
+            val outFile = File(cacheDir, name)
+            contentResolver.openInputStream(uri)?.use { input ->
+                FileOutputStream(outFile).use { output ->
+                    input.copyTo(output)
+                }
+            } ?: return null
+            outFile
+        } catch (e: Exception) {
+            Log.e("PLAY", "copyContentUriToCache error=${e.message}")
+            null
+        }
+    }
+
+    private fun queryDisplayName(uri: Uri): String? {
+        return try {
+            val projection = arrayOf(android.provider.MediaStore.MediaColumns.DISPLAY_NAME)
+            contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+                val idx = cursor.getColumnIndexOrThrow(android.provider.MediaStore.MediaColumns.DISPLAY_NAME)
+                if (cursor.moveToFirst()) cursor.getString(idx) else null
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun resolveGyroData(path: String?, csvData: String?): String {
+        if (!csvData.isNullOrBlank() && csvData != "null") return csvData
+
+        val key = when {
+            path.isNullOrBlank() -> ""
+            path.startsWith("content://") -> queryDisplayName(Uri.parse(path))?.removeSuffix(".mp4").orEmpty()
+            path.startsWith("file://") -> File(Uri.parse(path).path ?: path).nameWithoutExtension
+            else -> File(path).nameWithoutExtension
+        }
+        if (key.isBlank()) return ""
+
+        val db = dbHelper.readableDatabase
+        val cursor = db.query(
+            "headgyrodata",
+            arrayOf("data"),
+            "name = ?",
+            arrayOf(key),
+            null,
+            null,
+            null
+        )
+        cursor.use {
+            if (it.moveToFirst()) {
+                return it.getString(0)
+            }
+        }
+        return ""
     }
     //下記ではアプリ固有のexternal storage 外部ストレージが得られる。
     //filesDirではアプリ固有のinternal storage

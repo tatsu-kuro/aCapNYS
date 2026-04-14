@@ -2,6 +2,8 @@ package com.kuroda33.acapnys
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.content.Intent
+import android.widget.ImageButton
 import android.widget.TextView
 import java.util.Locale
 
@@ -15,6 +17,14 @@ class How2Activity : AppCompatActivity() {
             helpText.setText(R.string.large_text)
         }else{
             helpText.setText(R.string.eng_text)
+        }
+
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
+            finish()
+        }
+
+        findViewById<ImageButton>(R.id.btnGyro).setOnClickListener {
+            startActivity(Intent(this, GyroActivity::class.java))
         }
     }
 }
