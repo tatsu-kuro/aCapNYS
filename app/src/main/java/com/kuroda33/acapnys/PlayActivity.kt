@@ -42,6 +42,7 @@ class PlayActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private val data = mutableListOf<DataPoint>()
     private var currentIndex = 0
+    private var lastTime = 0L
     private var sourceUriString = ""
     fun createImageFiles(directory: File, count: Int) {
         val paint = Paint().apply {
@@ -88,38 +89,14 @@ class PlayActivity : AppCompatActivity() {
         myView.alpha = 1f
         if (data.isNotEmpty()) {
             val first = data.first()
-            myView.setQuats(first.q0, first.q1, first.q2, first.q3)
-            myView.mnq0 = first.q0
-            myView.mnq1 = first.q1
-            myView.mnq2 = first.q2
-            myView.mnq3 = first.q3
+            myView.setReferenceQuat(first.q0, first.q1, first.q2, first.q3)
         }
         myView.setRpkPpk()
-        val updateTimeRunnable = object : Runnable {
-            override fun run() {
-                val videoCurrent=videoView.currentPosition
-                val videoDuration=videoView.duration
-                handler.postDelayed(this, 33)
-                if (data.isNotEmpty() && videoDuration > 0) {
-                    val targetTime = videoCurrent + syncOffsetMs
-                    while (currentIndex < data.lastIndex && data[currentIndex + 1].timeMs <= targetTime) {
-                        currentIndex++
-                    }
-                    val sample = data[currentIndex.coerceIn(0, data.lastIndex)]
-                    myView.setQuats(sample.q0, sample.q1, sample.q2, sample.q3)
-                    myView.mnq0 = sample.q0
-                    myView.mnq1 = sample.q1
-                    myView.mnq2 = sample.q2
-                    myView.mnq3 = sample.q3
-                }
-            }
-        }
-
-        // 動画が再生されている間、経過時間を更新
         videoView.setOnPreparedListener {
             videoView.start()
             currentIndex = 0
-            handler.post(updateTimeRunnable)
+            lastTime = 0L
+            startSync()
         }
 
         videoView.setOnErrorListener { _, what, extra ->
@@ -175,6 +152,44 @@ class PlayActivity : AppCompatActivity() {
         } else {
             File(source).name
         }
+    }
+
+    private fun startSync() {
+        handler.post(object : Runnable {
+            override fun run() {
+                if (data.isEmpty()) {
+                    handler.postDelayed(this, 16)
+                    return
+                }
+
+                val t = videoView.currentPosition + syncOffsetMs
+                if (t < lastTime) {
+                    currentIndex = 0
+                }
+                lastTime = t
+
+                while (currentIndex + 1 < data.size && data[currentIndex + 1].timeMs <= t) {
+                    currentIndex++
+                }
+
+                val current = data[currentIndex]
+                val next = if (currentIndex + 1 < data.size) data[currentIndex + 1] else null
+
+                if (next == null || next.timeMs <= current.timeMs) {
+                    myView.setQuats(current.q0, current.q1, current.q2, current.q3)
+                } else {
+                    val alpha = ((t - current.timeMs).toFloat() / (next.timeMs - current.timeMs).toFloat())
+                        .coerceIn(0f, 1f)
+                    val q0 = current.q0 + (next.q0 - current.q0) * alpha
+                    val q1 = current.q1 + (next.q1 - current.q1) * alpha
+                    val q2 = current.q2 + (next.q2 - current.q2) * alpha
+                    val q3 = current.q3 + (next.q3 - current.q3) * alpha
+                    myView.setQuats(q0, q1, q2, q3)
+                }
+
+                handler.postDelayed(this, 16)
+            }
+        })
     }
     fun saveCanvasAsImage(context: Context, r:Int) {
         // 画像のサイズを指定

@@ -94,7 +94,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private var lastVideoUriString: String = ""
     private var currentName: String = ""
-    private var startTime: Long = 0L
+    private var startTimeMs: Long = 0L
+    private var startTimeNanos: Long = 0L
+    private val elapsedTimeRunnable = object : Runnable {
+        override fun run() {
+            if (!isRecording && !recordingFlag) return
+            val elapsedMs = SystemClock.elapsedRealtime() - startTimeMs
+            val minutes = (elapsedMs / 1000 / 60).toInt()
+            val seconds = ((elapsedMs / 1000) % 60).toInt()
+            viewBinding.elapsedTimeText.text = String.format(Locale.US, "%02d:%02d", minutes, seconds)
+            uiHandler.postDelayed(this, 250)
+        }
+    }
     private val csvBuffer = StringBuilder()
     private var recordingFlag = false
     private var isRecording = false
@@ -555,11 +566,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         viewBinding.helpButton.alpha = 0.35f
         viewBinding.cameraButton.isEnabled = false
         viewBinding.cameraButton.alpha = 0.35f
-        viewBinding.videoCaptureButton.isEnabled = true
-        viewBinding.videoCaptureButton.visibility = View.VISIBLE
-        viewBinding.videoCaptureButton.alpha = 0.08f
-        viewBinding.videoCaptureButton.text = "stop record"
+        viewBinding.zoomSeekBar.visibility = View.GONE
+        viewBinding.focusSeekBar.visibility = View.GONE
+        viewBinding.zoomText.visibility = View.GONE
+        viewBinding.focusText.visibility = View.GONE
+        viewBinding.recordButton.isEnabled = true
+        viewBinding.recordButton.visibility = View.VISIBLE
+        viewBinding.recordButton.alpha = 1f
+        viewBinding.recordButton.setImageResource(R.drawable.stop)
         viewBinding.viewFinder.visibility = View.VISIBLE
+        viewBinding.lastThumbnail.visibility = View.INVISIBLE
+        viewBinding.elapsedTimeText.visibility = View.VISIBLE
+        viewBinding.elapsedTimeText.bringToFront()
+        viewBinding.elapsedTimeText.text = "00:00"
     }
 
     private fun showControlsAfterStop() {
@@ -572,9 +591,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         viewBinding.helpButton.alpha = 1f
         viewBinding.cameraButton.isEnabled = true
         viewBinding.cameraButton.alpha = 1f
-        viewBinding.videoCaptureButton.visibility = View.VISIBLE
-        viewBinding.videoCaptureButton.alpha = 0.08f
-        viewBinding.videoCaptureButton.text = getString(R.string.start_capture)
+        viewBinding.zoomSeekBar.visibility = View.VISIBLE
+        viewBinding.focusSeekBar.visibility = View.VISIBLE
+        viewBinding.zoomText.visibility = View.VISIBLE
+        viewBinding.focusText.visibility = View.VISIBLE
+        viewBinding.recordButton.visibility = View.VISIBLE
+        viewBinding.recordButton.alpha = 1f
+        viewBinding.recordButton.setImageResource(R.drawable.record1)
+        viewBinding.lastThumbnail.visibility = View.VISIBLE
+        viewBinding.elapsedTimeText.visibility = View.GONE
 
         val params = window.attributes
         params.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
@@ -592,7 +617,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         currentName = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(System.currentTimeMillis())
         recordingUri = createVideoOutputUri("$currentName.mp4")
         if (recordingUri == null) return
-        startTime = SystemClock.elapsedRealtimeNanos()
+        startTimeMs = SystemClock.elapsedRealtime()
+        startTimeNanos = SystemClock.elapsedRealtimeNanos()
         csvBuffer.clear()
         csvBuffer.append("time,q0,q1,q2,q3\n")
         val baseQuat = viewBinding.myView.getCurrentQuat()
@@ -601,6 +627,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         hideControlsForRecording()
         resetHead()
         isRecording = true
+        uiHandler.post(elapsedTimeRunnable)
         createPreviewSession()
     }
 
@@ -610,6 +637,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val savedUri = recordingUri
         recordingFlag = false
         isRecording = false
+        uiHandler.removeCallbacks(elapsedTimeRunnable)
 
         try {
             cameraSession?.stopRepeating()
@@ -633,6 +661,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         cameraSession = null
         requestBuilder = null
         recordingUri = null
+        startTimeNanos = 0L
+        startTimeMs = 0L
 
         showControlsAfterStop()
         createPreviewSession()
@@ -755,8 +785,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                 viewBinding.myView.setQuats(q[0], q[1], q[2], q[3])
 
-                if (startTime != 0L && recordingFlag) {
-                    val t = (event.timestamp - startTime) / 1_000_000
+                if (startTimeNanos != 0L && recordingFlag) {
+                    val t = (event.timestamp - startTimeNanos) / 1_000_000
                     csvBuffer.append("$t,${q[0]},${q[1]},${q[2]},${q[3]}\n")
                 }
             }
@@ -808,7 +838,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         startCamera()
 
-        viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
+        viewBinding.recordButton.setOnClickListener { captureVideo() }
         viewBinding.lastThumbnail.setOnClickListener {
             val uriString = lastVideoUriString
             if (uriString.isBlank()) return@setOnClickListener

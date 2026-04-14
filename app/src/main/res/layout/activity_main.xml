@@ -46,6 +46,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/elapsedTimeText"
+        android:layout_width="70dp"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
+        android:gravity="center"
+        android:text="00:00"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:visibility="gone"
+        app:layout_constraintDimensionRatio="4:3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageButton
         android:id="@+id/listButton"
         android:layout_width="70dp"
@@ -73,24 +88,28 @@
         android:progressTint="@color/design_default_color_primary"
         android:thumbTint="@color/design_default_color_primary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/zoomTextLeft"
-        app:layout_constraintEnd_toStartOf="@+id/zoomTextRight" />
+        app:layout_constraintStart_toEndOf="@+id/zoomText"
+        app:layout_constraintEnd_toStartOf="@+id/focusText" />
 
-    <Button
-        android:id="@+id/video_capture_button"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:alpha="0.1"
-
-        android:text="start_record"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ImageButton
+        android:id="@+id/recordButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginEnd="8dp"
+        android:alpha="1.0"
+        android:background="@drawable/record_button_bg"
+        android:contentDescription="record"
+        android:padding="0dp"
+        android:src="@drawable/record1"
+        android:scaleType="fitXY"
+        app:tint="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/listButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@id/helpButton"
+        app:layout_constraintVertical_bias="0.5" />
 
     <EditText
-        android:id="@+id/zoomTextRight"
+        android:id="@+id/focusText"
         android:layout_width="80dp"
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
@@ -120,11 +139,11 @@
         android:progressTint="@color/design_default_color_primary"
         android:thumbTint="@color/design_default_color_primary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/zoomTextRight"
+        app:layout_constraintStart_toEndOf="@+id/focusText"
         app:layout_constraintEnd_toStartOf="@+id/cameraButton" />
 
     <EditText
-        android:id="@+id/zoomTextLeft"
+        android:id="@+id/zoomText"
         android:layout_width="80dp"
         android:layout_height="50dp"
         android:layout_marginStart="8dp"

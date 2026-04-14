@@ -158,6 +158,7 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
         tempnq1: Float,
         tempnq2: Float,
         tempnq3: Float,
+        invalidateView: Boolean = true,
     ) {
         nq0 = tempnq0
         nq1 = tempnq1
@@ -179,8 +180,9 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
         mnq1 = a2
         mnq2 = a3
         mnq3 = a1
-
-        invalidate()
+        if (invalidateView) {
+            invalidate()
+        }
     }
 
     var rpk12 = Array(600) { FloatArray(3) }
@@ -509,56 +511,143 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
         qOld2: Float,
         qOld3: Float
     ) {
+        if (playMode) {
+            val centerX = w / 2f
+            val centerY = h / 2f
+            val defaultRadius = 40f
+            val scale = faceR / defaultRadius
+            val uraPoint = faceR / 50f - 5f
+
+            for (i in 0 until facePoints.size) {
+                if (facePoints[i][0] == 1000) break
+                val x = ppk12[i][0]
+                val y = ppk12[i][1]
+                val z = ppk12[i][2]
+                RotateQu(i, x, y, z, qOld0, qOld1, qOld2, qOld3)
+            }
+
+            mPath.reset()
+
+            var startNewSegment = true
+            val flip = -1f
+
+            for (i in 0 until facePoints.size) {
+                if (facePoints[i][0] == 1000) break
+                val px = ppk[i][0]
+                val py = ppk[i][1]
+                val pz = ppk[i][2]
+                val screenX = centerX + flip * px * scale
+                val screenY = centerY + flip * pz * scale
+                val visible = py >= uraPoint
+
+                if (startNewSegment) {
+                    if (visible) {
+                        mPath.moveTo(screenX, screenY)
+                        startNewSegment = false
+                    }
+                } else {
+                    if (visible) {
+                        mPath.lineTo(screenX, screenY)
+                    } else {
+                        mPath.moveTo(screenX, screenY)
+                        startNewSegment = true
+                    }
+                }
+
+                if (facePoints[i][2] == 1) {
+                    startNewSegment = true
+                }
+            }
+            return
+        }
+
         val faceX0 = w / 2
         val faceY0 = h / 2 //center
         val defaultRadius = 40
         var i = 0
         while (facePoints[i][0] != 1000) {
-            RotateQu(
-                i,
-                ppk12[i][0],
-                ppk12[i][1],
-                ppk12[i][2],
-                qOld0,
-                qOld1,
-                qOld2,
-                qOld3
-            )
+            if (cameraNum == 1) {
+                RotateQu(
+                    i,
+                    ppk12[i][0],
+                    ppk12[i][1],
+                    ppk12[i][2],
+                    qOld0,
+                    qOld1,
+                    qOld2,
+                    qOld3
+                )
+            } else {
+                RotateQu(
+                    i,
+                    -ppk12[i][0],
+                    -ppk12[i][1],
+                    ppk12[i][2],
+                    qOld0,
+                    qOld1,
+                    qOld2,
+                    qOld3
+                )
+            }
             i++
         }
 
-        val uraPoint = faceR / 50.0f
-        var endpointF = true
-
-        i = 0
-        while (facePoints[i][0] != 1000) {
-            val px = ppk[i][0]
-            val py = ppk[i][1]
-            val pz = ppk[i][2]
-
-            if (endpointF) {
-                endpointF = py < uraPoint - 5
-                mPath.moveTo(
-                    faceX0 - px * faceR / defaultRadius,
-                    faceY0 - pz * faceR / defaultRadius
-                )
-            } else {
-                if (py > uraPoint - 5) {
-                    mPath.lineTo(
-                        faceX0 - px * faceR / defaultRadius,
-                        faceY0 - pz * faceR / defaultRadius
+        val uraPoint = faceR / 50.0f //この値の意味がよくわからなかった
+        var endpointF = true //終点でtrueとする
+        if (cameraNum == 0) { //iPhoneが >90||<-90 垂直以上に傾いた時
+            var j = 0
+            while (facePoints[j][0] != 1000) {
+                if (endpointF) { //始点に移動する
+                    endpointF = ppk[j][1] < uraPoint - 5
+                    mPath.moveTo(
+                        faceX0 + ppk[j][0] * faceR / defaultRadius,
+                        faceY0 + ppk[j][2] * faceR / defaultRadius
                     )
                 } else {
-                    mPath.moveTo(
-                        faceX0 - px * faceR / defaultRadius,
-                        faceY0 - pz * faceR / defaultRadius
-                    )
+                    if (ppk[j][1] >= uraPoint - 5) {
+                        mPath.lineTo(
+                            faceX0 + ppk[j][0] * faceR / defaultRadius,
+                            faceY0 + ppk[j][2] * faceR / defaultRadius
+                        )
+                    } else {
+                        mPath.moveTo(
+                            faceX0 + ppk[j][0] * faceR / defaultRadius,
+                            faceY0 + ppk[j][2] * faceR / defaultRadius
+                        )
+                    }
+                    if (facePoints[j][2] == 1) {
+                        endpointF = true
+                    }
                 }
-                if (facePoints[i][2] == 1) {
-                    endpointF = true
-                }
+                j++
             }
-            i++
+        } else { //iPhoneが-90~+90の時
+            var j = 0
+            while (facePoints[j][0] != 1000) {
+                if (endpointF) { //始点に移動する
+                    endpointF = ppk[j][1] < uraPoint - 5
+                    mPath.moveTo(
+                        faceX0 - ppk[j][0] * faceR / defaultRadius,
+                        faceY0 - ppk[j][2] * faceR / defaultRadius
+                    )
+                } else {
+                    if (ppk[j][1] > uraPoint - 5) {
+                        mPath.lineTo(
+                            faceX0 - ppk[j][0] * faceR / defaultRadius,
+                            faceY0 - ppk[j][2] * faceR / defaultRadius
+                        )
+                    } else {
+                        mPath.moveTo(
+                            faceX0 - ppk[j][0] * faceR / defaultRadius,
+                            faceY0 - ppk[j][2] * faceR / defaultRadius
+                        )
+                    }
+                    if (facePoints[j][2] == 1) {
+                        endpointF = true
+                    }
+                }
+                j++
+            }
         }
     }
 }
