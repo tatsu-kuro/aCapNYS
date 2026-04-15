@@ -18,6 +18,7 @@ import kotlin.math.sqrt
 class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
     var playMode: Boolean = false
+    var exportMode: Boolean = false
 
     private var mPaint: Paint = Paint() //画?
     // private var mPaint2: Paint = Paint()
@@ -62,18 +63,20 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
         mPath.reset()
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        canvas.drawCircle(
-            (width / 2).toFloat(),
-            (height / 2).toFloat(),
-            (2 * height / 5).toFloat(),
-            paintFill
-        )
-        canvas.drawCircle(
-            (width / 2).toFloat(),
-            (height / 2).toFloat(),
-            (2 * height / 5).toFloat(),
-            paintStroke
-        )
+        if (!exportMode) {
+            canvas.drawCircle(
+                (width / 2).toFloat(),
+                (height / 2).toFloat(),
+                (2 * height / 5).toFloat(),
+                paintFill
+            )
+            canvas.drawCircle(
+                (width / 2).toFloat(),
+                (height / 2).toFloat(),
+                (2 * height / 5).toFloat(),
+                paintStroke
+            )
+        }
         drawHead(width, height, 2 * height / 5, mnq0, mnq1, mnq2, mnq3)
         canvas.drawPath(mPath, mPaint)
     }
@@ -523,13 +526,17 @@ class MyView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
                 val x = ppk12[i][0]
                 val y = ppk12[i][1]
                 val z = ppk12[i][2]
-                RotateQu(i, x, y, z, qOld0, qOld1, qOld2, qOld3)
+                if (exportMode) {
+                    RotateQu(i, -x, -y, z, qOld0, qOld1, qOld2, qOld3)
+                } else {
+                    RotateQu(i, x, y, z, qOld0, qOld1, qOld2, qOld3)
+                }
             }
 
             mPath.reset()
 
             var startNewSegment = true
-            val flip = -1f
+            val flip = if (exportMode) 1f else -1f
 
             for (i in 0 until facePoints.size) {
                 if (facePoints[i][0] == 1000) break

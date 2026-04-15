@@ -906,8 +906,20 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         if (this::viewBinding.isInitialized && allPermissionsGranted()) {
             startCamera()
         }
+        refreshLastVideoFromPrefs()
         gravitySensor?.also { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_FASTEST) }
         rotationVectorSensor?.also { sensorManager.registerListener(this, it, SensorManager.SENSOR_DELAY_FASTEST) }
+    }
+
+    private fun refreshLastVideoFromPrefs() {
+        val saved = getSharedPreferences("app_prefs", MODE_PRIVATE).getString("last_video", null) ?: return
+        if (saved == lastVideoUriString) return
+        lastVideoUriString = saved
+        try {
+            val uri = android.net.Uri.parse(saved)
+            updateThumbnail(uri, 0)
+        } catch (_: Exception) {
+        }
     }
 
     override fun onPause() {

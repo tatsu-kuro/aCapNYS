@@ -21,6 +21,14 @@ import java.util.Locale
 
 class ListActivity : AppCompatActivity() {
 
+    private data class VideoItem(
+        val uri: Uri,
+        val dateMs: Long,
+        val recordedMs: Long,
+        val durationMs: Long,
+        val name: String
+    )
+
     private val displayList = mutableListOf<String>()
     private val uriList = mutableListOf<Uri>()
     private lateinit var listView: ListView
@@ -106,21 +114,27 @@ class ListActivity : AppCompatActivity() {
         )
 
         val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
-        val items = mutableListOf<Triple<Uri, Long, Long>>()
+        val items = mutableListOf<VideoItem>()
         cursor?.use {
             val idCol = it.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
             val dateCol = it.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
             val durCol = it.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
+            val nameCol = it.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
             while (it.moveToNext()) {
                 val id = it.getLong(idCol)
                 val uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
-                items.add(Triple(uri, it.getLong(dateCol) * 1000L, it.getLong(durCol)))
+                val name = it.getString(nameCol)
+                val recordedMs = parseRecordedTimeFromName(name) ?: it.getLong(dateCol) * 1000L
+                items.add(VideoItem(uri, it.getLong(dateCol) * 1000L, recordedMs, it.getLong(durCol), name))
             }
         }
 
-        items.sortedByDescending { it.second }.forEachIndexed { index, item ->
-            uriList.add(item.first)
-            displayList.add("(${items.size - index}) ${sdf.format(Date(item.second))} ${formatDuration(item.third)}")
+        items.sortedByDescending { it.recordedMs }.forEachIndexed { index, item ->
+            uriList.add(item.uri)
+            val mergedTag = if (item.name.contains("_merged", ignoreCase = true)) " [merged]" else ""
+            val recordedTime = formatRecordedTimeFromName(item.name)
+                ?: sdf.format(Date(item.recordedMs))
+            displayList.add("(${items.size - index}) $recordedTime ${formatDuration(item.durationMs)}$mergedTag")
         }
 
         adapter.notifyDataSetChanged()
@@ -183,6 +197,26 @@ class ListActivity : AppCompatActivity() {
             String.format("[%02d:%02d:%02d]", hour, min, sec)
         } else {
             String.format("[%02d:%02d]", min, sec)
+        }
+    }
+
+    private fun formatRecordedTimeFromName(name: String): String? {
+        val stem = name.removeSuffix("_merged").removeSuffix(".mp4")
+        return try {
+            val parsed = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).parse(stem)
+                ?: return null
+            SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault()).format(parsed)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun parseRecordedTimeFromName(name: String): Long? {
+        val stem = name.removeSuffix("_merged").removeSuffix(".mp4")
+        return try {
+            SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).parse(stem)?.time
+        } catch (_: Exception) {
+            null
         }
     }
 }
