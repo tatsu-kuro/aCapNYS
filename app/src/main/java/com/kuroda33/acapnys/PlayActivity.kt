@@ -35,7 +35,7 @@ import kotlin.concurrent.thread
 
 class PlayActivity : AppCompatActivity() {
 
-    private val syncOffsetMs = 0L
+    private val syncOffsetMs = 900L
 
 
 

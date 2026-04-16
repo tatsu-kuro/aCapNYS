@@ -11,6 +11,7 @@ internal class GyroOverlayFilter(
     private val data: List<DataPoint>,
     private val durationMs: Long,
     private val syncOffsetMs: Long,
+    private val sourceFps: Float,
     overlaySizePx: Int,
     private val onProgress: (Float) -> Unit = {}
 ) : GlOverlayFilter() {
@@ -37,7 +38,8 @@ internal class GyroOverlayFilter(
 
     override fun drawCanvas(canvas: Canvas) {
         val frameIndex = currentFrame.getAndIncrement()
-        val timeMs = (((frameIndex * 1000L) / 30L) + syncOffsetMs).coerceAtMost(durationMs)
+        val fps = if (sourceFps > 0f) sourceFps else 30f
+        val timeMs = (((frameIndex * 1000f) / fps).toLong() + syncOffsetMs).coerceAtMost(durationMs)
         val point = sampleAtTime(data, timeMs)
         overlayView.setQuats(point.q0, point.q1, point.q2, point.q3, invalidateView = false)
         val dx = 0f

@@ -36,7 +36,7 @@
         android:padding="10dp"
         android:src="@drawable/ic_left_triangle"
         android:tint="#FFFFFF"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageButton

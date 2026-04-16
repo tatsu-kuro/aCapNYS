@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:focusable="false"
             android:focusableInTouchMode="false"
-            android:text="Send motion data via WiFi"
+            android:text="Send motion data via WiFi to CapNYS( Windows)"
             android:textColor="@color/black"
             android:textAlignment="center" />
     </LinearLayout>
@@ -267,9 +267,9 @@
             android:text="+"
             android:textAlignment="center" />
 
-        <Button
+    <Button
             android:id="@+id/stopButton"
-            android:background="@android:drawable/editbox_background_normal"
+            android:background="@drawable/bg_back_circle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
@@ -649,7 +649,7 @@
         android:layout_height="48dp"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:background="@android:drawable/editbox_background_normal"
+        android:background="@drawable/bg_back_circle"
         android:backgroundTint="@color/design_default_color_primary"
         android:contentDescription="back"
         android:padding="10dp"

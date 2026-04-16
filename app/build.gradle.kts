@@ -5,13 +5,13 @@ plugins {
 
 android {
     namespace = "com.kuroda33.acapnys"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.kuroda33.acapnys"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 42
+        targetSdk = 35
+        versionCode = 45
         versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

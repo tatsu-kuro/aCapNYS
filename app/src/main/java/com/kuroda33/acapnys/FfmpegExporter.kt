@@ -14,7 +14,7 @@ import java.io.FileOutputStream
 
 class FfmpegExporter(private val context: Context) {
 
-    private val syncOffsetMs = 0L
+    private val syncOffsetMs = 900L
 
     fun export(
         sourceUriString: String,
@@ -26,6 +26,7 @@ class FfmpegExporter(private val context: Context) {
         try {
             val sourceFile = resolveSourceFile(sourceUriString)
             val durationMs = getDurationMs(sourceFile)
+            val sourceFps = getVideoFps(sourceFile, durationMs)
             if (durationMs <= 0L) throw IllegalStateException("video duration is invalid")
 
             val workDir = File(context.cacheDir, "video_export")
@@ -39,6 +40,7 @@ class FfmpegExporter(private val context: Context) {
                 data,
                 durationMs,
                 syncOffsetMs,
+                sourceFps,
                 0,
                 onProgress
             )
@@ -99,6 +101,26 @@ class FfmpegExporter(private val context: Context) {
             retriever.setDataSource(file.absolutePath)
             return retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                 ?.toLongOrNull() ?: 0L
+        } finally {
+            retriever.release()
+        }
+    }
+
+    private fun getVideoFps(file: File, durationMs: Long): Float {
+        val retriever = MediaMetadataRetriever()
+        return try {
+            retriever.setDataSource(file.absolutePath)
+            val frameCount = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT)
+                ?.toFloatOrNull()
+            val capturedFps = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CAPTURE_FRAMERATE)
+                ?.toFloatOrNull()
+            when {
+                frameCount != null && durationMs > 0L -> frameCount / (durationMs / 1000f)
+                capturedFps != null && capturedFps > 0f -> capturedFps
+                else -> 30f
+            }
+        } catch (_: Exception) {
+            30f
         } finally {
             retriever.release()
         }
