@@ -14,7 +14,7 @@ import java.io.FileOutputStream
 
 class FfmpegExporter(private val context: Context) {
 
-    private val syncOffsetMs = 900L
+    private val syncOffsetMs = 300L
 
     fun export(
         sourceUriString: String,

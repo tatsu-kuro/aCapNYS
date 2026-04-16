@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         private const val PREFS_NAME = "aCapNYS2_camera_prefs"
         private const val KEY_FOCUS_PROGRESS = "focus_progress"
         private const val KEY_ZOOM_PROGRESS = "zoom_progress"
+        private const val KEY_LAST_RECORDED_VIDEO = "last_recorded_video"
         private const val FAR_FOCUS_METERS = 0.3f
         private const val ZOOM_RANGE_FRACTION = 1f / 5f
     }
@@ -380,7 +381,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                                 session.setRepeatingRequest(builder.build(), null, backgroundHandler)
                                 if (isRecording) {
                                     mediaRecorder?.start()
-                                    recordingFlag = true
+                                    startRecordingCapture()
                                 }
                             } catch (_: Exception) {
                                 if (isRecording) cleanupRecordingFailure()
@@ -405,7 +406,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                             session.setRepeatingRequest(builder.build(), null, backgroundHandler)
                             if (isRecording) {
                                 mediaRecorder?.start()
-                                recordingFlag = true
+                                startRecordingCapture()
                             }
                         } catch (_: Exception) {
                             if (isRecording) cleanupRecordingFailure()
@@ -617,18 +618,22 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         currentName = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(System.currentTimeMillis())
         recordingUri = createVideoOutputUri("$currentName.mp4")
         if (recordingUri == null) return
+
+        hideControlsForRecording()
+        resetHead()
+        isRecording = true
+        createPreviewSession()
+    }
+
+    private fun startRecordingCapture() {
         startTimeMs = SystemClock.elapsedRealtime()
         startTimeNanos = SystemClock.elapsedRealtimeNanos()
         csvBuffer.clear()
         csvBuffer.append("time,q0,q1,q2,q3\n")
         val baseQuat = viewBinding.myView.getCurrentQuat()
         csvBuffer.append("0,${baseQuat[0]},${baseQuat[1]},${baseQuat[2]},${baseQuat[3]}\n")
-
-        hideControlsForRecording()
-        resetHead()
-        isRecording = true
+        recordingFlag = true
         uiHandler.post(elapsedTimeRunnable)
-        createPreviewSession()
     }
 
     private fun stopRecordingNow() {
@@ -674,6 +679,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private fun handleRecordedMedia(uri: android.net.Uri) {
         lastVideoUriString = uri.toString()
+        getSharedPreferences("app_prefs", MODE_PRIVATE)
+            .edit()
+            .putString(KEY_LAST_RECORDED_VIDEO, uri.toString())
+            .putString("last_video", uri.toString())
+            .apply()
         saveCSV(currentName)
         markVideoFinished(uri)
         updateThumbnail(uri, 0)
@@ -912,7 +922,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun refreshLastVideoFromPrefs() {
-        val saved = getSharedPreferences("app_prefs", MODE_PRIVATE).getString("last_video", null) ?: return
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        val saved = prefs.getString("last_video", null)
+            ?: prefs.getString(KEY_LAST_RECORDED_VIDEO, null)
+            ?: return
         if (saved == lastVideoUriString) return
         lastVideoUriString = saved
         try {

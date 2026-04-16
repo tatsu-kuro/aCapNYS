@@ -35,7 +35,7 @@ import kotlin.concurrent.thread
 
 class PlayActivity : AppCompatActivity() {
 
-    private val syncOffsetMs = 900L
+    private val syncOffsetMs = 300L
 
 
 
@@ -217,10 +217,13 @@ class PlayActivity : AppCompatActivity() {
                         Toast.makeText(this, "Completed", Toast.LENGTH_SHORT).show()
                         finish()
                     }
-                    getSharedPreferences("app_prefs", MODE_PRIVATE)
-                        .edit()
-                        .putString("last_video", savedUri.toString())
-                        .apply()
+                    val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                    val lastRecorded = prefs.getString("last_recorded_video", null)
+                    if (originalUri?.toString() == lastRecorded) {
+                        prefs.edit()
+                            .putString("last_video", savedUri.toString())
+                            .apply()
+                    }
                     exporter.deleteSourceMedia(originalUri)
                 },
                 onError = { message ->
